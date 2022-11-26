@@ -29,23 +29,38 @@ router.get('/', async (request: Request, response: Response) => {
 	try {
 		const getAllTicketCategory = await prisma.ticketCategory.findMany()
 
-		const groupBy = <T>(
-			array: T[],
-			predicate: (value: T, index: number, array: T[]) => string
-		) =>
-			array.reduce((acc, value, index, array) => {
-				;(acc[predicate(value, index, array)] ||= []).push(value)
-				return acc
-			}, {} as { [key: string]: T[] })
+		const addedResponse = (processedData: any, label: any) =>
+			processedData.filter((d: any) => d.label === label)
 
-		const grouped = groupBy(
-			getAllTicketCategory,
-			(category: any) => category.name
-		)
+		const processBankResponse = (data: any) => {
+			const processedData = []
+			for (let d of data) {
+				const temp = addedResponse(processedData, d.name)
+				if (!!temp.length) {
+					temp[0].options.push({
+						id: d.id,
+						label: d.name,
+						value: d.childrenName,
+					})
+				} else {
+					processedData.push({
+						label: d.name,
+						options: [
+							{
+								id: d.id,
+								label: d.name,
+								value: d.childrenName,
+							},
+						],
+					})
+				}
+			}
+			return processedData
+		}
 
 		return response.status(200).json({
 			message: 'Ticket category found',
-			body: grouped,
+			body: processBankResponse(getAllTicketCategory),
 			error: false,
 		})
 	} catch (err) {
