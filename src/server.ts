@@ -8,6 +8,7 @@ import equipamentController from './controllers/EquipamentController'
 import ticketCategoryController from './controllers/TicketCategory'
 import ticketPriorityController from './controllers/TicketPriority'
 import ticketTypeController from './controllers/TicketTypeController'
+import locationController from './controllers/LocationController'
 
 const app = express()
 
@@ -36,6 +37,7 @@ app.use('/ticket', ticketController)
 app.use('/ticket-category', ticketCategoryController)
 app.use('/ticket-priority', ticketPriorityController)
 app.use('/ticket-type', ticketTypeController)
+app.use('/location', locationController)
 app.use('/equipament', equipamentController)
 
 app.get('/', (req, res) => {

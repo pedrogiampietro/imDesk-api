@@ -5,8 +5,20 @@ const prisma = new PrismaClient()
 const router = express.Router()
 
 router.post('/', async (request, response) => {
+	const {
+		description,
+		ticketType,
+		ticketCategory,
+		ticketPriority,
+		ticketLocation,
+	} = request.body
+
 	try {
-		const createTicket = {}
+		const createTicket = await prisma.ticket.create({
+			data: {
+				title: 'mas vai sair',
+			},
+		})
 
 		return response.status(200).json({})
 	} catch (err) {
