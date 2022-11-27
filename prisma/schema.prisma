@@ -87,6 +87,7 @@ model TicketCategory {
   id           String   @id @default(uuid())
   name         String
   childrenName String
+  defaultText  String?
   Ticket       Ticket[]
 }
 

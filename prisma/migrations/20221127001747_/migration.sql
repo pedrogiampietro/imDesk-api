@@ -17,7 +17,6 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Ticket" (
     "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "createdBy" TEXT NOT NULL,
     "ticketType" TEXT NOT NULL,
@@ -28,11 +27,11 @@ CREATE TABLE "Ticket" (
     "equipaments" TEXT[],
     "images" TEXT[],
     "assignedToAt" TIMESTAMP(3),
-    "closedBy" TEXT NOT NULL,
+    "closedBy" TEXT,
     "closedAt" TIMESTAMP(3),
-    "status" TEXT NOT NULL,
+    "status" TEXT,
     "timeEstimate" TIMESTAMP(3),
-    "isDelay" BOOLEAN NOT NULL DEFAULT false,
+    "isDelay" BOOLEAN DEFAULT false,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -80,6 +79,8 @@ CREATE TABLE "TicketPriority" (
 CREATE TABLE "TicketCategory" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "childrenName" TEXT NOT NULL,
+    "defaultText" TEXT,
 
     CONSTRAINT "TicketCategory_pkey" PRIMARY KEY ("id")
 );
@@ -107,6 +108,18 @@ CREATE UNIQUE INDEX "RefreshToken_id_key" ON "RefreshToken"("id");
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ticketType_fkey" FOREIGN KEY ("ticketType") REFERENCES "TicketType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ticketCategory_fkey" FOREIGN KEY ("ticketCategory") REFERENCES "TicketCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ticketPriority_fkey" FOREIGN KEY ("ticketPriority") REFERENCES "TicketPriority"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ticketLocation_fkey" FOREIGN KEY ("ticketLocation") REFERENCES "Locations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Equipaments" ADD CONSTRAINT "Equipaments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
