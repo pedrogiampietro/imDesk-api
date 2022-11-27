@@ -27,7 +27,6 @@ model User {
 model Ticket {
   id             String    @id @default(uuid())
   description    String
-  createdBy      String
   ticketType     String
   ticketCategory String
   ticketPriority String
@@ -41,17 +40,16 @@ model Ticket {
   status         String?
   timeEstimate   DateTime?
   isDelay        Boolean?  @default(false)
-
-  userId String
+  userId         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  author           User           @relation(fields: [userId], references: [id])
   ticketTypeId     TicketType     @relation(fields: [ticketType], references: [id])
   ticketCategoryId TicketCategory @relation(fields: [ticketCategory], references: [id])
   ticketPriorityId TicketPriority @relation(fields: [ticketPriority], references: [id])
   ticketLocationId Locations      @relation(fields: [ticketLocation], references: [id])
+  User             User?          @relation(fields: [userId], references: [id])
 }
 
 model Equipaments {
