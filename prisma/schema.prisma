@@ -89,6 +89,21 @@ model TicketCategory {
   Ticket       Ticket[]
 }
 
+model Maintenance {
+  id                     String    @id @default(uuid())
+  name                   String
+  location               String
+  serialNumber           String
+  patrimony              String
+  model                  String
+  preventiveCount        Int?
+  correctiveCount        Int?
+  nextDatePreventive     DateTime?
+  previousDatePreventive DateTime?
+  description            String?
+  createdAt              DateTime  @default(now())
+}
+
 model RefreshToken {
   id          String   @id @unique @default(uuid())
   hashedToken String

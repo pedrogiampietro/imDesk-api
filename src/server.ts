@@ -9,6 +9,7 @@ import ticketCategoryController from './controllers/TicketCategory'
 import ticketPriorityController from './controllers/TicketPriority'
 import ticketTypeController from './controllers/TicketTypeController'
 import locationController from './controllers/LocationController'
+import maintenanceController from './controllers/MaintenanceController'
 
 const app = express()
 
@@ -39,6 +40,7 @@ app.use('/ticket-priority', ticketPriorityController)
 app.use('/ticket-type', ticketTypeController)
 app.use('/location', locationController)
 app.use('/equipament', equipamentController)
+app.use('/maintenance', maintenanceController)
 
 app.get('/', (req, res) => {
 	return res.json({ status: 'OK', data: new Date().toLocaleString() })
