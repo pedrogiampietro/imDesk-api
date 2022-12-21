@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
-import dayjs, { Dayjs, UnitType } from 'dayjs'
+import dayjs from 'dayjs'
 
 const prisma = new PrismaClient()
 const router = express.Router()
