@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
-import moment from 'moment'
+import dayjs, { Dayjs, UnitType } from 'dayjs'
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -12,6 +12,11 @@ interface IRequestCreateMaintenanceBody {
 	patrimony: string
 	model: string
 	nextDatePreventive: string
+}
+
+const addDays = (days: number, custom_date?: any) => {
+	const date = custom_date ? dayjs(custom_date) : dayjs()
+	return date.add(days, 'days').toDate()
 }
 
 router.post('/', async (request: Request, response: Response) => {
@@ -73,6 +78,10 @@ router.get('/', async (request: Request, response: Response) => {
 router.patch('/', async (request: Request, response: Response) => {
 	const { id, description } = request.body as any
 
+	const date = new Date()
+
+	const newDate = date.setDate(date.getDate() + 90)
+
 	if (!id) {
 		return response.status(400).json({
 			message: 'Missing id, please try again!',
@@ -87,8 +96,6 @@ router.patch('/', async (request: Request, response: Response) => {
 		},
 	})
 
-	const date = new Date(`${getSingleEquipament?.previousDatePreventive}`)
-
 	const findAndUpdateEquipament = await prisma.maintenance.update({
 		where: {
 			id,
@@ -97,15 +104,11 @@ router.patch('/', async (request: Request, response: Response) => {
 			preventiveCount: {
 				increment: 1,
 			},
-			nextDatePreventive: date.setDate(date.getDate() + 90).toLocaleString(),
-			previousDatePreventive:
-				getSingleEquipament?.previousDatePreventive || new Date().toISOString(),
+			nextDatePreventive: addDays(90, getSingleEquipament?.nextDatePreventive),
+			previousDatePreventive: addDays(0),
 			description,
 		},
 	})
-
-	console.log('findAndUpdateEquipament', findAndUpdateEquipament)
-	return
 
 	return response.status(201).json({
 		message: 'Maintenance updated successfully',
