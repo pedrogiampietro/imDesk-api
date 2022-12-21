@@ -78,10 +78,6 @@ router.get('/', async (request: Request, response: Response) => {
 router.patch('/', async (request: Request, response: Response) => {
 	const { id, description } = request.body as any
 
-	const date = new Date()
-
-	const newDate = date.setDate(date.getDate() + 90)
-
 	if (!id) {
 		return response.status(400).json({
 			message: 'Missing id, please try again!',
