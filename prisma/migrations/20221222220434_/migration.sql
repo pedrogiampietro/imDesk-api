@@ -98,6 +98,7 @@ CREATE TABLE "Maintenance" (
     "previousDatePreventive" TIMESTAMP(3),
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "maintenanceListTodoo" JSONB,
 
     CONSTRAINT "Maintenance_pkey" PRIMARY KEY ("id")
 );

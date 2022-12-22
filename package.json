@@ -13,6 +13,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@prisma/client": "^4.5.0",
+		"@types/uuid": "^9.0.0",
 		"bcrypt": "^5.1.0",
 		"cors": "^2.8.5",
 		"dayjs": "^1.11.7",
