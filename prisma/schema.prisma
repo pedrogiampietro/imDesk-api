@@ -102,6 +102,18 @@ model Maintenance {
   previousDatePreventive DateTime?
   description            String?
   createdAt              DateTime  @default(now())
+  maintenanceListTodoo   Json?
+
+  HistoryMaintenance HistoryMaintenance[]
+}
+
+model HistoryMaintenance {
+  id                   String   @id @default(uuid())
+  maintenanceListTodoo Json?
+  createdAt            DateTime @default(now())
+
+  maintenanceId String
+  historyId     Maintenance @relation(fields: [maintenanceId], references: [id])
 }
 
 model RefreshToken {

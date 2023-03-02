@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 import { PrismaClient } from '@prisma/client'
-import dayjs, { Dayjs, UnitType } from 'dayjs'
+import dayjs from 'dayjs'
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -22,6 +23,13 @@ const addDays = (days: number, custom_date?: any) => {
 router.post('/', async (request: Request, response: Response) => {
 	const { name, location, model, patrimony, serialNumber, nextDatePreventive } =
 		request.body as IRequestCreateMaintenanceBody
+
+	const jsonListTodoo = [
+		{ id: uuidv4(), name: 'Limpeza dos hardware', executed: false },
+		{ id: uuidv4(), name: 'Analise dos software instalados', executed: false },
+		{ id: uuidv4(), name: 'Atualização dos software', executed: false },
+		{ id: uuidv4(), name: 'Limpeza de temporários em geral', executed: false },
+	]
 
 	try {
 		const getSingleMaintence = await prisma.maintenance.findFirst({
@@ -48,6 +56,7 @@ router.post('/', async (request: Request, response: Response) => {
 				nextDatePreventive,
 				preventiveCount: 0,
 				correctiveCount: 0,
+				maintenanceListTodoo: jsonListTodoo,
 			},
 		})
 
@@ -76,7 +85,11 @@ router.get('/', async (request: Request, response: Response) => {
 })
 
 router.patch('/', async (request: Request, response: Response) => {
-	const { id, description } = request.body as any
+	const { id, description, maintenanceListTodoo } = request.body as any
+
+	const onlyExecuted = maintenanceListTodoo.filter(
+		(todoo: any) => todoo.executed
+	)
 
 	if (!id) {
 		return response.status(400).json({
@@ -103,6 +116,13 @@ router.patch('/', async (request: Request, response: Response) => {
 			nextDatePreventive: addDays(90, getSingleEquipament?.nextDatePreventive),
 			previousDatePreventive: addDays(0),
 			description,
+		},
+	})
+
+	await prisma.historyMaintenance.create({
+		data: {
+			maintenanceId: id,
+			maintenanceListTodoo: onlyExecuted,
 		},
 	})
 
