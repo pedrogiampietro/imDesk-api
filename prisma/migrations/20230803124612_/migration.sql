@@ -98,8 +98,19 @@ CREATE TABLE "Maintenance" (
     "previousDatePreventive" TIMESTAMP(3),
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "maintenanceListTodoo" JSONB,
 
     CONSTRAINT "Maintenance_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "HistoryMaintenance" (
+    "id" TEXT NOT NULL,
+    "maintenanceListTodoo" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "maintenanceId" TEXT NOT NULL,
+
+    CONSTRAINT "HistoryMaintenance_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -140,6 +151,9 @@ ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_userId_fkey" FOREIGN KEY ("userId") 
 
 -- AddForeignKey
 ALTER TABLE "Equipaments" ADD CONSTRAINT "Equipaments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HistoryMaintenance" ADD CONSTRAINT "HistoryMaintenance_maintenanceId_fkey" FOREIGN KEY ("maintenanceId") REFERENCES "Maintenance"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

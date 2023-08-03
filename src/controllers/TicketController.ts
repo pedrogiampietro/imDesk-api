@@ -16,6 +16,10 @@ interface IRequestQuery {
   userId: string;
 }
 
+interface IUpdateBody {
+  assignedTo: string;
+}
+
 router.post("/", async (request: Request, response: Response) => {
   try {
     const {
@@ -121,42 +125,6 @@ router.post("/", async (request: Request, response: Response) => {
   }
 });
 
-// router.post('/', async (request: Request, response: Response) => {
-// 	const {
-// 		ticket_description,
-// 		ticket_type,
-// 		ticket_category,
-// 		ticket_priority,
-// 		ticket_location,
-// 	} = request.body as IRequestBody
-// 	const { userId } = request.query as unknown as IRequestQuery
-
-// 	try {
-// 		const createTicket = await prisma.ticket.create({
-// 			data: {
-// 				description: ticket_description,
-// 				ticketType: ticket_type,
-// 				ticketCategory: ticket_category,
-// 				ticketLocation: ticket_location,
-// 				ticketPriority: ticket_priority,
-// 				status: 'new',
-// 				assignedTo: [],
-// 				equipaments: [],
-// 				images: [],
-// 				userId,
-// 			},
-// 		})
-
-// 		return response.status(200).json({
-// 			message: 'Ticket created successfully',
-// 			body: createTicket,
-// 			error: false,
-// 		})
-// 	} catch (err) {
-// 		return response.status(500).json(err)
-// 	}
-// })
-
 router.get("/", async (request: Request, response: Response) => {
   try {
     const getAllTickets = await prisma.ticket.findMany({
@@ -182,5 +150,103 @@ router.get("/", async (request: Request, response: Response) => {
     return response.status(500).json(err);
   }
 });
+
+router.put("/:id", async (request: Request, response: Response) => {
+  try {
+    const ticketId = request.params.id;
+
+    console.log("Ticket ID:", ticketId); // log the ticket ID
+
+    const {
+      description,
+      ticketTypeId,
+      ticketCategoryId,
+      ticketLocationId,
+      ticketPriorityId,
+      assignedTo,
+      equipaments,
+      images,
+      status,
+      userId,
+      timeEstimate,
+      isDelay,
+    } = request.body;
+
+    console.log("Request Body:", request.body); // log the entire request body
+
+    const updatedTicket = await prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        description,
+        ticketType: ticketTypeId,
+        ticketCategory: ticketCategoryId,
+        ticketLocation: ticketLocationId,
+        ticketPriority: ticketPriorityId,
+        assignedTo,
+        equipaments,
+        images,
+        status,
+        User: userId,
+        timeEstimate,
+        isDelay,
+      },
+      include: {
+        ticketCategoryId: true,
+        ticketLocationId: true,
+        ticketPriorityId: true,
+        ticketTypeId: true,
+        User: true,
+      },
+    });
+
+    return response.status(200).json({
+      message: "Ticket updated successfully",
+      body: updatedTicket,
+      error: false,
+    });
+  } catch (err) {
+    console.error("Error occurred:", err); // log any error that occurred
+
+    return response.status(500).json(err);
+  }
+});
+
+// router.put("/:id", async (request: Request, response: Response) => {
+//   try {
+//     const { id } = request.params;
+//     const { assignedTo } = request.body as IUpdateBody;
+
+//     const tech = await prisma.user.findUnique({
+//       where: { id: assignedTo },
+//     });
+
+//     if (!tech) {
+//       throw new Error(`Technician with id ${assignedTo} not found.`);
+//     }
+
+//     const techData = `${assignedTo}-${tech.name}`;
+
+//     const updateTicket = await prisma.ticket.update({
+//       where: { id: id },
+//       data: { assignedTo: { set: techData } },
+//     });
+
+//     if (!updateTicket) {
+//       return response.status(404).json({
+//         message: "Ticket not found",
+//         error: true,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Ticket updated successfully",
+//       body: updateTicket,
+//       error: false,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return response.status(500).json(err);
+//   }
+// });
 
 export default router;

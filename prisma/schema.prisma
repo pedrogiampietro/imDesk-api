@@ -16,6 +16,7 @@ model User {
   phone     String
   ramal     String
   sector    String
+  isTechnician Boolean   @default(false)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
 
