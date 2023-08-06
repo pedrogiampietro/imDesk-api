@@ -157,52 +157,64 @@ router.get('/', async (request: Request, response: Response) => {
 router.put('/:id', async (request: Request, response: Response) => {
 	try {
 		const ticketId = request.params.id;
+		const userId = request.query.userId || request.body.userId;
+		const requestBody = request.body;
+		let updateData: Record<string, any> = {};
 
-		console.log('Ticket ID:', ticketId);
-
-		const {
-			description,
-			ticketTypeId,
-			ticketCategoryId,
-			ticketLocationId,
-			ticketPriorityId,
-			assignedTo,
-			equipaments,
-			images,
-			status,
-			userId,
-			timeEstimate,
-			isDelay,
-		} = request.body;
-
-		console.log('Request Body:', request.body);
-
-		const tech = await prisma.user.findUnique({
-			where: { id: assignedTo.id },
-		});
-
-		if (!tech) {
-			throw new Error(`Technician with id ${assignedTo.name} not found.`);
+		if (!ticketId || !userId) {
+			return response
+				.status(400)
+				.json({ message: 'Required parameters are missing.', error: true });
 		}
 
-		const techData = `${assignedTo.id}-${tech.name}`;
+		const loggedInUser = await prisma.user.findUnique({
+			where: { id: userId },
+		});
+
+		if (requestBody.assignedTo && requestBody.assignedTo.id) {
+			const tech = await prisma.user.findUnique({
+				where: { id: requestBody.assignedTo.id },
+			});
+
+			if (!tech) {
+				throw new Error(
+					`Technician with id ${requestBody.assignedTo.id} not found.`
+				);
+			}
+
+			updateData.assignedTo = `${requestBody.assignedTo.id}-${tech.name}`;
+		}
+
+		const fields = [
+			'description',
+			'ticketTypeId',
+			'ticketCategoryId',
+			'ticketLocationId',
+			'ticketPriorityId',
+			'equipaments',
+			'images',
+			'status',
+			'userId',
+			'timeEstimate',
+			'isDelay',
+		];
+		fields.forEach((field) => {
+			if (requestBody[field]) {
+				updateData[field] = requestBody[field];
+			}
+		});
+
+		if (requestBody.status === 'closed') {
+			if (!loggedInUser) {
+				throw new Error(`Logged-in user not found.`);
+			}
+			updateData.closedBy = loggedInUser.name;
+			updateData.closedAt = new Date();
+		}
 
 		const updatedTicket = await prisma.ticket.update({
 			where: { id: ticketId },
-			data: {
-				description,
-				ticketType: ticketTypeId,
-				ticketCategory: ticketCategoryId,
-				ticketLocation: ticketLocationId,
-				ticketPriority: ticketPriorityId,
-				assignedTo: techData,
-				equipaments,
-				images,
-				status,
-				User: userId,
-				timeEstimate,
-				isDelay,
-			},
+			data: updateData,
 			include: {
 				ticketCategoryId: true,
 				ticketLocationId: true,
@@ -217,10 +229,9 @@ router.put('/:id', async (request: Request, response: Response) => {
 			body: updatedTicket,
 			error: false,
 		});
-	} catch (err) {
+	} catch (err: any) {
 		console.error('Error occurred:', err);
-
-		return response.status(500).json(err);
+		return response.status(500).json({ message: err.message, error: true });
 	}
 });
 
@@ -235,7 +246,7 @@ router.post('/response', async (request: Request, response: Response) => {
 				type: type,
 				User: {
 					connect: {
-						id: userId, // use the userId here
+						id: userId,
 					},
 				},
 				Ticket: {
