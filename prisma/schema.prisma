@@ -8,21 +8,22 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  username  String    @unique
-  name      String
-  email     String    @unique
-  password  String
-  phone     String
-  ramal     String
-  sector    String
+  id           String    @id @default(uuid())
+  username     String    @unique
+  name         String
+  email        String    @unique
+  password     String
+  phone        String
+  ramal        String
+  sector       String
   isTechnician Boolean   @default(false)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime? @default(now())
 
-  Ticket        Ticket[]
-  RefreshTokens RefreshToken[]
-  Equipaments   Equipaments[]
+  Ticket         Ticket[]
+  RefreshTokens  RefreshToken[]
+  Equipaments    Equipaments[]
+  TicketResponse TicketResponse[]
 }
 
 model Ticket {
@@ -46,11 +47,12 @@ model Ticket {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  ticketTypeId     TicketType     @relation(fields: [ticketType], references: [id])
-  ticketCategoryId TicketCategory @relation(fields: [ticketCategory], references: [id])
-  ticketPriorityId TicketPriority @relation(fields: [ticketPriority], references: [id])
-  ticketLocationId Locations      @relation(fields: [ticketLocation], references: [id])
-  User             User?          @relation(fields: [userId], references: [id])
+  ticketTypeId     TicketType       @relation(fields: [ticketType], references: [id])
+  ticketCategoryId TicketCategory   @relation(fields: [ticketCategory], references: [id])
+  ticketPriorityId TicketPriority   @relation(fields: [ticketPriority], references: [id])
+  ticketLocationId Locations        @relation(fields: [ticketLocation], references: [id])
+  User             User?            @relation(fields: [userId], references: [id])
+  TicketResponse   TicketResponse[]
 }
 
 model Equipaments {
@@ -115,6 +117,18 @@ model HistoryMaintenance {
 
   maintenanceId String
   historyId     Maintenance @relation(fields: [maintenanceId], references: [id])
+}
+
+model TicketResponse {
+  id        String   @id @default(uuid())
+  content   String
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  ticketId  String
+  User      User     @relation(fields: [userId], references: [id])
+  Ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }
 
 model RefreshToken {
