@@ -131,6 +131,50 @@ model TicketResponse {
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }
 
+model MachineInfo {
+  id               String   @id @default(uuid())
+  hostname         String
+  platform         String
+  release          String
+  cpu              String
+  memory           String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  NetworkConnections NetworkConnection[]
+  UserInfos          UserInfo[]
+}
+
+model NetworkConnection {
+  id            String      @id @default(uuid())
+  protocol      String
+  localAddress  String
+  localPort     String
+  peerAddress   String
+  peerPort      String
+  state         String
+  pid           Int
+  process       String
+  createdAt     DateTime    @default(now())
+
+  machineInfoId String
+  machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
+}
+
+model UserInfo {
+  id            String      @id @default(uuid())
+  user          String
+  tty           String
+  date          DateTime
+  time          String
+  ip            String?
+  command       String
+  createdAt     DateTime    @default(now())
+
+  machineInfoId String
+  machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
+}
+
 model RefreshToken {
   id          String   @id @unique @default(uuid())
   hashedToken String
