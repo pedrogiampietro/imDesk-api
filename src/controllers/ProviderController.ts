@@ -5,24 +5,21 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 router.post("/", async (request: Request, response: Response) => {
-  const { userId } = request.query;
-  const { name, model, serialNumber, patrimonyTag, type } = request.body;
+  const { providerId, file, startDate, endDate } = request.body;
 
   try {
-    const createEquipament = await prisma.equipaments.create({
+    const createContract = await prisma.contract.create({
       data: {
-        name,
-        model,
-        serialNumber,
-        patrimonyTag,
-        type,
-        userId: String(userId),
+        providerId: providerId,
+        file: file,
+        startDate: startDate,
+        endDate: endDate,
       },
     });
 
     return response.status(200).json({
-      message: "Equipament created successfully",
-      body: createEquipament,
+      message: "Contract created successfully",
+      body: createContract,
       error: false,
     });
   } catch (err) {
@@ -32,11 +29,11 @@ router.post("/", async (request: Request, response: Response) => {
 
 router.get("/", async (request: Request, response: Response) => {
   try {
-    const getAllEquipaments = await prisma.equipaments.findMany();
+    const getAllContracts = await prisma.contract.findMany();
 
     return response.status(200).json({
-      message: "Equipament found",
-      body: getAllEquipaments,
+      message: "Contracts found",
+      body: getAllContracts,
       error: false,
     });
   } catch (err) {

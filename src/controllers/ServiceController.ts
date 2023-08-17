@@ -5,24 +5,20 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 router.post("/", async (request: Request, response: Response) => {
-  const { userId } = request.query;
-  const { name, model, serialNumber, patrimonyTag, type } = request.body;
+  const { providerId, name, price } = request.body;
 
   try {
-    const createEquipament = await prisma.equipaments.create({
+    const createService = await prisma.service.create({
       data: {
-        name,
-        model,
-        serialNumber,
-        patrimonyTag,
-        type,
-        userId: String(userId),
+        providerId: providerId,
+        name: name,
+        price: price,
       },
     });
 
     return response.status(200).json({
-      message: "Equipament created successfully",
-      body: createEquipament,
+      message: "Service created successfully",
+      body: createService,
       error: false,
     });
   } catch (err) {
@@ -32,11 +28,11 @@ router.post("/", async (request: Request, response: Response) => {
 
 router.get("/", async (request: Request, response: Response) => {
   try {
-    const getAllEquipaments = await prisma.equipaments.findMany();
+    const getAllServices = await prisma.service.findMany();
 
     return response.status(200).json({
-      message: "Equipament found",
-      body: getAllEquipaments,
+      message: "Services found",
+      body: getAllServices,
       error: false,
     });
   } catch (err) {
