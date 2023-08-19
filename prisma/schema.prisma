@@ -75,8 +75,6 @@ model Ticket {
   ticketLocationId Locations          @relation(fields: [ticketLocation], references: [id])
   User             User?              @relation(fields: [userId], references: [id])
   TicketResponse   TicketResponse[]
-  Company          Company            @relation(fields: [companyId], references: [id])
-  companyId        String
   TicketEvaluation TicketEvaluation[]
 }
 
@@ -244,8 +242,11 @@ model Contract {
   endDate    DateTime
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())
+  <<<<<<< HEAD
   Company    Company   @relation(fields: [companyId], references: [id])
   companyId  String
+  =======
+  >>>>>>> 5cdfc9d518c8560de8e943bfd40751d8efc4956b
 }
 
 model Service {
@@ -256,8 +257,11 @@ model Service {
   price      Float
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())
+  <<<<<<< HEAD
   Company    Company   @relation(fields: [companyId], references: [id])
   companyId  String
+  =======
+  >>>>>>> 5cdfc9d518c8560de8e943bfd40751d8efc4956b
 }
 
 model TicketEvaluation {
