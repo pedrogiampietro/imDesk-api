@@ -54,12 +54,27 @@ router.post('/sign-up', async (request, response) => {
 });
 
 router.post('/sign-in', async (request, response) => {
-	const { email, password } = request.body;
+	const { email, password, companyId } = request.body;
 
 	try {
+		if (!companyId) {
+			return response.status(400).json('A companyId é necessária.');
+		}
+
+		const findCompany = await prisma.company.findUnique({
+			where: {
+				id: companyId,
+			},
+		});
+
+		if (!findCompany) {
+			return response.status(404).json('Empresa não encontrada no sistema.');
+		}
+
 		const findUser = await prisma.user.findFirst({
 			where: {
 				email: email,
+				companyId: companyId,
 			},
 			include: {
 				Company: true,
@@ -70,10 +85,17 @@ router.post('/sign-in', async (request, response) => {
 			return response.status(404).json('Usuário não encontrado no sistema.');
 		}
 
+		if (!findUser.Company || !findUser.Company.id) {
+			return response
+				.status(400)
+				.json('Usuário não associado a nenhuma empresa.');
+		}
+
 		const validPassword = await bcrypt.compare(password, findUser.password);
 
-		if (!validPassword)
+		if (!validPassword) {
 			return response.status(400).json('Password incorreto, tente novamente.');
+		}
 
 		const token = generateAccessToken(findUser.id);
 		const refreshToken = generateRefreshToken(findUser.id, token);
