@@ -20,10 +20,11 @@ model User {
   createdAt    DateTime? @default(now())
   updatedAt    DateTime? @default(now())
 
-  Ticket         Ticket[]
-  RefreshTokens  RefreshToken[]
-  Equipaments    Equipaments[]
-  TicketResponse TicketResponse[]
+  Ticket           Ticket[]
+  RefreshTokens    RefreshToken[]
+  Equipaments      Equipaments[]
+  TicketResponse   TicketResponse[]
+  TicketEvaluation TicketEvaluation[]
 }
 
 model Ticket {
@@ -47,12 +48,13 @@ model Ticket {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  ticketTypeId     TicketType       @relation(fields: [ticketType], references: [id])
-  ticketCategoryId TicketCategory   @relation(fields: [ticketCategory], references: [id])
-  ticketPriorityId TicketPriority   @relation(fields: [ticketPriority], references: [id])
-  ticketLocationId Locations        @relation(fields: [ticketLocation], references: [id])
-  User             User?            @relation(fields: [userId], references: [id])
+  ticketTypeId     TicketType         @relation(fields: [ticketType], references: [id])
+  ticketCategoryId TicketCategory     @relation(fields: [ticketCategory], references: [id])
+  ticketPriorityId TicketPriority     @relation(fields: [ticketPriority], references: [id])
+  ticketLocationId Locations          @relation(fields: [ticketLocation], references: [id])
+  User             User?              @relation(fields: [userId], references: [id])
   TicketResponse   TicketResponse[]
+  TicketEvaluation TicketEvaluation[]
 }
 
 model Equipaments {
@@ -133,44 +135,44 @@ model TicketResponse {
 }
 
 model MachineInfo {
-  id               String   @id @default(uuid())
-  hostname         String
-  platform         String
-  release          String
-  cpu              String
-  memory           String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id        String   @id @default(uuid())
+  hostname  String
+  platform  String
+  release   String
+  cpu       String
+  memory    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   NetworkConnections NetworkConnection[]
   UserInfos          UserInfo[]
 }
 
 model NetworkConnection {
-  id            String      @id @default(uuid())
-  protocol      String
-  localAddress  String
-  localPort     String
-  peerAddress   String
-  peerPort      String
-  state         String
-  pid           Int
-  process       String
-  createdAt     DateTime    @default(now())
+  id           String   @id @default(uuid())
+  protocol     String
+  localAddress String
+  localPort    String
+  peerAddress  String
+  peerPort     String
+  state        String
+  pid          Int
+  process      String
+  createdAt    DateTime @default(now())
 
   machineInfoId String
   machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
 }
 
 model UserInfo {
-  id            String      @id @default(uuid())
-  user          String
-  tty           String
-  date          DateTime
-  time          String
-  ip            String?
-  command       String
-  createdAt     DateTime    @default(now())
+  id        String   @id @default(uuid())
+  user      String
+  tty       String
+  date      DateTime
+  time      String
+  ip        String?
+  command   String
+  createdAt DateTime @default(now())
 
   machineInfoId String
   machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
@@ -187,32 +189,47 @@ model RefreshToken {
 }
 
 model Provider {
-  id           String    @id @default(uuid())
-  name         String
-  phone        String
-  email        String    @unique
-  address      String
-  createdAt    DateTime? @default(now())
-  updatedAt    DateTime? @default(now())
+  id        String     @id @default(uuid())
+  name      String
+  phone     String
+  email     String     @unique
+  address   String
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @default(now())
+  Contract  Contract[]
+  Service   Service[]
 }
 
 model Contract {
-  id        String    @id @default(uuid())
-  provider  Provider  @relation(fields: [providerId], references: [id])
+  id         String    @id @default(uuid())
+  provider   Provider  @relation(fields: [providerId], references: [id])
   providerId String
-  file      String    // Para armazenar o link para o contrato (PDF, imagem, etc.)
-  startDate DateTime
-  endDate   DateTime
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
+  file       String // Para armazenar o link para o contrato (PDF, imagem, etc.)
+  startDate  DateTime
+  endDate    DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now())
 }
 
 model Service {
-  id        String    @id @default(uuid())
-  provider  Provider  @relation(fields: [providerId], references: [id])
+  id         String    @id @default(uuid())
+  provider   Provider  @relation(fields: [providerId], references: [id])
   providerId String
-  name      String
-  price     Float
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
+  name       String
+  price      Float
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now())
+}
+
+model TicketEvaluation {
+  id        String    @id @default(uuid())
+  rating    Int       @default(0) @db.Integer
+  comments  String?   @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  userId   String
+  ticketId String
+  User     User   @relation(fields: [userId], references: [id])
+  Ticket   Ticket @relation(fields: [ticketId], references: [id])
 }
