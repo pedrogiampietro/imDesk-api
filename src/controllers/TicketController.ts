@@ -10,6 +10,7 @@ interface IRequestBody {
 	ticket_category: string;
 	ticket_priority: string;
 	ticket_location: string;
+	companyId: string;
 }
 
 interface IRequestQuery {
@@ -21,6 +22,14 @@ interface ITicketResponseRequestBody {
 	userId: string;
 	content: string;
 	type: string;
+	companyId: string;
+}
+
+interface ITicketEvaluationRequestBody {
+	ticketId: string;
+	rating: number;
+	comments: string;
+	userId: string;
 }
 
 router.post('/', async (request: Request, response: Response) => {
@@ -31,6 +40,7 @@ router.post('/', async (request: Request, response: Response) => {
 			ticket_category,
 			ticket_priority,
 			ticket_location,
+			companyId,
 		} = request.body as IRequestBody;
 
 		const { userId } = request.query as unknown as IRequestQuery;
@@ -47,13 +57,18 @@ router.post('/', async (request: Request, response: Response) => {
 				equipaments: [],
 				images: [],
 				userId,
+				companyId,
 			},
 			include: {
 				ticketCategoryId: true,
 				ticketLocationId: true,
 				ticketPriorityId: true,
 				ticketTypeId: true,
-				User: true,
+				User: {
+					include: {
+						Company: true,
+					},
+				},
 			},
 		});
 
@@ -90,6 +105,7 @@ router.post('/', async (request: Request, response: Response) => {
 			sector: createTicket.User?.sector,
 			createdAt: createTicket.User?.createdAt,
 			updatedAt: createTicket.User?.updatedAt,
+			Company: createTicket.User?.Company,
 		};
 
 		const responseObj = {
@@ -130,7 +146,18 @@ router.post('/', async (request: Request, response: Response) => {
 
 router.get('/', async (request: Request, response: Response) => {
 	try {
+		const { companyId } = request.query;
+
+		if (!companyId || typeof companyId !== 'string') {
+			return response
+				.status(400)
+				.json({ message: 'Company ID is required.', error: true });
+		}
+
 		const getAllTickets = await prisma.ticket.findMany({
+			where: {
+				companyId: companyId,
+			},
 			orderBy: {
 				createdAt: 'desc',
 			},
@@ -141,11 +168,12 @@ router.get('/', async (request: Request, response: Response) => {
 				ticketPriorityId: true,
 				ticketTypeId: true,
 				User: true,
+				TicketEvaluation: true,
 			},
 		});
 
 		return response.status(200).json({
-			message: 'Ticket created successfully',
+			message: 'Tickets retrieved successfully',
 			body: getAllTickets,
 			error: false,
 		});
@@ -158,6 +186,7 @@ router.put('/:id', async (request: Request, response: Response) => {
 	try {
 		const ticketId = request.params.id;
 		const userId = request.query.userId || request.body.userId;
+		const companyId = request.query.companyId || request.body.companyId;
 		const requestBody = request.body;
 		let updateData: Record<string, any> = {};
 
@@ -237,23 +266,16 @@ router.put('/:id', async (request: Request, response: Response) => {
 
 router.post('/response', async (request: Request, response: Response) => {
 	try {
-		const { ticketId, userId, content, type } =
+		const { ticketId, userId, content, type, companyId } =
 			request.body as ITicketResponseRequestBody;
 
 		const ticketResponse = await prisma.ticketResponse.create({
 			data: {
 				content: content,
 				type: type,
-				User: {
-					connect: {
-						id: userId,
-					},
-				},
-				Ticket: {
-					connect: {
-						id: ticketId,
-					},
-				},
+				companyId: companyId,
+				userId: userId,
+				ticketId: ticketId,
 			},
 		});
 
@@ -271,10 +293,18 @@ router.post('/response', async (request: Request, response: Response) => {
 router.get('/:id/responses', async (request: Request, response: Response) => {
 	try {
 		const ticketId = request.params.id;
+		const companyId = request.query.companyId;
+
+		if (!companyId || typeof companyId !== 'string') {
+			return response
+				.status(400)
+				.json({ message: 'Company ID is required.', error: true });
+		}
 
 		const ticketResponses = await prisma.ticketResponse.findMany({
 			where: {
 				ticketId: ticketId,
+				companyId: companyId,
 			},
 			include: {
 				User: true,
@@ -284,6 +314,75 @@ router.get('/:id/responses', async (request: Request, response: Response) => {
 		return response.status(200).json({
 			message: 'Fetched ticket responses successfully',
 			body: ticketResponses,
+			error: false,
+		});
+	} catch (err) {
+		return response.status(500).json(err);
+	}
+});
+
+// Criação de avaliação
+router.post('/evaluate', async (request: Request, response: Response) => {
+	try {
+		const { ticketId, rating, comments, userId } =
+			request.body as ITicketEvaluationRequestBody;
+
+		// Validar a classificação
+		if (rating < 1 || rating > 5) {
+			return response.status(400).json({
+				message: 'Rating must be between 1 and 5',
+				error: true,
+			});
+		}
+
+		// Verificar se o chamado existe
+		const ticketExists = await prisma.ticket.findUnique({
+			where: {
+				id: ticketId,
+			},
+		});
+
+		if (!ticketExists) {
+			return response.status(404).json({
+				message: 'Ticket not found',
+				error: true,
+			});
+		}
+
+		const ticketEvaluation = await prisma.ticketEvaluation.create({
+			data: {
+				ticketId: ticketId,
+				rating: rating,
+				comments: comments,
+				userId,
+			},
+		});
+
+		return response.status(201).json({
+			message: 'Evaluation created successfully',
+			body: ticketEvaluation,
+			error: false,
+		});
+	} catch (err) {
+		console.error('Error occurred:', err);
+		return response.status(500).json({ message: 'Internal Server Error' });
+	}
+});
+
+// Listagem de avaliações para um chamado específico
+router.get('/:id/evaluations', async (request: Request, response: Response) => {
+	try {
+		const ticketId = request.params.id;
+
+		const ticketEvaluations = await prisma.ticketEvaluation.findMany({
+			where: {
+				ticketId: ticketId,
+			},
+		});
+
+		return response.status(200).json({
+			message: 'Fetched ticket evaluations successfully',
+			body: ticketEvaluations,
 			error: false,
 		});
 	} catch (err) {

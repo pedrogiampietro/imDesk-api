@@ -18,12 +18,13 @@ router.post('/sign-up', async (request, response) => {
 		ramal,
 		sector,
 		isTechnician,
+		companyId,
 	} = request.body;
 
-	if (!email || !password)
+	if (!email || !password || !companyId)
 		response
 			.status(400)
-			.json('nome, e-mail e um password são obrigatórios para cadastro');
+			.json('Nome, e-mail, senha e companyId são obrigatórios para cadastro');
 
 	const hashedPassword = bcrypt.hashSync(password, saltRounds);
 
@@ -38,6 +39,7 @@ router.post('/sign-up', async (request, response) => {
 				ramal,
 				sector,
 				isTechnician,
+				companyId,
 			},
 		});
 
@@ -59,6 +61,9 @@ router.post('/sign-in', async (request, response) => {
 			where: {
 				email: email,
 			},
+			include: {
+				Company: true,
+			},
 		});
 
 		if (!findUser) {
@@ -78,6 +83,10 @@ router.post('/sign-in', async (request, response) => {
 			name: findUser.name,
 			email: findUser.email,
 			isTechnician: findUser.isTechnician,
+			companies: {
+				companyId: findUser.Company.id,
+				companyName: findUser.Company.name,
+			},
 			tokens: {
 				token: token,
 				refreshToken: refreshToken,
