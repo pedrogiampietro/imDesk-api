@@ -14,16 +14,24 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  Users          User[]
-  Tickets        Ticket[]
-  Equipaments    Equipaments[]
-  Locations      Locations[]
-  Services       Service[]
-  Contracts      Contract[]
-  TicketType     TicketType[]
-  TicketPriority TicketPriority[]
-  TicketCategory TicketCategory[]
-  TicketResponse TicketResponse[]
+  UserCompanies    UserCompany[]
+  Tickets          TicketCompany[]
+  Equipments       EquipmentCompany[]
+  Locations        LocationCompany[]
+  Services         Service[]
+  Contracts        Contract[]
+  TicketTypes      TicketType[]
+  TicketPriorities TicketPriority[]
+  TicketCategories TicketCategory[]
+}
+
+model UserCompany {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model User {
@@ -41,46 +49,44 @@ model User {
 
   Ticket           Ticket[]
   RefreshTokens    RefreshToken[]
-  Equipaments      Equipaments[]
+  Equipments       EquipmentCompany[]
   TicketResponse   TicketResponse[]
-  Company          Company            @relation(fields: [companyId], references: [id])
-  companyId        String
   TicketEvaluation TicketEvaluation[]
+  UserCompanies    UserCompany[]
 }
 
 model Ticket {
-  id             String    @id @default(uuid())
-  description    String
-  ticketType     String
-  ticketCategory String
-  ticketPriority String
-  ticketLocation String
-  assignedTo     String[]
-  equipaments    String[]
-  images         String[]
-  assignedToAt   DateTime?
-  closedBy       String?
-  closedAt       DateTime?
-  status         String?
-  timeEstimate   DateTime?
-  isDelay        Boolean?  @default(false)
-  userId         String?
+  id               String    @id @default(uuid())
+  description      String
+  ticketTypeId     String
+  ticketCategoryId String
+  ticketPriorityId String
+  ticketLocationId String
+  assignedTo       String[]
+  equipaments      String[]
+  images           String[]
+  assignedToAt     DateTime?
+  closedBy         String?
+  closedAt         DateTime?
+  status           String?
+  timeEstimate     DateTime?
+  isDelay          Boolean?  @default(false)
+  userId           String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  ticketTypeId     TicketType         @relation(fields: [ticketType], references: [id])
-  ticketCategoryId TicketCategory     @relation(fields: [ticketCategory], references: [id])
-  ticketPriorityId TicketPriority     @relation(fields: [ticketPriority], references: [id])
-  ticketLocationId Locations          @relation(fields: [ticketLocation], references: [id])
+  ticketType       TicketType         @relation(fields: [ticketTypeId], references: [id])
+  ticketCategory   TicketCategory     @relation(fields: [ticketCategoryId], references: [id])
+  ticketPriority   TicketPriority     @relation(fields: [ticketPriorityId], references: [id])
+  ticketLocation   Locations          @relation(fields: [ticketLocationId], references: [id])
   User             User?              @relation(fields: [userId], references: [id])
   TicketResponse   TicketResponse[]
   TicketEvaluation TicketEvaluation[]
-  Company          Company?           @relation(fields: [companyId], references: [id])
-  companyId        String?
+  TicketCompanies  TicketCompany[]
 }
 
-model Equipaments {
+model Equipments {
   id           String @id @default(uuid())
   name         String
   model        String
@@ -88,18 +94,44 @@ model Equipaments {
   patrimonyTag String
   type         String
 
-  userId      String
-  equipaments User    @relation(fields: [userId], references: [id])
-  Company     Company @relation(fields: [companyId], references: [id])
-  companyId   String
+  EquipmentCompanies EquipmentCompany[]
 }
 
 model Locations {
-  id        String   @id @default(uuid())
-  name      String
-  Ticket    Ticket[]
-  Company   Company  @relation(fields: [companyId], references: [id])
+  id   String @id @default(uuid())
+  name String
+
+  LocationCompanies LocationCompany[]
+  Ticket            Ticket[]
+}
+
+model TicketCompany {
+  ticketId  String
+  ticket    Ticket  @relation(fields: [ticketId], references: [id])
   companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@id([ticketId, companyId])
+}
+
+model EquipmentCompany {
+  equipmentId String
+  equipment   Equipments @relation(fields: [equipmentId], references: [id])
+  companyId   String
+  company     Company    @relation(fields: [companyId], references: [id])
+  User        User?      @relation(fields: [userId], references: [id])
+  userId      String?
+
+  @@id([equipmentId, companyId])
+}
+
+model LocationCompany {
+  locationId String
+  location   Locations @relation(fields: [locationId], references: [id])
+  companyId  String
+  company    Company   @relation(fields: [companyId], references: [id])
+
+  @@id([locationId, companyId])
 }
 
 model TicketType {
@@ -165,8 +197,6 @@ model TicketResponse {
   ticketId  String
   User      User     @relation(fields: [userId], references: [id])
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
-  Company   Company  @relation(fields: [companyId], references: [id])
-  companyId String
 }
 
 model MachineInfo {
