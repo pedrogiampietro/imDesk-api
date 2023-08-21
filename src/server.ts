@@ -12,7 +12,6 @@ import locationController from './controllers/LocationController';
 import maintenanceController from './controllers/MaintenanceController';
 import colletInformationController from './controllers/ColletInformation';
 import providerController from './controllers/ProviderController';
-import serviceController from './controllers/ServiceController';
 import companiesController from './controllers/CompanyController';
 
 const app = express();
@@ -46,8 +45,7 @@ app.use('/location', locationController);
 app.use('/equipament', equipamentController);
 app.use('/maintenance', maintenanceController);
 app.use('/collect', colletInformationController);
-app.use('/services', providerController);
-app.use('/contracts', serviceController);
+app.use('/providers', providerController);
 app.use('/companies', companiesController);
 
 app.get('/', (req, res) => {

@@ -4,23 +4,60 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = express.Router();
 
-router.post('/', async (request: Request, response: Response) => {
+// Criar um novo provedor
+router.post('/provider', async (request: Request, response: Response) => {
+	const { name, phone, email, address } = request.body;
+
+	try {
+		const provider = await prisma.provider.create({
+			data: {
+				name: name,
+				phone: phone,
+				email: email,
+				address: address,
+			},
+		});
+
+		return response.status(200).json({
+			message: 'Provider created successfully',
+			body: provider,
+			error: false,
+		});
+	} catch (err) {
+		return response.status(500).json(err);
+	}
+});
+
+// Adicionar um novo serviço a um provedor específico
+router.post('/service', async (request: Request, response: Response) => {
+	const { providerId, name, price, companyId } = request.body;
+
+	try {
+		const service = await prisma.service.create({
+			data: {
+				providerId: providerId,
+				name: name,
+				price: price,
+				companyId: companyId,
+			},
+		});
+
+		return response.status(200).json({
+			message: 'Service added successfully',
+			body: service,
+			error: false,
+		});
+	} catch (err) {
+		return response.status(500).json(err);
+	}
+});
+
+// Adicionar um novo contrato a um provedor específico
+router.post('/contract', async (request: Request, response: Response) => {
 	const { providerId, file, startDate, endDate, companyId } = request.body;
 
 	try {
-		const company = await prisma.company.findFirst({
-			where: { id: companyId },
-		});
-
-		if (!company) {
-			return response.status(404).json({
-				message: 'Company not found',
-				body: null,
-				error: true,
-			});
-		}
-
-		const createContract = await prisma.contract.create({
+		const contract = await prisma.contract.create({
 			data: {
 				providerId: providerId,
 				file: file,
@@ -31,8 +68,8 @@ router.post('/', async (request: Request, response: Response) => {
 		});
 
 		return response.status(200).json({
-			message: 'Contract created successfully',
-			body: createContract,
+			message: 'Contract added successfully',
+			body: contract,
 			error: false,
 		});
 	} catch (err) {
@@ -40,7 +77,7 @@ router.post('/', async (request: Request, response: Response) => {
 	}
 });
 
-router.get('/', async (request: Request, response: Response) => {
+router.get('/contract', async (request: Request, response: Response) => {
 	try {
 		const getAllContracts = await prisma.contract.findMany({
 			include: {
