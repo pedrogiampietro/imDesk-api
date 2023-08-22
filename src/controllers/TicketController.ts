@@ -176,24 +176,11 @@ router.post("/", async (request: Request, response: Response) => {
 
 router.get("/", async (request: Request, response: Response) => {
   try {
-    const companyIds = request.query.companyIds as string[];
+    const { companyId } = request.query;
 
-    if (!companyIds || !Array.isArray(companyIds)) {
+    if (!companyId || typeof companyId !== "string") {
       return response.status(400).json({
-        message: "Company IDs are required and should be an array.",
-        error: true,
-      });
-    }
-
-    // Filter and cast companyIds to an array of strings
-    const filteredCompanyIds = companyIds.filter(
-      (id: any) => typeof id === "string"
-    );
-
-    // Check if filteredCompanyIds is empty after filtering
-    if (filteredCompanyIds.length === 0) {
-      return response.status(400).json({
-        message: "Company IDs should be an array of strings.",
+        message: "Company ID is required and must be a string.",
         error: true,
       });
     }
@@ -202,9 +189,7 @@ router.get("/", async (request: Request, response: Response) => {
       where: {
         TicketCompanies: {
           some: {
-            companyId: {
-              in: filteredCompanyIds,
-            },
+            companyId: companyId,
           },
         },
       },
@@ -266,7 +251,7 @@ router.put("/:id", async (request: Request, response: Response) => {
       updateData.assignedTo = `${requestBody.assignedTo.id}-${requestBody.assignedTo.name}`;
     } else {
       // Handle the case where no technician is assigned
-      updateData.assignedTo = null;
+      updateData.assignedTo = undefined;
     }
 
     const fields = [
@@ -285,7 +270,7 @@ router.put("/:id", async (request: Request, response: Response) => {
     });
 
     if (requestBody.ticketTypeId) {
-      updateData.ticketTypeId = {
+      updateData.ticketType = {
         connect: {
           id: requestBody.ticketTypeId,
         },
@@ -293,7 +278,7 @@ router.put("/:id", async (request: Request, response: Response) => {
     }
 
     if (requestBody.ticketCategoryId) {
-      updateData.ticketCategoryId = {
+      updateData.ticketCategory = {
         connect: {
           id: requestBody.ticketCategoryId,
         },
@@ -301,7 +286,7 @@ router.put("/:id", async (request: Request, response: Response) => {
     }
 
     if (requestBody.ticketLocationId) {
-      updateData.ticketLocationId = {
+      updateData.ticketLocation = {
         connect: {
           id: requestBody.ticketLocationId,
         },
@@ -309,7 +294,7 @@ router.put("/:id", async (request: Request, response: Response) => {
     }
 
     if (requestBody.ticketPriorityId) {
-      updateData.ticketPriorityId = {
+      updateData.ticketPriority = {
         connect: {
           id: requestBody.ticketPriorityId,
         },
@@ -351,6 +336,14 @@ router.post("/response", async (request: Request, response: Response) => {
   try {
     const { ticketId, userId, content, type } =
       request.body as ITicketResponseRequestBody;
+
+    if (!ticketId || !userId || !content || !type) {
+      return response.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (typeof content !== "string") {
+      return response.status(400).json({ message: "Content must be a string" });
+    }
 
     const ticketResponse = await prisma.ticketResponse.create({
       data: {

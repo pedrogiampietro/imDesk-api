@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
@@ -57,8 +57,8 @@ router.post("/sign-up", async (request, response) => {
   }
 });
 
-router.post("/sign-in", async (request, response) => {
-  const { email, password } = request.body;
+router.post("/sign-in", async (request: Request, response: Response) => {
+  const { email, password, companyId, companyName } = request.body as any;
 
   try {
     const findUser = await prisma.user.findUnique({
@@ -95,6 +95,17 @@ router.post("/sign-in", async (request, response) => {
       return response.status(400).json("Password incorreto, tente novamente.");
     }
 
+    // Update user's currentLoggedCompany
+    await prisma.user.update({
+      where: {
+        id: findUser.id,
+      },
+      data: {
+        currentLoggedCompanyId: companyId,
+        currentLoggedCompanyName: companyName,
+      },
+    });
+
     const token = generateAccessToken(findUser.id);
     const refreshToken = generateRefreshToken(findUser.id, token);
 
@@ -107,6 +118,10 @@ router.post("/sign-in", async (request, response) => {
         companyId: uc.company.id,
         companyName: uc.company.name,
       })),
+      currentLogged: {
+        currentLoggedCompanyId: companyId,
+        currentLoggedCompanyName: companyName,
+      },
       tokens: {
         token: token,
         refreshToken: refreshToken,

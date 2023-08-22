@@ -29,6 +29,7 @@ CREATE TABLE "User" (
     "phone" TEXT NOT NULL,
     "ramal" TEXT NOT NULL,
     "sector" TEXT NOT NULL,
+    "currentLoggedCompany" TEXT NOT NULL,
     "isTechnician" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -109,18 +110,32 @@ CREATE TABLE "LocationCompany" (
 CREATE TABLE "TicketType" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "companyId" TEXT NOT NULL,
 
     CONSTRAINT "TicketType_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TicketTypeCompany" (
+    "ticketTypeId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+
+    CONSTRAINT "TicketTypeCompany_pkey" PRIMARY KEY ("ticketTypeId","companyId")
 );
 
 -- CreateTable
 CREATE TABLE "TicketPriority" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "companyId" TEXT NOT NULL,
 
     CONSTRAINT "TicketPriority_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TicketPriorityCompany" (
+    "ticketPriorityId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+
+    CONSTRAINT "TicketPriorityCompany_pkey" PRIMARY KEY ("ticketPriorityId","companyId")
 );
 
 -- CreateTable
@@ -129,9 +144,16 @@ CREATE TABLE "TicketCategory" (
     "name" TEXT NOT NULL,
     "childrenName" TEXT NOT NULL,
     "defaultText" TEXT,
-    "companyId" TEXT NOT NULL,
 
     CONSTRAINT "TicketCategory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TicketCategoryCompany" (
+    "ticketCategoryId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+
+    CONSTRAINT "TicketCategoryCompany_pkey" PRIMARY KEY ("ticketCategoryId","companyId")
 );
 
 -- CreateTable
@@ -342,13 +364,22 @@ ALTER TABLE "LocationCompany" ADD CONSTRAINT "LocationCompany_locationId_fkey" F
 ALTER TABLE "LocationCompany" ADD CONSTRAINT "LocationCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketType" ADD CONSTRAINT "TicketType_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TicketTypeCompany" ADD CONSTRAINT "TicketTypeCompany_ticketTypeId_fkey" FOREIGN KEY ("ticketTypeId") REFERENCES "TicketType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketPriority" ADD CONSTRAINT "TicketPriority_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TicketTypeCompany" ADD CONSTRAINT "TicketTypeCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketCategory" ADD CONSTRAINT "TicketCategory_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TicketPriorityCompany" ADD CONSTRAINT "TicketPriorityCompany_ticketPriorityId_fkey" FOREIGN KEY ("ticketPriorityId") REFERENCES "TicketPriority"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketPriorityCompany" ADD CONSTRAINT "TicketPriorityCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketCategoryCompany" ADD CONSTRAINT "TicketCategoryCompany_ticketCategoryId_fkey" FOREIGN KEY ("ticketCategoryId") REFERENCES "TicketCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketCategoryCompany" ADD CONSTRAINT "TicketCategoryCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "HistoryMaintenance" ADD CONSTRAINT "HistoryMaintenance_maintenanceId_fkey" FOREIGN KEY ("maintenanceId") REFERENCES "Maintenance"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
