@@ -5,11 +5,16 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 router.post("/", async (request: Request, response: Response) => {
-  const { name, companyId } = request.body;
+  const { name, companyIds } = request.body;
 
-  if (!companyId || typeof companyId !== "string") {
+  if (
+    !name ||
+    !companyIds ||
+    !Array.isArray(companyIds) ||
+    companyIds.length === 0
+  ) {
     return response.status(400).json({
-      message: "CompanyId é obrigatório para criar uma localização",
+      message: "Name e companyIds são obrigatórios para criar uma localização",
       error: true,
     });
   }
@@ -18,11 +23,15 @@ router.post("/", async (request: Request, response: Response) => {
     const createLocation = await prisma.locations.create({
       data: {
         name: name,
-        companyId: companyId,
+        LocationCompanies: {
+          create: companyIds.map((companyId: string) => ({
+            companyId,
+          })),
+        },
       },
     });
 
-    return response.status(200).json({
+    return response.status(201).json({
       message: "Location created successfully",
       body: createLocation,
       error: false,
@@ -45,7 +54,14 @@ router.get("/", async (request: Request, response: Response) => {
   try {
     const getAllLocation = await prisma.locations.findMany({
       where: {
-        companyId: companyId,
+        LocationCompanies: {
+          some: {
+            companyId: companyId,
+          },
+        },
+      },
+      include: {
+        LocationCompanies: true,
       },
     });
 

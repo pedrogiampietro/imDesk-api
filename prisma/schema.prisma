@@ -14,15 +14,15 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  UserCompanies    UserCompany[]
-  Tickets          TicketCompany[]
-  Equipments       EquipmentCompany[]
-  Locations        LocationCompany[]
-  Services         Service[]
-  Contracts        Contract[]
-  TicketTypes      TicketType[]
-  TicketPriorities TicketPriority[]
-  TicketCategories TicketCategory[]
+  UserCompanies         UserCompany[]
+  Tickets               TicketCompany[]
+  Equipments            EquipmentCompany[]
+  Locations             LocationCompany[]
+  Services              Service[]
+  Contracts             Contract[]
+  TicketTypes TicketTypeCompany[]
+  TicketCategories TicketCategoryCompany[]
+  TicketPriorityCompany TicketPriorityCompany[]
 }
 
 model UserCompany {
@@ -135,29 +135,55 @@ model LocationCompany {
 }
 
 model TicketType {
-  id        String   @id @default(uuid())
-  name      String
-  Ticket    Ticket[]
-  Company   Company  @relation(fields: [companyId], references: [id])
-  companyId String
+  id               String            @id @default(uuid())
+  name             String
+  Ticket           Ticket[]
+  TicketTypeCompanies TicketTypeCompany[]
+}
+
+model TicketTypeCompany {
+  ticketTypeId String
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id])
+  companyId    String
+  company      Company @relation(fields: [companyId], references: [id])
+  
+  @@id([ticketTypeId, companyId])
 }
 
 model TicketPriority {
-  id        String   @id @default(uuid())
-  name      String
-  Ticket    Ticket[]
-  Company   Company  @relation(fields: [companyId], references: [id])
-  companyId String
+  id     String   @id @default(uuid())
+  name   String
+  Ticket Ticket[]
+
+  TicketPriorityCompanies TicketPriorityCompany[]
+
+}
+
+model TicketPriorityCompany {
+  ticketPriorityId String
+  ticketPriority   TicketPriority @relation(fields: [ticketPriorityId], references: [id])
+  companyId        String
+  company          Company        @relation(fields: [companyId], references: [id])
+
+  @@id([ticketPriorityId, companyId])
 }
 
 model TicketCategory {
-  id           String   @id @default(uuid())
-  name         String
-  childrenName String
-  defaultText  String?
-  Ticket       Ticket[]
-  Company      Company  @relation(fields: [companyId], references: [id])
-  companyId    String
+  id               String                 @id @default(uuid())
+  name             String
+  childrenName     String
+  defaultText      String?
+  Ticket           Ticket[]
+  TicketCategoryCompanies TicketCategoryCompany[]
+}
+
+model TicketCategoryCompany {
+  ticketCategoryId String
+  ticketCategory   TicketCategory @relation(fields: [ticketCategoryId], references: [id])
+  companyId        String
+  company          Company @relation(fields: [companyId], references: [id])
+  
+  @@id([ticketCategoryId, companyId])
 }
 
 model Maintenance {

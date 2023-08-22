@@ -10,7 +10,7 @@ interface IRequestBody {
   ticket_category: string;
   ticket_priority: string;
   ticket_location: string;
-  companyId: string;
+  companyIds: string[];
 }
 
 interface IRequestQuery {
@@ -45,19 +45,33 @@ router.post("/", async (request: Request, response: Response) => {
 
     const { userId } = request.query as unknown as IRequestQuery;
 
-    const userCompany = await prisma.userCompany.findFirst({
-      where: {
-        userId: userId,
-        companyId: companyId,
-      },
-    });
-
-    if (!userCompany) {
-      return response.status(404).json({
-        message: "User is not associated with the provided company",
+    if (!companyIds || companyIds.length === 0) {
+      return response.status(400).json({
+        message: "Company IDs are required and must be an array.",
         error: true,
       });
     }
+
+    // Check if user is associated with the provided companies
+    const userCompanies = await prisma.userCompany.findMany({
+      where: {
+        userId: userId,
+        companyId: {
+          in: companyIds,
+        },
+      },
+    });
+
+    if (userCompanies.length === 0) {
+      return response.status(404).json({
+        message: "User is not associated with the provided companies",
+        error: true,
+      });
+    }
+
+    const ticketCompanies = companyIds.map((companyId) => ({
+      companyId: companyId,
+    }));
 
     const createTicket = await prisma.ticket.create({
       data: {
@@ -71,7 +85,9 @@ router.post("/", async (request: Request, response: Response) => {
         equipaments: [],
         images: [],
         userId,
-        TicketCompanies: c,
+        TicketCompanies: {
+          create: ticketCompanies,
+        },
       },
       include: {
         ticketCategory: true,
@@ -87,25 +103,25 @@ router.post("/", async (request: Request, response: Response) => {
     });
 
     const ticketCategoryId = {
-      id: createTicket.ticketCategoryId.id,
-      name: createTicket.ticketCategoryId.name,
-      childrenName: createTicket.ticketCategoryId.childrenName,
-      defaultText: createTicket.ticketCategoryId.defaultText,
+      id: createTicket.ticketCategory.id,
+      name: createTicket.ticketCategory.name,
+      childrenName: createTicket.ticketCategory.childrenName,
+      defaultText: createTicket.ticketCategory.defaultText,
     };
 
     const ticketLocationId = {
-      id: createTicket.ticketLocationId.id,
-      name: createTicket.ticketLocationId.name,
+      id: createTicket.ticketLocation.id,
+      name: createTicket.ticketLocation.name,
     };
 
     const ticketPriorityId = {
-      id: createTicket.ticketPriorityId.id,
-      name: createTicket.ticketPriorityId.name,
+      id: createTicket.ticketPriority.id,
+      name: createTicket.ticketPriority.name,
     };
 
     const ticketTypeId = {
-      id: createTicket.ticketTypeId.id,
-      name: createTicket.ticketTypeId.name,
+      id: createTicket.ticketType.id,
+      name: createTicket.ticketType.name,
     };
 
     const User = {
@@ -160,29 +176,54 @@ router.post("/", async (request: Request, response: Response) => {
 
 router.get("/", async (request: Request, response: Response) => {
   try {
-    const { companyId } = request.query;
+    const companyIds = request.query.companyIds as string[];
 
-    if (!companyId || typeof companyId !== "string") {
-      return response
-        .status(400)
-        .json({ message: "Company ID is required.", error: true });
+    if (!companyIds || !Array.isArray(companyIds)) {
+      return response.status(400).json({
+        message: "Company IDs are required and should be an array.",
+        error: true,
+      });
+    }
+
+    // Filter and cast companyIds to an array of strings
+    const filteredCompanyIds = companyIds.filter(
+      (id: any) => typeof id === "string"
+    );
+
+    // Check if filteredCompanyIds is empty after filtering
+    if (filteredCompanyIds.length === 0) {
+      return response.status(400).json({
+        message: "Company IDs should be an array of strings.",
+        error: true,
+      });
     }
 
     const getAllTickets = await prisma.ticket.findMany({
       where: {
-        companyId: companyId,
+        TicketCompanies: {
+          some: {
+            companyId: {
+              in: filteredCompanyIds,
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
       take: 10,
       include: {
-        ticketCategoryId: true,
-        ticketLocationId: true,
-        ticketPriorityId: true,
-        ticketTypeId: true,
+        ticketCategory: true,
+        ticketLocation: true,
+        ticketPriority: true,
+        ticketType: true,
         User: true,
         TicketEvaluation: true,
+        TicketCompanies: {
+          include: {
+            company: true,
+          },
+        },
       },
     });
 
@@ -287,10 +328,10 @@ router.put("/:id", async (request: Request, response: Response) => {
       where: { id: ticketId },
       data: updateData,
       include: {
-        ticketCategoryId: true,
-        ticketLocationId: true,
-        ticketPriorityId: true,
-        ticketTypeId: true,
+        ticketCategory: true,
+        ticketLocation: true,
+        ticketPriority: true,
+        ticketType: true,
         User: true,
       },
     });
