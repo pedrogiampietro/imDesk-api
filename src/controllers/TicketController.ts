@@ -11,6 +11,7 @@ interface IRequestBody {
   ticket_priority: string;
   ticket_location: string;
   companyIds: string[];
+  manualResolutionDueDate?: string;
 }
 
 interface IRequestQuery {
@@ -41,6 +42,7 @@ router.post("/", async (request: Request, response: Response) => {
       ticket_priority,
       ticket_location,
       companyIds,
+      manualResolutionDueDate,
     } = request.body as IRequestBody;
 
     const { userId } = request.query as unknown as IRequestQuery;
@@ -69,6 +71,57 @@ router.post("/", async (request: Request, response: Response) => {
       });
     }
 
+    const ticketTypeObj = await prisma.ticketType.findUnique({
+      where: {
+        id: ticket_type,
+      },
+    });
+
+    const ticketCategoryObj = await prisma.ticketCategory.findUnique({
+      where: {
+        id: ticket_category,
+      },
+    });
+
+    const ticketPriorityObj = await prisma.ticketPriority.findUnique({
+      where: {
+        id: ticket_priority,
+      },
+    });
+
+    if (!ticketTypeObj || !ticketCategoryObj || !ticketPriorityObj) {
+      return response.status(400).json({
+        message: "Invalid ticket type, category, or priority ID provided.",
+        error: true,
+      });
+    }
+
+    // Consultar a definição de SLA para o tipo e prioridade do ticket
+    const slaDef = await prisma.sLADefinition.findFirst({
+      where: {
+        ticketType: ticketTypeObj.name,
+        ticketCategory: ticketCategoryObj.name,
+        ticketPriority: ticketPriorityObj.name,
+      },
+    });
+
+    if (!slaDef) {
+      return response.status(400).json({
+        message:
+          "No SLA definition found for the provided ticket type, category, and priority.",
+        error: true,
+      });
+    }
+
+    let resolutionDueDate = new Date();
+    if (manualResolutionDueDate) {
+      resolutionDueDate = new Date(manualResolutionDueDate); // Se manualResolutionDueDate for fornecido, use-o
+    } else {
+      resolutionDueDate.setHours(
+        resolutionDueDate.getHours() + slaDef.resolutionTime
+      ); // Caso contrário, use o SLA padrão
+    }
+
     const ticketCompanies = companyIds.map((companyId) => ({
       companyId: companyId,
     }));
@@ -84,6 +137,10 @@ router.post("/", async (request: Request, response: Response) => {
         assignedTo: [],
         equipaments: [],
         images: [],
+        timeEstimate: resolutionDueDate,
+        manualResolutionDueDate: manualResolutionDueDate
+          ? new Date(manualResolutionDueDate)
+          : null,
         userId,
         TicketCompanies: {
           create: ticketCompanies,
@@ -152,7 +209,7 @@ router.post("/", async (request: Request, response: Response) => {
       closedBy: createTicket.closedBy,
       closedAt: createTicket.closedAt,
       status: createTicket.status,
-      timeEstimate: createTicket.timeEstimate,
+      timeEstimate: resolutionDueDate,
       isDelay: createTicket.isDelay,
       userId: createTicket.userId,
       createdAt: createTicket.createdAt,
@@ -307,6 +364,40 @@ router.put("/:id", async (request: Request, response: Response) => {
       }
       updateData.closedBy = loggedInUser.name;
       updateData.closedAt = new Date();
+    }
+
+    if (requestBody.slaDefinitionId || requestBody.manualResolutionDueDate) {
+      // Consultar a definição de SLA para o tipo e prioridade do ticket
+      const slaDef = await prisma.sLADefinition.findFirst({
+        where: {
+          id: Number(requestBody.slaDefinitionId),
+        },
+      });
+
+      if (!slaDef) {
+        return response.status(400).json({
+          message:
+            "No SLA definition found for the provided ticket type, category, and priority.",
+          error: true,
+        });
+      }
+
+      let resolutionDueDate = new Date();
+      if (requestBody.manualResolutionDueDate) {
+        resolutionDueDate = new Date(requestBody.manualResolutionDueDate); // Se manualResolutionDueDate for fornecido, use-o
+      } else {
+        resolutionDueDate.setHours(
+          resolutionDueDate.getHours() + slaDef.resolutionTime
+        ); // Caso contrário, use o SLA padrão
+      }
+
+      // Atualize o timeEstimate com a resolutionDueDate
+      updateData.timeEstimate = resolutionDueDate;
+
+      // Vincular ao SLADefinition (se fornecido)
+      if (requestBody.slaDefinitionId) {
+        updateData.slaDefinitionId = Number(requestBody.slaDefinitionId);
+      }
     }
 
     const updatedTicket = await prisma.ticket.update({
