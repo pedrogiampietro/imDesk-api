@@ -113,6 +113,7 @@ router.post("/sign-in", async (request: Request, response: Response) => {
       id: findUser.id,
       name: findUser.name,
       email: findUser.email,
+      avatarUrl: findUser.avatarUrl,
       isTechnician: findUser.isTechnician,
       companies: findUser.UserCompanies.map((uc) => ({
         companyId: uc.company.id,

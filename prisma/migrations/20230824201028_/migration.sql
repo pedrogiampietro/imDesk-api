@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "MachineInfo" ALTER COLUMN "memoryFree" SET DATA TYPE TEXT,
+ALTER COLUMN "memoryTotal" SET DATA TYPE TEXT;

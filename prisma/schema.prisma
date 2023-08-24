@@ -49,6 +49,7 @@ model User {
   isTechnician             Boolean   @default(false)
   createdAt                DateTime? @default(now())
   updatedAt                DateTime? @default(now())
+  avatarUrl                String?
 
   Ticket           Ticket[]
   RefreshTokens    RefreshToken[]
@@ -59,7 +60,7 @@ model User {
 }
 
 model Ticket {
-  id                      String         @id @default(uuid())
+  id                      String    @id @default(uuid())
   description             String
   ticketTypeId            String
   ticketCategoryId        String
@@ -73,24 +74,24 @@ model Ticket {
   closedAt                DateTime?
   status                  String?
   timeEstimate            DateTime?
-  isDelay                 Boolean?       @default(false)
+  isDelay                 Boolean?  @default(false)
   userId                  String?
-  manualResolutionDueDate DateTime? 
-  slaViolated             Boolean        @default(false)
-  createdAt               DateTime       @default(now())
-  updatedAt               DateTime       @default(now())
-  slaDefinitionId         Int?           // Campo adicionado
+  manualResolutionDueDate DateTime?
+  slaViolated             Boolean   @default(false)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @default(now())
+  slaDefinitionId         Int? // Campo adicionado
 
-  ticketType       TicketType            @relation(fields: [ticketTypeId], references: [id])
-  ticketCategory   TicketCategory        @relation(fields: [ticketCategoryId], references: [id])
-  ticketPriority   TicketPriority        @relation(fields: [ticketPriorityId], references: [id])
-  ticketLocation   Locations             @relation(fields: [ticketLocationId], references: [id])
-  User             User?                 @relation(fields: [userId], references: [id])
+  ticketType       TicketType         @relation(fields: [ticketTypeId], references: [id])
+  ticketCategory   TicketCategory     @relation(fields: [ticketCategoryId], references: [id])
+  ticketPriority   TicketPriority     @relation(fields: [ticketPriorityId], references: [id])
+  ticketLocation   Locations          @relation(fields: [ticketLocationId], references: [id])
+  User             User?              @relation(fields: [userId], references: [id])
   TicketResponse   TicketResponse[]
   TicketEvaluation TicketEvaluation[]
   TicketCompanies  TicketCompany[]
   SLAViolation     SLAViolation[]
-  SLADefinition    SLADefinition?        @relation(fields: [slaDefinitionId], references: [id])  // Relação adicionada
+  SLADefinition    SLADefinition?     @relation(fields: [slaDefinitionId], references: [id]) // Relação adicionada
 }
 
 model Equipments {
@@ -231,49 +232,54 @@ model TicketResponse {
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }
 
-model MachineInfo {
+model DiskInfo {
   id        String   @id @default(uuid())
-  hostname  String
-  platform  String
-  release   String
-  cpu       String
-  memory    String
+  device    String
+  size      BigInt
+  used      BigInt
+  available BigInt
+  capacity  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  NetworkConnections NetworkConnection[]
-  UserInfos          UserInfo[]
+  machineInfoId String
+  machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
 }
 
-model NetworkConnection {
-  id           String   @id @default(uuid())
-  protocol     String
-  localAddress String
-  localPort    String
-  peerAddress  String
-  peerPort     String
-  state        String
-  pid          Int
-  process      String
-  createdAt    DateTime @default(now())
+model InstalledApp {
+  id              String   @id @default(uuid())
+  displayName     String
+  displayIcon     String?
+  displayVersion  String?
+  installLocation String?
+  publisher       String?
+  uninstallString String?
+  otherDetails    Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   machineInfoId String
   machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
 }
 
-model UserInfo {
-  id        String   @id @default(uuid())
-  user      String
-  tty       String
-  date      DateTime
-  time      String
-  ip        String?
-  command   String
-  createdAt DateTime @default(now())
+model MachineInfo {
+  id          String   @id @default(uuid())
+  hostname    String
+  platform    String
+  release     String
+  cpu         String
+  memoryTotal String
+  memoryFree  String
+  userInfo    String
+  macAddress  String
+  ipAddress   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  machineInfoId String
-  machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
+  Disks              DiskInfo[]
+  InstalledApps      InstalledApp[]
 }
+
 
 model RefreshToken {
   id          String   @id @unique @default(uuid())
@@ -346,12 +352,12 @@ model SLAViolation {
 }
 
 model SLADefinition {
-  id             Int        @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   ticketType     String
   ticketPriority String
   ticketCategory String
   resolutionTime Int
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  Tickets        Ticket[]   
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Tickets        Ticket[]
 }
