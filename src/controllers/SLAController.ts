@@ -5,15 +5,12 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 router.post("/", async (request: Request, response: Response) => {
-  const { ticketType, ticketPriority, ticketCategory, resolutionTime } =
-    request.body;
+  const { ticketPriority, resolutionTime } = request.body;
 
   try {
     const newSLA = await prisma.sLADefinition.create({
       data: {
-        ticketType,
         ticketPriority,
-        ticketCategory,
         resolutionTime,
       },
     });

@@ -71,25 +71,13 @@ router.post("/", async (request: Request, response: Response) => {
       });
     }
 
-    const ticketTypeObj = await prisma.ticketType.findUnique({
-      where: {
-        id: ticket_type,
-      },
-    });
-
-    const ticketCategoryObj = await prisma.ticketCategory.findUnique({
-      where: {
-        id: ticket_category,
-      },
-    });
-
     const ticketPriorityObj = await prisma.ticketPriority.findUnique({
       where: {
         id: ticket_priority,
       },
     });
 
-    if (!ticketTypeObj || !ticketCategoryObj || !ticketPriorityObj) {
+    if (!ticketPriorityObj) {
       return response.status(400).json({
         message: "Invalid ticket type, category, or priority ID provided.",
         error: true,
@@ -99,16 +87,13 @@ router.post("/", async (request: Request, response: Response) => {
     // Consultar a definição de SLA para o tipo e prioridade do ticket
     const slaDef = await prisma.sLADefinition.findFirst({
       where: {
-        ticketType: ticketTypeObj.name,
-        ticketCategory: ticketCategoryObj.name,
         ticketPriority: ticketPriorityObj.name,
       },
     });
 
     if (!slaDef) {
       return response.status(400).json({
-        message:
-          "No SLA definition found for the provided ticket type, category, and priority.",
+        message: "No SLA definition found for the provided ticket priority.",
         error: true,
       });
     }

@@ -292,15 +292,20 @@ model RefreshToken {
 }
 
 model Provider {
-  id        String     @id @default(uuid())
-  name      String
-  phone     String
-  email     String     @unique
-  address   String
-  createdAt DateTime?  @default(now())
-  updatedAt DateTime?  @default(now())
-  Contract  Contract[]
-  Service   Service[]
+  id          String     @id @default(uuid())
+  name        String
+  phone       String
+  email       String     @unique
+  address     String
+  status      Boolean    @default(true)
+  logoURL     String?    
+  description String?    
+  category    String?    
+  price       Float?     
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @default(now())
+  Contract    Contract[]
+  Service     Service[]
 }
 
 model Contract {
@@ -312,8 +317,7 @@ model Contract {
   endDate    DateTime
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())
-
-  Company   Company @relation(fields: [companyId], references: [id])
+  Company    Company   @relation(fields: [companyId], references: [id])
   companyId String
 }
 
@@ -325,8 +329,7 @@ model Service {
   price      Float
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())
-
-  Company   Company @relation(fields: [companyId], references: [id])
+  Company    Company   @relation(fields: [companyId], references: [id])
   companyId String
 }
 
@@ -353,9 +356,7 @@ model SLAViolation {
 
 model SLADefinition {
   id             Int      @id @default(autoincrement())
-  ticketType     String
   ticketPriority String
-  ticketCategory String
   resolutionTime Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

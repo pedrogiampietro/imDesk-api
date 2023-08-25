@@ -6,24 +6,17 @@ async function main() {
   // SLAs de exemplo
   const slaData = [
     {
-      ticketType: "Preventiva",
-      ticketCategory: "Software",
       ticketPriority: "Alta",
-      resolutionTime: 2, // em horas
+      resolutionTime: 12, // em horas
     },
     {
-      ticketType: "Preventiva",
-      ticketCategory: "Hardware",
       ticketPriority: "Média",
-      resolutionTime: 4, // em horas
-    },
-    {
-      ticketType: "Corretiva",
-      ticketCategory: "Rede",
-      ticketPriority: "Baixa",
       resolutionTime: 24, // em horas
     },
-    // ... implementar o restante das SLAs conforme necessário
+    {
+      ticketPriority: "Baixa",
+      resolutionTime: 72, // em horas
+    },
   ];
 
   for (const sla of slaData) {
