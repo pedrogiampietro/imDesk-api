@@ -7,7 +7,7 @@
     "start": "node build/server.js",
     "build": "tsc",
     "dev": "tsnd --exit-child src/server.ts",
-    "seed": "ts-node prisma/seed.ts"
+    "create:seeds": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

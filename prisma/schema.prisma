@@ -57,6 +57,7 @@ model User {
   TicketResponse   TicketResponse[]
   TicketEvaluation TicketEvaluation[]
   UserCompanies    UserCompany[]
+  Notification     Notification[]
 }
 
 model Ticket {
@@ -92,6 +93,7 @@ model Ticket {
   TicketCompanies  TicketCompany[]
   SLAViolation     SLAViolation[]
   SLADefinition    SLADefinition?     @relation(fields: [slaDefinitionId], references: [id]) // Relação adicionada
+  Notification     Notification[]
 }
 
 model Equipments {
@@ -276,10 +278,9 @@ model MachineInfo {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  Disks              DiskInfo[]
-  InstalledApps      InstalledApp[]
+  Disks         DiskInfo[]
+  InstalledApps InstalledApp[]
 }
-
 
 model RefreshToken {
   id          String   @id @unique @default(uuid())
@@ -298,10 +299,10 @@ model Provider {
   email       String     @unique
   address     String
   status      Boolean    @default(true)
-  logoURL     String?    
-  description String?    
-  category    String?    
-  price       Float?     
+  logoURL     String?
+  description String?
+  category    String?
+  price       Float?
   createdAt   DateTime?  @default(now())
   updatedAt   DateTime?  @default(now())
   Contract    Contract[]
@@ -318,7 +319,7 @@ model Contract {
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())
   Company    Company   @relation(fields: [companyId], references: [id])
-  companyId String
+  companyId  String
 }
 
 model Service {
@@ -330,7 +331,7 @@ model Service {
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())
   Company    Company   @relation(fields: [companyId], references: [id])
-  companyId String
+  companyId  String
 }
 
 model TicketEvaluation {
@@ -361,4 +362,16 @@ model SLADefinition {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   Tickets        Ticket[]
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  ticketId  String
+  type      String // Tipo da Notificação (Ticket Pulled, Ticket Closed, etc.)
+  isRead    Boolean  @default(false)
+  User      User     @relation(fields: [userId], references: [id])
+  Ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }

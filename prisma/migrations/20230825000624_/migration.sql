@@ -29,10 +29,12 @@ CREATE TABLE "User" (
     "phone" TEXT NOT NULL,
     "ramal" TEXT NOT NULL,
     "sector" TEXT NOT NULL,
-    "currentLoggedCompany" TEXT NOT NULL,
+    "currentLoggedCompanyId" TEXT,
+    "currentLoggedCompanyName" TEXT,
     "isTechnician" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "avatarUrl" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -55,8 +57,11 @@ CREATE TABLE "Ticket" (
     "timeEstimate" TIMESTAMP(3),
     "isDelay" BOOLEAN DEFAULT false,
     "userId" TEXT,
+    "manualResolutionDueDate" TIMESTAMP(3),
+    "slaViolated" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "slaDefinitionId" INTEGER,
 
     CONSTRAINT "Ticket_pkey" PRIMARY KEY ("id")
 );
@@ -199,49 +204,53 @@ CREATE TABLE "TicketResponse" (
 );
 
 -- CreateTable
+CREATE TABLE "DiskInfo" (
+    "id" TEXT NOT NULL,
+    "device" TEXT NOT NULL,
+    "size" BIGINT NOT NULL,
+    "used" BIGINT NOT NULL,
+    "available" BIGINT NOT NULL,
+    "capacity" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "machineInfoId" TEXT NOT NULL,
+
+    CONSTRAINT "DiskInfo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "InstalledApp" (
+    "id" TEXT NOT NULL,
+    "displayName" TEXT NOT NULL,
+    "displayIcon" TEXT,
+    "displayVersion" TEXT,
+    "installLocation" TEXT,
+    "publisher" TEXT,
+    "uninstallString" TEXT,
+    "otherDetails" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "machineInfoId" TEXT NOT NULL,
+
+    CONSTRAINT "InstalledApp_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "MachineInfo" (
     "id" TEXT NOT NULL,
     "hostname" TEXT NOT NULL,
     "platform" TEXT NOT NULL,
     "release" TEXT NOT NULL,
     "cpu" TEXT NOT NULL,
-    "memory" TEXT NOT NULL,
+    "memoryTotal" TEXT NOT NULL,
+    "memoryFree" TEXT NOT NULL,
+    "userInfo" TEXT NOT NULL,
+    "macAddress" TEXT NOT NULL,
+    "ipAddress" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "MachineInfo_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "NetworkConnection" (
-    "id" TEXT NOT NULL,
-    "protocol" TEXT NOT NULL,
-    "localAddress" TEXT NOT NULL,
-    "localPort" TEXT NOT NULL,
-    "peerAddress" TEXT NOT NULL,
-    "peerPort" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
-    "pid" INTEGER NOT NULL,
-    "process" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "machineInfoId" TEXT NOT NULL,
-
-    CONSTRAINT "NetworkConnection_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "UserInfo" (
-    "id" TEXT NOT NULL,
-    "user" TEXT NOT NULL,
-    "tty" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
-    "time" TEXT NOT NULL,
-    "ip" TEXT,
-    "command" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "machineInfoId" TEXT NOT NULL,
-
-    CONSTRAINT "UserInfo_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -309,6 +318,29 @@ CREATE TABLE "TicketEvaluation" (
     CONSTRAINT "TicketEvaluation_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "SLAViolation" (
+    "id" TEXT NOT NULL,
+    "reason" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "SLAViolation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SLADefinition" (
+    "id" SERIAL NOT NULL,
+    "ticketType" TEXT NOT NULL,
+    "ticketPriority" TEXT NOT NULL,
+    "ticketCategory" TEXT NOT NULL,
+    "resolutionTime" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SLADefinition_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
@@ -341,6 +373,9 @@ ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ticketLocationId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_slaDefinitionId_fkey" FOREIGN KEY ("slaDefinitionId") REFERENCES "SLADefinition"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -391,10 +426,10 @@ ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_userId_fkey" FOREIGN
 ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "NetworkConnection" ADD CONSTRAINT "NetworkConnection_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DiskInfo" ADD CONSTRAINT "DiskInfo_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserInfo" ADD CONSTRAINT "UserInfo_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "InstalledApp" ADD CONSTRAINT "InstalledApp_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -416,3 +451,6 @@ ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_userId_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SLAViolation" ADD CONSTRAINT "SLAViolation_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
