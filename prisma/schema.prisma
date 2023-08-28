@@ -69,7 +69,6 @@ model Ticket {
   ticketLocationId        String
   assignedTo              String[]
   equipaments             String[]
-  images                  String[]
   assignedToAt            DateTime?
   closedBy                String?
   closedAt                DateTime?
@@ -94,6 +93,14 @@ model Ticket {
   SLAViolation     SLAViolation[]
   SLADefinition    SLADefinition?     @relation(fields: [slaDefinitionId], references: [id]) // Relação adicionada
   Notification     Notification[]
+  images Image[]
+}
+
+model Image {
+  id       Int      @id @default(autoincrement())
+  path     String
+  ticketId String
+  ticket   Ticket   @relation(fields: [ticketId], references: [id])
 }
 
 model Equipments {

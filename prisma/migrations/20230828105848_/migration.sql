@@ -272,6 +272,11 @@ CREATE TABLE "Provider" (
     "phone" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "address" TEXT NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT true,
+    "logoURL" TEXT,
+    "description" TEXT,
+    "category" TEXT,
+    "price" DOUBLE PRECISION,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
 
@@ -331,14 +336,25 @@ CREATE TABLE "SLAViolation" (
 -- CreateTable
 CREATE TABLE "SLADefinition" (
     "id" SERIAL NOT NULL,
-    "ticketType" TEXT NOT NULL,
     "ticketPriority" TEXT NOT NULL,
-    "ticketCategory" TEXT NOT NULL,
     "resolutionTime" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "SLADefinition_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Notification" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -454,3 +470,9 @@ ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_ticketId_fkey" F
 
 -- AddForeignKey
 ALTER TABLE "SLAViolation" ADD CONSTRAINT "SLAViolation_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

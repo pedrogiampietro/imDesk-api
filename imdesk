@@ -1,0 +1,645 @@
+_type: export
+__export_format: 4
+__export_date: 2023-08-28T13:00:06.355Z
+__export_source: insomnia.desktop.app:v2023.5.6
+resources:
+  - _id: req_2a9cf04107e24600a08e6e3fc15ed6b3
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1671669334100
+    created: 1669313278208
+    url: http://www.imdesk.tk/
+    name: Status Server
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669313278208
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: wrk_32d4bc60a895415eacd70debbca34947
+    parentId: null
+    modified: 1693227534240
+    created: 1692980988310
+    name: ImDesk
+    description: ""
+    scope: design
+    _type: workspace
+  - _id: req_20f61d0d8ea7432492d12e55aba37b37
+    parentId: fld_780ab7911f4248daa89283e4b9021924
+    modified: 1669332396608
+    created: 1669332370886
+    url: http://localhost:3333/equipament/
+    name: List All Equipaments
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669332370886
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_780ab7911f4248daa89283e4b9021924
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669332341041
+    created: 1669332337067
+    name: Equipaments
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313274920
+    _type: request_group
+  - _id: req_0dd64a1fe4044d1386ae3b0f201c824c
+    parentId: fld_780ab7911f4248daa89283e4b9021924
+    modified: 1669333306450
+    created: 1669332402516
+    url: http://localhost:3333/equipament/
+    name: Create Equipament
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "Monitor Dell 24",
+        		"model": "Dell",
+            "serialNumber": "7312890-370128-93789012-12893712-893789",
+        		"patrimonyTag": "CEJAM-9381"
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669322824547
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_d4df6f5fd0b3442e9adc575e34e15c49
+    parentId: fld_06e9d491eb2a42e786a23ea72905aced
+    modified: 1669567838998
+    created: 1669335293718
+    url: http://localhost:3333/ticket-category
+    name: List All Category
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669332370886
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_06e9d491eb2a42e786a23ea72905aced
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669568618649
+    created: 1669335293715
+    name: Ticket Category
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313273276
+    _type: request_group
+  - _id: req_880391be6eaf4afc99b1111960d7e202
+    parentId: fld_06e9d491eb2a42e786a23ea72905aced
+    modified: 1669567878675
+    created: 1669335293724
+    url: http://localhost:3333/ticket-category
+    name: Create Category
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "WTT",
+        		"childrenName": "Verificar serviço de envio"
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669322824547
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_0ed7d1a2788e436ab002a1495bbc3c17
+    parentId: fld_356e30be6ff84040a3bdf0e352cae441
+    modified: 1671571156782
+    created: 1671571130033
+    url: http://localhost:3333/maintenance
+    name: List All Maintenance
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669332370886
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_356e30be6ff84040a3bdf0e352cae441
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1671571130030
+    created: 1671571130030
+    name: Maintenance
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313272865
+    _type: request_group
+  - _id: req_396d70bcce784e4ca9be0a3c2ece7e38
+    parentId: fld_356e30be6ff84040a3bdf0e352cae441
+    modified: 1671659819989
+    created: 1671571130037
+    url: http://localhost:3333/maintenance
+    name: Create Maintenance
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "CEJAM-3390",
+        		"location": "Tecnologia da Informação",
+        		"serialNumber": "1293-1290kda-s1902-38asd",
+        		"patrimony": "002347",
+        		"model": "THINKCENTRE",
+        		"nextDatePreventive": ""
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669322824547
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_fa0407359f594c7788231e011b33f422
+    parentId: fld_356e30be6ff84040a3bdf0e352cae441
+    modified: 1671578304949
+    created: 1671577922960
+    url: http://localhost:3333/maintenance
+    name: Complete Preventive Maintenance
+    description: ""
+    method: PATCH
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"id": "559fe11f-106c-438d-9196-dc237a7178a0"
+        	
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669318051377.5
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_4c89e40ae33b4cbeae4c971404f9af31
+    parentId: fld_9429764928324b909e8dda117ff9761e
+    modified: 1669470235400
+    created: 1669470173394
+    url: http://localhost:3333/ticket-type
+    name: List All Type
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669332370886
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_9429764928324b909e8dda117ff9761e
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669470173392
+    created: 1669470173392
+    name: Ticket Type
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313272454
+    _type: request_group
+  - _id: req_e326216eb1f94dba9ac196e3d04a4d01
+    parentId: fld_9429764928324b909e8dda117ff9761e
+    modified: 1669567889263
+    created: 1669470173397
+    url: http://localhost:3333/ticket-type
+    name: Create Type
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "Preventiva"
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669322824547
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_28c88af3536e4f9cad48bca8f1ce747b
+    parentId: fld_6d34c6f3d99f444d91929c6ac70a5252
+    modified: 1669470296493
+    created: 1669470276459
+    url: http://localhost:3333/ticket-priority
+    name: List All Priority
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669332370886
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_6d34c6f3d99f444d91929c6ac70a5252
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669470276457
+    created: 1669470276457
+    name: Ticket Priority
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313272043
+    _type: request_group
+  - _id: req_5ddd3f3331a740f7a97e230872ed1df6
+    parentId: fld_6d34c6f3d99f444d91929c6ac70a5252
+    modified: 1669567893384
+    created: 1669470276462
+    url: http://localhost:3333/ticket-priority
+    name: Create Priority
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "Baixa"
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669322824547
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_45c543523c134f90b09571965f89a1ac
+    parentId: fld_67e02b5ae0554b648ab945ccd114369e
+    modified: 1669491928829
+    created: 1669491903110
+    url: http://localhost:3333/ticket-location
+    name: List All Location
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1669332370886
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_67e02b5ae0554b648ab945ccd114369e
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669491903104
+    created: 1669491903104
+    name: Ticket Location
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313271837.5
+    _type: request_group
+  - _id: req_c91c98e6ea63458ba686348b05fd4ce6
+    parentId: fld_67e02b5ae0554b648ab945ccd114369e
+    modified: 1669569730622
+    created: 1669491903115
+    url: http://localhost:3333/location
+    name: Create Location
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "Direção"
+        }
+    parameters:
+      - id: pair_3be4c50bdefd4dd4b491c9b46b921a90
+        name: userId
+        value: c8dd076b-da8a-4589-bd21-4f87c165f801
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_6a2cd508f75c47d89f54eb75fb194645
+      - id: pair_39a2098e5922462789298c0d1880fecd
+        name: ""
+        value: ""
+        description: ""
+    authentication: {}
+    metaSortKey: -1669322824547
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_0d760e3778f941c8831fbd590574f5f9
+    parentId: fld_1779da4b0bc7476b957c177389457f15
+    modified: 1693227482159
+    created: 1692981138993
+    url: http://localhost:3333/companies
+    name: Create Companie
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name": "Hospital da Mulher Mariska Ribeiro",
+        	"address": "Bangu"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1693227481492
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_1779da4b0bc7476b957c177389457f15
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1693227505393
+    created: 1693227454341
+    name: Companies
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313271734.75
+    _type: request_group
+  - _id: req_ef9afa18eb3c4993bdbde98bce5bb20e
+    parentId: fld_d4466a6144034058bba052668c6f2597
+    modified: 1671669583425
+    created: 1669313194573
+    url: "{{ _.productionUrl }}/authenticate/sign-in"
+    name: Login
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"email": "pedro@dev.com",
+        	"password": "secret"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -1669313194573
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_d4466a6144034058bba052668c6f2597
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669313271632
+    created: 1669313271632
+    name: Autenticação
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313271632
+    _type: request_group
+  - _id: req_06fab3de05344fecae3918cd8ac0dbcc
+    parentId: fld_d4466a6144034058bba052668c6f2597
+    modified: 1693227521459
+    created: 1669332358435
+    url: http://localhost:3333/authenticate/sign-up
+    name: Register
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"username": "pedrogiampietro",
+          "name": "Pedro Giampietro",
+          "email": "pedro@dev.com",     
+          "password": "secret",
+        	"phone": "21997221764",
+          "ramal": "1072",
+          "sector": "TI",
+        	"isTechnician": true,
+        	"companyIds": ["cd561dd4-6a14-4cf8-a335-18a599666e0a"]
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -1669313194523
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_9d02eeaf49de40959297bd74f3b5e76e
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1671669574185
+    created: 1669313194567
+    name: Base Environment
+    data:
+      devUrl: http://localhost
+      productionUrl: http://www.imdesk.tk
+      token: "{% response 'body', 'req_5d195bc631e64aad92eee44cecd0ece3',
+        'b64::JC50b2tlbnMudG9rZW4=::46b', 'never', 60 %}"
+    dataPropertyOrder:
+      "&":
+        - devUrl
+        - productionUrl
+        - token
+    color: null
+    isPrivate: false
+    metaSortKey: 1669313194567
+    _type: environment
+  - _id: jar_bfd36545b43549a2b39cb5d5abd0a97c
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669313194569
+    created: 1669313194569
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar
+  - _id: spc_7da6ee6992e04e33a8da854404d16457
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1693227534234
+    created: 1692980988317
+    fileName: ImDesk
+    contents: ""
+    contentType: yaml
+    _type: api_spec
+  - _id: uts_ec53efc1675e41da904ebf7c2750f251
+    parentId: wrk_32d4bc60a895415eacd70debbca34947
+    modified: 1669313194575
+    created: 1669313194575
+    name: Example Test Suite
+    _type: unit_test_suite

@@ -1,21 +1,13 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { uploadTickets } from "../middlewares/multer";
 
 const prisma = new PrismaClient();
 const router = express.Router();
 
-interface IRequestBody {
-  ticket_description: string;
-  ticket_type: string;
-  ticket_category: string;
-  ticket_priority: string;
-  ticket_location: string;
-  companyIds: string[];
-  manualResolutionDueDate?: string;
-}
-
 interface IRequestQuery {
   userId: string;
+  companyIds: string[];
 }
 
 interface ITicketResponseRequestBody {
@@ -33,188 +25,200 @@ interface ITicketEvaluationRequestBody {
   userId: string;
 }
 
-router.post("/", async (request: Request, response: Response) => {
-  try {
-    const {
-      ticket_description,
-      ticket_type,
-      ticket_category,
-      ticket_priority,
-      ticket_location,
-      companyIds,
-      manualResolutionDueDate,
-    } = request.body as IRequestBody;
+router.post(
+  "/",
+  uploadTickets.array("ticket_images"),
+  async (request: Request, response: Response) => {
+    try {
+      const { userId } = request.query as unknown as IRequestQuery;
+      const companyIds = JSON.parse(request.body.companyIds as string);
+      const values = JSON.parse(request.body.values as string);
+      const ticket_images = request.files as Express.Multer.File[];
 
-    const { userId } = request.query as unknown as IRequestQuery;
+      const {
+        ticket_description,
+        ticket_type,
+        ticket_category,
+        ticket_priority,
+        ticket_location,
+        manualResolutionDueDate,
+      } = values;
 
-    if (!companyIds || companyIds.length === 0) {
-      return response.status(400).json({
-        message: "Company IDs are required and must be an array.",
-        error: true,
-      });
-    }
+      if (!companyIds || companyIds.length === 0) {
+        return response.status(400).json({
+          message: "Company IDs are required and must be an array.",
+          error: true,
+        });
+      }
 
-    // Check if user is associated with the provided companies
-    const userCompanies = await prisma.userCompany.findMany({
-      where: {
-        userId: userId,
-        companyId: {
-          in: companyIds,
-        },
-      },
-    });
-
-    if (userCompanies.length === 0) {
-      return response.status(404).json({
-        message: "User is not associated with the provided companies",
-        error: true,
-      });
-    }
-
-    const ticketPriorityObj = await prisma.ticketPriority.findUnique({
-      where: {
-        id: ticket_priority,
-      },
-    });
-
-    if (!ticketPriorityObj) {
-      return response.status(400).json({
-        message: "Invalid ticket type, category, or priority ID provided.",
-        error: true,
-      });
-    }
-
-    // Consultar a definição de SLA para o tipo e prioridade do ticket
-    const slaDef = await prisma.sLADefinition.findFirst({
-      where: {
-        ticketPriority: ticketPriorityObj.name,
-      },
-    });
-
-    if (!slaDef) {
-      return response.status(400).json({
-        message: "No SLA definition found for the provided ticket priority.",
-        error: true,
-      });
-    }
-
-    let resolutionDueDate = new Date();
-    if (manualResolutionDueDate) {
-      resolutionDueDate = new Date(manualResolutionDueDate); // Se manualResolutionDueDate for fornecido, use-o
-    } else {
-      resolutionDueDate.setHours(
-        resolutionDueDate.getHours() + slaDef.resolutionTime
-      ); // Caso contrário, use o SLA padrão
-    }
-
-    const ticketCompanies = companyIds.map((companyId) => ({
-      companyId: companyId,
-    }));
-
-    const createTicket = await prisma.ticket.create({
-      data: {
-        description: ticket_description,
-        ticketTypeId: ticket_type,
-        ticketCategoryId: ticket_category,
-        ticketLocationId: ticket_location,
-        ticketPriorityId: ticket_priority,
-        status: "new",
-        assignedTo: [],
-        equipaments: [],
-        images: [],
-        timeEstimate: resolutionDueDate,
-        manualResolutionDueDate: manualResolutionDueDate
-          ? new Date(manualResolutionDueDate)
-          : null,
-        userId,
-        TicketCompanies: {
-          create: ticketCompanies,
-        },
-      },
-      include: {
-        ticketCategory: true,
-        ticketLocation: true,
-        ticketPriority: true,
-        ticketType: true,
-        User: {
-          include: {
-            UserCompanies: true,
+      // Check if user is associated with the provided companies
+      const userCompanies = await prisma.userCompany.findMany({
+        where: {
+          userId: userId,
+          companyId: {
+            in: companyIds,
           },
         },
-      },
-    });
+      });
 
-    const ticketCategoryId = {
-      id: createTicket.ticketCategory.id,
-      name: createTicket.ticketCategory.name,
-      childrenName: createTicket.ticketCategory.childrenName,
-      defaultText: createTicket.ticketCategory.defaultText,
-    };
+      if (userCompanies.length === 0) {
+        return response.status(404).json({
+          message: "User is not associated with the provided companies",
+          error: true,
+        });
+      }
 
-    const ticketLocationId = {
-      id: createTicket.ticketLocation.id,
-      name: createTicket.ticketLocation.name,
-    };
+      const ticketPriorityObj = await prisma.ticketPriority.findUnique({
+        where: {
+          id: ticket_priority,
+        },
+      });
 
-    const ticketPriorityId = {
-      id: createTicket.ticketPriority.id,
-      name: createTicket.ticketPriority.name,
-    };
+      if (!ticketPriorityObj) {
+        return response.status(400).json({
+          message: "Invalid ticket type, category, or priority ID provided.",
+          error: true,
+        });
+      }
 
-    const ticketTypeId = {
-      id: createTicket.ticketType.id,
-      name: createTicket.ticketType.name,
-    };
+      // Consultar a definição de SLA para o tipo e prioridade do ticket
+      const slaDef = await prisma.sLADefinition.findFirst({
+        where: {
+          ticketPriority: ticketPriorityObj.name,
+        },
+      });
 
-    const User = {
-      id: createTicket.User?.id,
-      username: createTicket.User?.username,
-      name: createTicket.User?.name,
-      email: createTicket.User?.email,
-      password: createTicket.User?.password,
-      phone: createTicket.User?.phone,
-      ramal: createTicket.User?.ramal,
-      sector: createTicket.User?.sector,
-      createdAt: createTicket.User?.createdAt,
-      updatedAt: createTicket.User?.updatedAt,
-      Company: createTicket.User?.UserCompanies,
-    };
+      if (!slaDef) {
+        return response.status(400).json({
+          message: "No SLA definition found for the provided ticket priority.",
+          error: true,
+        });
+      }
 
-    const responseObj = {
-      id: createTicket.id,
-      description: createTicket.description,
-      ticketType: createTicket.ticketType,
-      ticketCategory: createTicket.ticketCategory,
-      ticketPriority: createTicket.ticketPriority,
-      ticketLocation: createTicket.ticketLocation,
-      assignedTo: createTicket.assignedTo,
-      equipaments: createTicket.equipaments,
-      images: createTicket.images,
-      assignedToAt: createTicket.assignedToAt,
-      closedBy: createTicket.closedBy,
-      closedAt: createTicket.closedAt,
-      status: createTicket.status,
-      timeEstimate: resolutionDueDate,
-      isDelay: createTicket.isDelay,
-      userId: createTicket.userId,
-      createdAt: createTicket.createdAt,
-      updatedAt: createTicket.updatedAt,
-      ticketCategoryId,
-      ticketLocationId,
-      ticketPriorityId,
-      ticketTypeId,
-      User,
-    };
+      let resolutionDueDate = new Date();
+      if (manualResolutionDueDate) {
+        resolutionDueDate = new Date(manualResolutionDueDate); // Se manualResolutionDueDate for fornecido, use-o
+      } else {
+        resolutionDueDate.setHours(
+          resolutionDueDate.getHours() + slaDef.resolutionTime
+        ); // Caso contrário, use o SLA padrão
+      }
 
-    return response.status(200).json({
-      message: "Ticket created successfully",
-      body: responseObj,
-      error: false,
-    });
-  } catch (err) {
-    return response.status(500).json(err);
+      const ticketImages = ticket_images.map((image) => ({
+        path: `http://${request.headers.host}/uploads/tickets_img/${image.filename}`,
+      }));
+
+      const ticketCompanies = companyIds.map((companyId: any) => ({
+        companyId: companyId,
+      }));
+
+      const createTicket = await prisma.ticket.create({
+        data: {
+          description: ticket_description,
+          ticketTypeId: ticket_type,
+          ticketCategoryId: ticket_category,
+          ticketLocationId: ticket_location,
+          ticketPriorityId: ticket_priority,
+          status: "new",
+          assignedTo: [],
+          equipaments: [],
+          images: {
+            create: ticketImages,
+          },
+          timeEstimate: resolutionDueDate,
+          manualResolutionDueDate: manualResolutionDueDate
+            ? new Date(manualResolutionDueDate)
+            : null,
+          userId,
+          TicketCompanies: {
+            create: ticketCompanies,
+          },
+        },
+        include: {
+          ticketCategory: true,
+          ticketLocation: true,
+          ticketPriority: true,
+          ticketType: true,
+          User: {
+            include: {
+              UserCompanies: true,
+            },
+          },
+        },
+      });
+
+      const ticketCategoryId = {
+        id: createTicket.ticketCategory.id,
+        name: createTicket.ticketCategory.name,
+        childrenName: createTicket.ticketCategory.childrenName,
+        defaultText: createTicket.ticketCategory.defaultText,
+      };
+
+      const ticketLocationId = {
+        id: createTicket.ticketLocation.id,
+        name: createTicket.ticketLocation.name,
+      };
+
+      const ticketPriorityId = {
+        id: createTicket.ticketPriority.id,
+        name: createTicket.ticketPriority.name,
+      };
+
+      const ticketTypeId = {
+        id: createTicket.ticketType.id,
+        name: createTicket.ticketType.name,
+      };
+
+      const User = {
+        id: createTicket.User?.id,
+        username: createTicket.User?.username,
+        name: createTicket.User?.name,
+        email: createTicket.User?.email,
+        password: createTicket.User?.password,
+        phone: createTicket.User?.phone,
+        ramal: createTicket.User?.ramal,
+        sector: createTicket.User?.sector,
+        createdAt: createTicket.User?.createdAt,
+        updatedAt: createTicket.User?.updatedAt,
+        Company: createTicket.User?.UserCompanies,
+      };
+
+      const responseObj = {
+        id: createTicket.id,
+        description: createTicket.description,
+        ticketType: createTicket.ticketType,
+        ticketCategory: createTicket.ticketCategory,
+        ticketPriority: createTicket.ticketPriority,
+        ticketLocation: createTicket.ticketLocation,
+        assignedTo: createTicket.assignedTo,
+        equipaments: createTicket.equipaments,
+        // images: createTicket.images,
+        assignedToAt: createTicket.assignedToAt,
+        closedBy: createTicket.closedBy,
+        closedAt: createTicket.closedAt,
+        status: createTicket.status,
+        timeEstimate: resolutionDueDate,
+        isDelay: createTicket.isDelay,
+        userId: createTicket.userId,
+        createdAt: createTicket.createdAt,
+        updatedAt: createTicket.updatedAt,
+        ticketCategoryId,
+        ticketLocationId,
+        ticketPriorityId,
+        ticketTypeId,
+        User,
+      };
+
+      return response.status(200).json({
+        message: "Ticket created successfully",
+        body: responseObj,
+        error: false,
+      });
+    } catch (err) {
+      return response.status(500).json(err);
+    }
   }
-});
+);
 
 router.get("/", async (request: Request, response: Response) => {
   try {
@@ -251,6 +255,7 @@ router.get("/", async (request: Request, response: Response) => {
             company: true,
           },
         },
+        images: true,
       },
     });
 
