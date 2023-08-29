@@ -1,10 +1,10 @@
 _type: export
 __export_format: 4
-__export_date: 2023-08-28T13:00:06.355Z
+__export_date: 2023-08-29T21:12:56.865Z
 __export_source: insomnia.desktop.app:v2023.5.6
 resources:
-  - _id: req_2a9cf04107e24600a08e6e3fc15ed6b3
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: req_28fec07891eb4b83ade88cc00538f888
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1671669334100
     created: 1669313278208
     url: http://www.imdesk.tk/
@@ -24,16 +24,16 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: wrk_292683b1ec4342c9a567bab842d00800
     parentId: null
-    modified: 1693227534240
-    created: 1692980988310
+    modified: 1693227619675
+    created: 1693227619675
     name: ImDesk
     description: ""
     scope: design
     _type: workspace
-  - _id: req_20f61d0d8ea7432492d12e55aba37b37
-    parentId: fld_780ab7911f4248daa89283e4b9021924
+  - _id: req_ed78ed52fd6b44f29fc3cd99b0488ad4
+    parentId: fld_089d44b733e5401e9c155130df644e1b
     modified: 1669332396608
     created: 1669332370886
     url: http://localhost:3333/equipament/
@@ -53,8 +53,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_780ab7911f4248daa89283e4b9021924
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_089d44b733e5401e9c155130df644e1b
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669332341041
     created: 1669332337067
     name: Equipaments
@@ -63,8 +63,8 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313274920
     _type: request_group
-  - _id: req_0dd64a1fe4044d1386ae3b0f201c824c
-    parentId: fld_780ab7911f4248daa89283e4b9021924
+  - _id: req_2bee58ef4826414d877e368622396d3b
+    parentId: fld_089d44b733e5401e9c155130df644e1b
     modified: 1669333306450
     created: 1669332402516
     url: http://localhost:3333/equipament/
@@ -103,8 +103,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_d4df6f5fd0b3442e9adc575e34e15c49
-    parentId: fld_06e9d491eb2a42e786a23ea72905aced
+  - _id: req_cab2ca0c3c5047e58178f6bbec1bcc66
+    parentId: fld_0ff534c4b7a04546979eb745d86083c2
     modified: 1669567838998
     created: 1669335293718
     url: http://localhost:3333/ticket-category
@@ -124,8 +124,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_06e9d491eb2a42e786a23ea72905aced
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_0ff534c4b7a04546979eb745d86083c2
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669568618649
     created: 1669335293715
     name: Ticket Category
@@ -134,8 +134,8 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313273276
     _type: request_group
-  - _id: req_880391be6eaf4afc99b1111960d7e202
-    parentId: fld_06e9d491eb2a42e786a23ea72905aced
+  - _id: req_0c7b619f131d4651b07345adb363fdff
+    parentId: fld_0ff534c4b7a04546979eb745d86083c2
     modified: 1669567878675
     created: 1669335293724
     url: http://localhost:3333/ticket-category
@@ -172,8 +172,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_0ed7d1a2788e436ab002a1495bbc3c17
-    parentId: fld_356e30be6ff84040a3bdf0e352cae441
+  - _id: req_665a2cd8ae8b4016bb2acb056455f4e4
+    parentId: fld_9940a8e4cd644d4fb8aae9bac68e7eac
     modified: 1671571156782
     created: 1671571130033
     url: http://localhost:3333/maintenance
@@ -193,8 +193,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_356e30be6ff84040a3bdf0e352cae441
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_9940a8e4cd644d4fb8aae9bac68e7eac
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1671571130030
     created: 1671571130030
     name: Maintenance
@@ -203,8 +203,8 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313272865
     _type: request_group
-  - _id: req_396d70bcce784e4ca9be0a3c2ece7e38
-    parentId: fld_356e30be6ff84040a3bdf0e352cae441
+  - _id: req_c72bcaab977641a78ddeaf8f948630e8
+    parentId: fld_9940a8e4cd644d4fb8aae9bac68e7eac
     modified: 1671659819989
     created: 1671571130037
     url: http://localhost:3333/maintenance
@@ -245,8 +245,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_fa0407359f594c7788231e011b33f422
-    parentId: fld_356e30be6ff84040a3bdf0e352cae441
+  - _id: req_5dbffe6e974b41f484ba3380309dc2e8
+    parentId: fld_9940a8e4cd644d4fb8aae9bac68e7eac
     modified: 1671578304949
     created: 1671577922960
     url: http://localhost:3333/maintenance
@@ -283,8 +283,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_4c89e40ae33b4cbeae4c971404f9af31
-    parentId: fld_9429764928324b909e8dda117ff9761e
+  - _id: req_4ec2d4de64df4bf79a9534b1151d3233
+    parentId: fld_d19291d74d5449a5a2665c925a99adf2
     modified: 1669470235400
     created: 1669470173394
     url: http://localhost:3333/ticket-type
@@ -304,8 +304,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_9429764928324b909e8dda117ff9761e
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_d19291d74d5449a5a2665c925a99adf2
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669470173392
     created: 1669470173392
     name: Ticket Type
@@ -314,8 +314,8 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313272454
     _type: request_group
-  - _id: req_e326216eb1f94dba9ac196e3d04a4d01
-    parentId: fld_9429764928324b909e8dda117ff9761e
+  - _id: req_7d4cec2390d14f6a890f112ee91b56cf
+    parentId: fld_d19291d74d5449a5a2665c925a99adf2
     modified: 1669567889263
     created: 1669470173397
     url: http://localhost:3333/ticket-type
@@ -351,8 +351,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_28c88af3536e4f9cad48bca8f1ce747b
-    parentId: fld_6d34c6f3d99f444d91929c6ac70a5252
+  - _id: req_8fd78d8a5e5e449e97aa462c17cfd084
+    parentId: fld_8fef9e7229884030bf55d736056c8e0b
     modified: 1669470296493
     created: 1669470276459
     url: http://localhost:3333/ticket-priority
@@ -372,8 +372,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_6d34c6f3d99f444d91929c6ac70a5252
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_8fef9e7229884030bf55d736056c8e0b
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669470276457
     created: 1669470276457
     name: Ticket Priority
@@ -382,8 +382,8 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313272043
     _type: request_group
-  - _id: req_5ddd3f3331a740f7a97e230872ed1df6
-    parentId: fld_6d34c6f3d99f444d91929c6ac70a5252
+  - _id: req_12938ec6dec548d2855d9552043d8d3a
+    parentId: fld_8fef9e7229884030bf55d736056c8e0b
     modified: 1669567893384
     created: 1669470276462
     url: http://localhost:3333/ticket-priority
@@ -419,8 +419,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_45c543523c134f90b09571965f89a1ac
-    parentId: fld_67e02b5ae0554b648ab945ccd114369e
+  - _id: req_7ad7093d9f844848a0e6b1444dac485d
+    parentId: fld_e1800c495390463dbfb6680839ee62a8
     modified: 1669491928829
     created: 1669491903110
     url: http://localhost:3333/ticket-location
@@ -440,8 +440,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_67e02b5ae0554b648ab945ccd114369e
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_e1800c495390463dbfb6680839ee62a8
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669491903104
     created: 1669491903104
     name: Ticket Location
@@ -450,8 +450,8 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313271837.5
     _type: request_group
-  - _id: req_c91c98e6ea63458ba686348b05fd4ce6
-    parentId: fld_67e02b5ae0554b648ab945ccd114369e
+  - _id: req_485252013c4343178566d1da09cb83df
+    parentId: fld_e1800c495390463dbfb6680839ee62a8
     modified: 1669569730622
     created: 1669491903115
     url: http://localhost:3333/location
@@ -487,8 +487,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_0d760e3778f941c8831fbd590574f5f9
-    parentId: fld_1779da4b0bc7476b957c177389457f15
+  - _id: req_718accc789f44342a588fe3224f19e44
+    parentId: fld_2bf6ae64da3a4c62b3165c2140f4a715
     modified: 1693227482159
     created: 1692981138993
     url: http://localhost:3333/companies
@@ -518,8 +518,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_1779da4b0bc7476b957c177389457f15
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_2bf6ae64da3a4c62b3165c2140f4a715
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1693227505393
     created: 1693227454341
     name: Companies
@@ -528,8 +528,249 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313271734.75
     _type: request_group
-  - _id: req_ef9afa18eb3c4993bdbde98bce5bb20e
-    parentId: fld_d4466a6144034058bba052668c6f2597
+  - _id: req_23230696842f495bb1dee63486cf3bba
+    parentId: fld_2bf6ae64da3a4c62b3165c2140f4a715
+    modified: 1693310063979
+    created: 1693310061849
+    url: http://localhost:3333/companies
+    name: List Companies
+    description: ""
+    method: GET
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name": "Hospital da Mulher Mariska Ribeiro",
+        	"address": "Bangu"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1681279926189
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_dcf3a86a893e4d6dafba79ca966262db
+    parentId: fld_4ccfd26c2ff94c65804995642768e595
+    modified: 1693312860636
+    created: 1693310076306
+    url: http://localhost:3333/deposit
+    name: Create Deposit
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+            "name": "Depósito Exemplo",
+            "companyId": "a0a88fc0-a449-4fe0-95a9-8acdddbd5ca4",
+            "location": "Localização Exemplo"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1693227481492
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_4ccfd26c2ff94c65804995642768e595
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
+    modified: 1693310076296
+    created: 1693310076296
+    name: Deposit
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313271683.375
+    _type: request_group
+  - _id: req_f5f33d37026b484884352c8c60899f48
+    parentId: fld_4ccfd26c2ff94c65804995642768e595
+    modified: 1693313435901
+    created: 1693313164845
+    url: http://localhost:3333/deposit/67322405-c7c1-4e71-9d96-2ef237050a24
+    name: UpdateDeposit
+    description: ""
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+            "name": "Depósito Exemplo 2",
+            "companyId": "a0a88fc0-a449-4fe0-95a9-8acdddbd5ca4",
+            "location": "Localização Exemplo 2",
+        		"userId": "09a456f2-1348-490d-8359-c5da81b6f1a2"
+        }
+    parameters:
+      - id: pair_bb119e20b2ef4a6bb68483833066d11e
+        name: ""
+        value: ""
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1687253703840.5
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_c32a4d660f664a25b054de054d1712e6
+    parentId: fld_4ccfd26c2ff94c65804995642768e595
+    modified: 1693312928467
+    created: 1693310076348
+    url: http://localhost:3333/deposit
+    name: List Deposits
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - id: pair_ae21e2d83db646bfb208b52153ae2f52
+        name: companyId
+        value: a0a88fc0-a449-4fe0-95a9-8acdddbd5ca4
+        description: ""
+    headers:
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1681279926189
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_57ae93d1c65c432193aca8bd93687486
+    parentId: fld_6e91ae354f624eacbe135e87a985610f
+    modified: 1693313698864
+    created: 1693313164759
+    url: http://localhost:3333/deposit-item/items/8771877c-6f36-4167-9cfe-b21823208179
+    name: Update Item
+    description: ""
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+            "name": "SSD 240",
+            "quantity": 2
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1693227481492
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_6e91ae354f624eacbe135e87a985610f
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
+    modified: 1693313164747
+    created: 1693313164747
+    name: Deposit-Item
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1669313271657.6875
+    _type: request_group
+  - _id: req_1403e33fb37546c1be1ef32bb43e4151
+    parentId: fld_6e91ae354f624eacbe135e87a985610f
+    modified: 1693313468976
+    created: 1693311358756
+    url: http://localhost:3333/deposit-item/items
+    name: Create Item
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+            "name": "SSD 240",
+            "depotId": "67322405-c7c1-4e71-9d96-2ef237050a24",
+            "quantity": 6
+        }
+    parameters:
+      - id: pair_bb119e20b2ef4a6bb68483833066d11e
+        name: ""
+        value: ""
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1690240592666.25
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_392f0fa1d609468b8bb6eb70314962ab
+    parentId: fld_6e91ae354f624eacbe135e87a985610f
+    modified: 1693313545713
+    created: 1693313164802
+    url: http://localhost:3333/deposit-item/items
+    name: List Items
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - id: pair_ae21e2d83db646bfb208b52153ae2f52
+        name: depotId
+        value: 67322405-c7c1-4e71-9d96-2ef237050a24
+        description: ""
+    headers:
+      - name: User-Agent
+        value: Insomnia/2023.5.6
+    authentication: {}
+    metaSortKey: -1681279926189
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_11a975cfcf63426fbd8d0f618795737c
+    parentId: fld_d3d8d50376374e1cab701adb758ada98
     modified: 1671669583425
     created: 1669313194573
     url: "{{ _.productionUrl }}/authenticate/sign-in"
@@ -557,8 +798,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: fld_d4466a6144034058bba052668c6f2597
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: fld_d3d8d50376374e1cab701adb758ada98
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669313271632
     created: 1669313271632
     name: Autenticação
@@ -567,9 +808,9 @@ resources:
     environmentPropertyOrder: null
     metaSortKey: -1669313271632
     _type: request_group
-  - _id: req_06fab3de05344fecae3918cd8ac0dbcc
-    parentId: fld_d4466a6144034058bba052668c6f2597
-    modified: 1693227521459
+  - _id: req_0258bee3e83b45e5a3fc6643fb527844
+    parentId: fld_d3d8d50376374e1cab701adb758ada98
+    modified: 1693313005633
     created: 1669332358435
     url: http://localhost:3333/authenticate/sign-up
     name: Register
@@ -579,15 +820,15 @@ resources:
       mimeType: application/json
       text: |-
         {
-        	"username": "pedrogiampietro",
-          "name": "Pedro Giampietro",
+        	"username": "pedro",
+          "name": "Pedro",
           "email": "pedro@dev.com",     
           "password": "secret",
         	"phone": "21997221764",
           "ramal": "1072",
           "sector": "TI",
         	"isTechnician": true,
-        	"companyIds": ["cd561dd4-6a14-4cf8-a335-18a599666e0a"]
+        	"companyIds": ["a0a88fc0-a449-4fe0-95a9-8acdddbd5ca4"]
         }
     parameters: []
     headers:
@@ -603,8 +844,8 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: env_9d02eeaf49de40959297bd74f3b5e76e
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: env_8c93d58b9c4648d49ff90cecd933bad3
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1671669574185
     created: 1669313194567
     name: Base Environment
@@ -622,23 +863,23 @@ resources:
     isPrivate: false
     metaSortKey: 1669313194567
     _type: environment
-  - _id: jar_bfd36545b43549a2b39cb5d5abd0a97c
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: jar_dd938663ef454b25baa75b91c8dc9641
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669313194569
     created: 1669313194569
     name: Default Jar
     cookies: []
     _type: cookie_jar
-  - _id: spc_7da6ee6992e04e33a8da854404d16457
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
-    modified: 1693227534234
-    created: 1692980988317
+  - _id: spc_950e73f99c644808a481c5e014533d93
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
+    modified: 1693227619693
+    created: 1693227619687
     fileName: ImDesk
     contents: ""
     contentType: yaml
     _type: api_spec
-  - _id: uts_ec53efc1675e41da904ebf7c2750f251
-    parentId: wrk_32d4bc60a895415eacd70debbca34947
+  - _id: uts_a201197ae1c04398845dc3509464afeb
+    parentId: wrk_292683b1ec4342c9a567bab842d00800
     modified: 1669313194575
     created: 1669313194575
     name: Example Test Suite
