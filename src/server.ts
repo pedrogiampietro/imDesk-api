@@ -15,6 +15,8 @@ import colletInformationController from "./controllers/ColletInformation";
 import providerController from "./controllers/ProviderController";
 import companiesController from "./controllers/CompanyController";
 import slaController from "./controllers/SLAController";
+import depositController from "./controllers/DepositController";
+import depositItemController from "./controllers/DepositItemController";
 
 const app = express();
 
@@ -51,6 +53,8 @@ app.use("/collect", colletInformationController);
 app.use("/providers", providerController);
 app.use("/companies", companiesController);
 app.use("/sla", slaController);
+app.use("/deposit", depositController);
+app.use("/deposit-item", depositItemController);
 
 app.get("/", (req, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });

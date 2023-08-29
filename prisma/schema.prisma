@@ -24,6 +24,7 @@ model Company {
   TicketTypes           TicketTypeCompany[]
   TicketCategories      TicketCategoryCompany[]
   TicketPriorityCompany TicketPriorityCompany[]
+  Depots                Depot[]
 }
 
 model UserCompany {
@@ -58,6 +59,17 @@ model User {
   TicketEvaluation TicketEvaluation[]
   UserCompanies    UserCompany[]
   Notification     Notification[]
+  DepotUsers       DepotUser[]
+  Log              Log[]
+}
+
+model DepotUser {
+  depotId String
+  Depot   Depot  @relation(fields: [depotId], references: [id])
+  userId  String
+  User    User   @relation(fields: [userId], references: [id])
+
+  @@id([depotId, userId])
 }
 
 model Ticket {
@@ -80,7 +92,7 @@ model Ticket {
   slaViolated             Boolean   @default(false)
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @default(now())
-  slaDefinitionId         Int? // Campo adicionado
+  slaDefinitionId         Int?
 
   ticketType       TicketType         @relation(fields: [ticketTypeId], references: [id])
   ticketCategory   TicketCategory     @relation(fields: [ticketCategoryId], references: [id])
@@ -91,16 +103,17 @@ model Ticket {
   TicketEvaluation TicketEvaluation[]
   TicketCompanies  TicketCompany[]
   SLAViolation     SLAViolation[]
-  SLADefinition    SLADefinition?     @relation(fields: [slaDefinitionId], references: [id]) // Relação adicionada
+  SLADefinition    SLADefinition?     @relation(fields: [slaDefinitionId], references: [id])
   Notification     Notification[]
-  images Image[]
+  images           Image[]
+  usedItems        TicketItem[]
 }
 
 model Image {
-  id       Int      @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   path     String
   ticketId String
-  ticket   Ticket   @relation(fields: [ticketId], references: [id])
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
 }
 
 model Equipments {
@@ -377,8 +390,51 @@ model Notification {
   updatedAt DateTime @updatedAt
   userId    String
   ticketId  String
-  type      String // Tipo da Notificação (Ticket Pulled, Ticket Closed, etc.)
+  type      String
   isRead    Boolean  @default(false)
   User      User     @relation(fields: [userId], references: [id])
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
+}
+
+model Depot {
+  id         String      @id @default(uuid())
+  name       String
+  location   String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now())
+  companyId  String
+  Company    Company     @relation(fields: [companyId], references: [id])
+  DepotItems DepotItem[]
+  DepotUsers DepotUser[]
+}
+
+model DepotItem {
+  id            String       @id @default(uuid())
+  name          String
+  category      String?
+  quantity      Int
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now())
+  depotId       String
+  Depot         Depot        @relation(fields: [depotId], references: [id])
+  usedInTickets TicketItem[]
+}
+
+model TicketItem {
+  ticketId    String
+  Ticket      Ticket    @relation(fields: [ticketId], references: [id])
+  depotItemId String
+  DepotItem   DepotItem @relation(fields: [depotItemId], references: [id])
+  quantity    Int
+
+  @@id([ticketId, depotItemId])
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  details   String
+  createdAt DateTime @default(now())
 }
