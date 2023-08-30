@@ -54,11 +54,23 @@ router.get("/", async (request: Request, response: Response) => {
       },
       include: {
         Company: true,
+        DepotUsers: {
+          include: {
+            User: true,
+          },
+        },
       },
     });
+
+    // Mapear os depósitos para incluir os usuários no formato desejado
+    const depotsWithUsers = depots.map((depot) => ({
+      ...depot,
+      users: depot.DepotUsers.map((depotUser) => depotUser.User),
+    }));
+
     return response.status(200).json({
       message: "Depósitos encontrados",
-      body: depots,
+      body: depotsWithUsers,
       error: false,
     });
   } catch (err) {
@@ -72,7 +84,6 @@ router.put("/:id", async (request: Request, response: Response) => {
   const { name, userId } = request.body;
 
   try {
-    // Atualize o nome do Depot
     const depot = await prisma.depot.update({
       where: {
         id,
@@ -80,19 +91,69 @@ router.put("/:id", async (request: Request, response: Response) => {
       data: {
         name,
       },
+      include: {
+        Company: true,
+        DepotUsers: {
+          include: {
+            User: true,
+          },
+        },
+      },
     });
 
-    // Sempre crie um novo DepotUser
-    await prisma.depotUser.create({
-      data: {
+    const existingDepotUsers = await prisma.depotUser.findMany({
+      where: {
         depotId: id,
-        userId,
+      },
+    });
+
+    const usersToRemove = existingDepotUsers.filter(
+      (depotUser) => !userId.includes(depotUser.userId)
+    );
+    for (let user of usersToRemove) {
+      await prisma.depotUser.delete({
+        where: {
+          depotId_userId: {
+            depotId: id,
+            userId: user.userId,
+          },
+        },
+      });
+    }
+
+    for (let usersId of userId) {
+      const existingDepotUser = existingDepotUsers.find(
+        (depotUser) => depotUser.userId === usersId
+      );
+
+      if (!existingDepotUser) {
+        await prisma.depotUser.create({
+          data: {
+            depotId: id,
+            userId: usersId,
+          },
+        });
+      }
+    }
+
+    // Busque o Depot atualizado do banco de dados
+    const updatedDepot = await prisma.depot.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Company: true,
+        DepotUsers: {
+          include: {
+            User: true,
+          },
+        },
       },
     });
 
     return response.status(200).json({
       message: "Depósito atualizado com sucesso",
-      body: depot,
+      body: updatedDepot,
       error: false,
     });
   } catch (err) {
