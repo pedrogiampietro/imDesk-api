@@ -413,6 +413,7 @@ model DepotItem {
   name          String
   category      String?
   quantity      Int
+  cost          Int
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @default(now())
   depotId       String
@@ -421,13 +422,13 @@ model DepotItem {
 }
 
 model TicketItem {
+  id          String    @id @default(uuid())
   ticketId    String
   Ticket      Ticket    @relation(fields: [ticketId], references: [id])
   depotItemId String
   DepotItem   DepotItem @relation(fields: [depotItemId], references: [id])
   quantity    Int
-
-  @@id([ticketId, depotItemId])
+  cost        Int?
 }
 
 model Log {

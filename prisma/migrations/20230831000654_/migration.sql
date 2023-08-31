@@ -40,6 +40,14 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
+CREATE TABLE "DepotUser" (
+    "depotId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "DepotUser_pkey" PRIMARY KEY ("depotId","userId")
+);
+
+-- CreateTable
 CREATE TABLE "Ticket" (
     "id" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -378,7 +386,7 @@ CREATE TABLE "Depot" (
 );
 
 -- CreateTable
-CREATE TABLE "Item" (
+CREATE TABLE "DepotItem" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "category" TEXT,
@@ -387,22 +395,28 @@ CREATE TABLE "Item" (
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "depotId" TEXT NOT NULL,
 
-    CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "DepotItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "TicketItem" (
     "ticketId" TEXT NOT NULL,
-    "itemId" TEXT NOT NULL,
+    "depotItemId" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
+    "cost" INTEGER,
 
-    CONSTRAINT "TicketItem_pkey" PRIMARY KEY ("ticketId","itemId")
+    CONSTRAINT "TicketItem_pkey" PRIMARY KEY ("ticketId","depotItemId")
 );
 
 -- CreateTable
-CREATE TABLE "_UserDepots" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+CREATE TABLE "Log" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
+    "details" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -417,17 +431,17 @@ CREATE UNIQUE INDEX "RefreshToken_id_key" ON "RefreshToken"("id");
 -- CreateIndex
 CREATE UNIQUE INDEX "Provider_email_key" ON "Provider"("email");
 
--- CreateIndex
-CREATE UNIQUE INDEX "_UserDepots_AB_unique" ON "_UserDepots"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_UserDepots_B_index" ON "_UserDepots"("B");
-
 -- AddForeignKey
 ALTER TABLE "UserCompany" ADD CONSTRAINT "UserCompany_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserCompany" ADD CONSTRAINT "UserCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DepotUser" ADD CONSTRAINT "DepotUser_depotId_fkey" FOREIGN KEY ("depotId") REFERENCES "Depot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DepotUser" ADD CONSTRAINT "DepotUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ticketTypeId_fkey" FOREIGN KEY ("ticketTypeId") REFERENCES "TicketType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -538,16 +552,13 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_ticketId_fkey" FOREIGN K
 ALTER TABLE "Depot" ADD CONSTRAINT "Depot_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Item" ADD CONSTRAINT "Item_depotId_fkey" FOREIGN KEY ("depotId") REFERENCES "Depot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DepotItem" ADD CONSTRAINT "DepotItem_depotId_fkey" FOREIGN KEY ("depotId") REFERENCES "Depot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_depotItemId_fkey" FOREIGN KEY ("depotItemId") REFERENCES "DepotItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_UserDepots" ADD CONSTRAINT "_UserDepots_A_fkey" FOREIGN KEY ("A") REFERENCES "Depot"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UserDepots" ADD CONSTRAINT "_UserDepots_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Log" ADD CONSTRAINT "Log_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
