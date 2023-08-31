@@ -391,6 +391,7 @@ CREATE TABLE "DepotItem" (
     "name" TEXT NOT NULL,
     "category" TEXT,
     "quantity" INTEGER NOT NULL,
+    "cost" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "depotId" TEXT NOT NULL,
@@ -400,12 +401,13 @@ CREATE TABLE "DepotItem" (
 
 -- CreateTable
 CREATE TABLE "TicketItem" (
+    "id" TEXT NOT NULL,
     "ticketId" TEXT NOT NULL,
     "depotItemId" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "cost" INTEGER,
 
-    CONSTRAINT "TicketItem_pkey" PRIMARY KEY ("ticketId","depotItemId")
+    CONSTRAINT "TicketItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
