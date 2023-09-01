@@ -51,6 +51,7 @@ model User {
   createdAt                DateTime? @default(now())
   updatedAt                DateTime? @default(now())
   avatarUrl                String?
+  hourlyRate               Float?
 
   Ticket           Ticket[]
   RefreshTokens    RefreshToken[]
@@ -107,6 +108,7 @@ model Ticket {
   Notification     Notification[]
   images           Image[]
   usedItems        TicketItem[]
+  Todos            Todo[]
 }
 
 model Image {
@@ -438,4 +440,13 @@ model Log {
   action    String
   details   String
   createdAt DateTime @default(now())
+}
+
+model Todo {
+  id          String  @id @default(uuid())
+  description String
+  completed   Boolean @default(false)
+  ticketId    String
+
+  Ticket Ticket @relation(fields: [ticketId], references: [id])
 }
