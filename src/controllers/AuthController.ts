@@ -39,6 +39,7 @@ router.post("/sign-up", async (request, response) => {
         ramal,
         sector,
         isTechnician,
+        groupId: null,
         UserCompanies: {
           create: companyIds.map((companyId: string) => ({
             companyId,

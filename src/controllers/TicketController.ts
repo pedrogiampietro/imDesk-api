@@ -68,6 +68,15 @@ router.post(
         });
       }
 
+      const currentUserGroup = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          groupId: true,
+        },
+      });
+
       const ticketPriorityObj = await prisma.ticketPriority.findUnique({
         where: {
           id: ticket_priority,
@@ -125,6 +134,7 @@ router.post(
           images: {
             create: ticketImages,
           },
+          groupId: currentUserGroup?.groupId,
           timeEstimate: resolutionDueDate,
           manualResolutionDueDate: manualResolutionDueDate
             ? new Date(manualResolutionDueDate)
@@ -222,7 +232,7 @@ router.post(
 
 router.get("/", async (request: Request, response: Response) => {
   try {
-    const { companyId } = request.query;
+    const { companyId, currentUserId } = request.query;
 
     if (!companyId || typeof companyId !== "string") {
       return response.status(400).json({
@@ -231,8 +241,31 @@ router.get("/", async (request: Request, response: Response) => {
       });
     }
 
+    const userIdStr = String(currentUserId);
+
+    const currentUserGroup = await prisma.user.findUnique({
+      where: {
+        id: userIdStr,
+      },
+      select: {
+        group: true,
+      },
+    });
+
+    const userAndGroupCondition = {
+      OR: [
+        {
+          userId: userIdStr,
+        },
+        {
+          groupId: currentUserGroup?.group?.id,
+        },
+      ],
+    };
+
     const getAllTickets = await prisma.ticket.findMany({
       where: {
+        ...userAndGroupCondition,
         TicketCompanies: {
           some: {
             companyId: companyId,

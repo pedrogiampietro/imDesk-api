@@ -52,6 +52,7 @@ model User {
   updatedAt                DateTime? @default(now())
   avatarUrl                String?
   hourlyRate               Float?
+  groupId                  Int?
 
   Ticket           Ticket[]
   RefreshTokens    RefreshToken[]
@@ -62,6 +63,7 @@ model User {
   Notification     Notification[]
   DepotUsers       DepotUser[]
   Log              Log[]
+  group            Group?             @relation(fields: [groupId], references: [id])
 }
 
 model DepotUser {
@@ -94,6 +96,7 @@ model Ticket {
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @default(now())
   slaDefinitionId         Int?
+  groupId                 Int?
 
   ticketType       TicketType         @relation(fields: [ticketTypeId], references: [id])
   ticketCategory   TicketCategory     @relation(fields: [ticketCategoryId], references: [id])
@@ -109,6 +112,7 @@ model Ticket {
   images           Image[]
   usedItems        TicketItem[]
   Todos            Todo[]
+  group            Group?             @relation(fields: [groupId], references: [id])
 }
 
 model Image {
@@ -433,15 +437,6 @@ model TicketItem {
   cost        Int?
 }
 
-model Log {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  action    String
-  details   String
-  createdAt DateTime @default(now())
-}
-
 model Todo {
   id          String  @id @default(uuid())
   description String
@@ -449,4 +444,20 @@ model Todo {
   ticketId    String
 
   Ticket Ticket @relation(fields: [ticketId], references: [id])
+}
+
+model Group {
+  id      Int      @id @default(autoincrement())
+  name    String
+  users   User[]
+  tickets Ticket[]
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  details   String
+  createdAt DateTime @default(now())
 }
