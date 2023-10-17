@@ -26,6 +26,7 @@ model Company {
   TicketPriorityCompany TicketPriorityCompany[]
   Depots                Depot[]
   GroupCompanies        GroupCompany[]
+  EquipmentTypes        EquipmentTypeCompany[]
 }
 
 model UserCompany {
@@ -163,8 +164,6 @@ model TicketCompany {
 
   @@id([ticketId, companyId])
 }
-
-
 
 model LocationCompany {
   locationId String
@@ -468,6 +467,24 @@ model GroupCompany {
   company   Company @relation(fields: [companyId], references: [id])
 
   @@id([groupId, companyId])
+}
+
+model EquipmentType {
+  id        String                 @id @default(uuid())
+  name      String
+  companies EquipmentTypeCompany[]
+}
+
+model EquipmentTypeCompany {
+  id              String   @unique @default(uuid())
+  equipmentTypeId String
+  companyId       String
+  createdAt       DateTime @default(now())
+
+  equipmentType EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  company       Company       @relation(fields: [companyId], references: [id])
+
+  @@id([equipmentTypeId, companyId])
 }
 
 model Log {

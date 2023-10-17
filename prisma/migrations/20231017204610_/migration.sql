@@ -98,6 +98,16 @@ CREATE TABLE "Equipments" (
 );
 
 -- CreateTable
+CREATE TABLE "EquipmentCompany" (
+    "equipmentId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "groupId" INTEGER,
+    "userId" TEXT,
+
+    CONSTRAINT "EquipmentCompany_pkey" PRIMARY KEY ("equipmentId","companyId")
+);
+
+-- CreateTable
 CREATE TABLE "Locations" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -111,15 +121,6 @@ CREATE TABLE "TicketCompany" (
     "companyId" TEXT NOT NULL,
 
     CONSTRAINT "TicketCompany_pkey" PRIMARY KEY ("ticketId","companyId")
-);
-
--- CreateTable
-CREATE TABLE "EquipmentCompany" (
-    "equipmentId" TEXT NOT NULL,
-    "companyId" TEXT NOT NULL,
-    "userId" TEXT,
-
-    CONSTRAINT "EquipmentCompany_pkey" PRIMARY KEY ("equipmentId","companyId")
 );
 
 -- CreateTable
@@ -502,19 +503,22 @@ ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_groupId_fkey" FOREIGN KEY ("groupId"
 ALTER TABLE "Image" ADD CONSTRAINT "Image_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_equipmentId_fkey" FOREIGN KEY ("equipmentId") REFERENCES "Equipments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LocationCompany" ADD CONSTRAINT "LocationCompany_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Locations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
