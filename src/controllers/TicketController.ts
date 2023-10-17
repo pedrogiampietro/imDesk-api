@@ -248,7 +248,7 @@ router.get("/", async (request: Request, response: Response) => {
         id: userIdStr,
       },
       select: {
-        group: true,
+        Groups: true,
       },
     });
 
@@ -258,7 +258,7 @@ router.get("/", async (request: Request, response: Response) => {
           userId: userIdStr,
         },
         {
-          groupId: currentUserGroup?.group?.id,
+          groupId: currentUserGroup?.Groups?.id,
         },
       ],
     };

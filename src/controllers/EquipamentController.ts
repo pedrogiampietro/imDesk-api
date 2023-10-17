@@ -4,75 +4,50 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const router = express.Router();
 
-router.post("/", async (request: Request, response: Response) => {
-  const { userId } = request.query;
-  const { name, model, serialNumber, patrimonyTag, type, companyIds } =
+router.post("/", async (request, response) => {
+  const { name, model, serialNumber, patrimonyTag, type, companyId, groupId } =
     request.body;
 
-  if (!companyIds || !Array.isArray(companyIds)) {
-    return response.status(400).json({
-      message: "CompanyIds are required and should be an array.",
-      error: true,
-    });
-  }
-
-  // Filter and cast companyIds to an array of strings
-  const filteredCompanyIds = companyIds.filter((id) => typeof id === "string");
-
-  // Check if filteredCompanyIds is empty after filtering
-  if (filteredCompanyIds.length === 0) {
-    return response.status(400).json({
-      message: "CompanyIds should be an array of strings.",
-      error: true,
-    });
-  }
-
   try {
-    const createEquipament = await prisma.equipments.create({
+    const newEquipment = await prisma.equipments.create({
       data: {
         name,
         model,
         serialNumber,
         patrimonyTag,
         type,
-        EquipmentCompanies: {
-          create: filteredCompanyIds.map((companyId) => ({
-            companyId: companyId,
-            userId: String(userId),
-          })),
-        },
       },
     });
 
-    return response.status(200).json({
-      message: "Equipamento criado com sucesso",
-      body: createEquipament,
+    if (newEquipment) {
+      await prisma.equipmentCompany.create({
+        data: {
+          equipmentId: newEquipment.id,
+          companyId: companyId,
+          groupId: groupId,
+        },
+      });
+    }
+
+    return response.status(201).json({
+      message: "Equipamento criado com sucesso!",
+      body: newEquipment,
       error: false,
     });
   } catch (err) {
-    return response.status(500).json(err);
+    console.error(err);
+    return response
+      .status(500)
+      .json({ message: "Ocorreu um erro ao criar o equipamento." });
   }
 });
 
 router.get("/", async (request: Request, response: Response) => {
-  const { companyIds } = request.query as any;
+  const { companyId } = request.query as any;
 
-  if (!companyIds || !Array.isArray(companyIds)) {
+  if (!companyId || typeof companyId !== "string") {
     return response.status(400).json({
-      message: "CompanyIds are required and should be an array.",
-      error: true,
-    });
-  }
-
-  // Filter and cast companyIds to an array of strings
-  const filteredCompanyIds = companyIds.filter(
-    (id: any) => typeof id === "string"
-  );
-
-  // Check if filteredCompanyIds is empty after filtering
-  if (filteredCompanyIds.length === 0) {
-    return response.status(400).json({
-      message: "CompanyIds should be an array of strings.",
+      message: "CompanyId é obrigatório para buscar prioridades de equipaments",
       error: true,
     });
   }
@@ -82,16 +57,7 @@ router.get("/", async (request: Request, response: Response) => {
       where: {
         EquipmentCompanies: {
           some: {
-            companyId: {
-              in: filteredCompanyIds,
-            },
-          },
-        },
-      },
-      include: {
-        EquipmentCompanies: {
-          include: {
-            company: true,
+            companyId: companyId,
           },
         },
       },

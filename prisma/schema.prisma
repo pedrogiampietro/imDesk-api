@@ -25,6 +25,7 @@ model Company {
   TicketCategories      TicketCategoryCompany[]
   TicketPriorityCompany TicketPriorityCompany[]
   Depots                Depot[]
+  GroupCompanies        GroupCompany[]
 }
 
 model UserCompany {
@@ -63,7 +64,7 @@ model User {
   Notification     Notification[]
   DepotUsers       DepotUser[]
   Log              Log[]
-  group            Group?             @relation(fields: [groupId], references: [id])
+  Groups           Group?             @relation(fields: [groupId], references: [id])
 }
 
 model DepotUser {
@@ -133,6 +134,19 @@ model Equipments {
   EquipmentCompanies EquipmentCompany[]
 }
 
+model EquipmentCompany {
+  equipmentId String
+  equipment   Equipments @relation(fields: [equipmentId], references: [id])
+  companyId   String
+  company     Company    @relation(fields: [companyId], references: [id])
+  groupId     Int?
+  group       Group?     @relation(fields: [groupId], references: [id])
+  userId      String?
+  User        User?      @relation(fields: [userId], references: [id])
+
+  @@id([equipmentId, companyId])
+}
+
 model Locations {
   id   String @id @default(uuid())
   name String
@@ -150,16 +164,7 @@ model TicketCompany {
   @@id([ticketId, companyId])
 }
 
-model EquipmentCompany {
-  equipmentId String
-  equipment   Equipments @relation(fields: [equipmentId], references: [id])
-  companyId   String
-  company     Company    @relation(fields: [companyId], references: [id])
-  User        User?      @relation(fields: [userId], references: [id])
-  userId      String?
 
-  @@id([equipmentId, companyId])
-}
 
 model LocationCompany {
   locationId String
@@ -451,6 +456,18 @@ model Group {
   name    String
   users   User[]
   tickets Ticket[]
+
+  GroupCompanies   GroupCompany[]
+  EquipmentCompany EquipmentCompany[]
+}
+
+model GroupCompany {
+  groupId   Int
+  group     Group   @relation(fields: [groupId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@id([groupId, companyId])
 }
 
 model Log {
