@@ -42,6 +42,62 @@ router.post("/", async (request, response) => {
   }
 });
 
+router.put("/:id", async (request, response) => {
+  const id = request.path;
+  const { name, model, serialNumber, patrimonyTag, type, companyId, groupId } =
+    request.body;
+
+  try {
+    const equipment = await prisma.equipments.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!equipment) {
+      return response
+        .status(404)
+        .json({ message: "Equipamento não encontrado." });
+    }
+
+    const updatedEquipment = await prisma.equipments.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name,
+        model,
+        serialNumber,
+        patrimonyTag,
+        type,
+      },
+    });
+
+    if (companyId || groupId) {
+      await prisma.equipmentCompany.updateMany({
+        where: {
+          equipmentId: id,
+        },
+        data: {
+          ...(companyId ? { companyId: companyId } : {}),
+          ...(groupId ? { groupId: groupId } : {}),
+        },
+      });
+    }
+
+    return response.status(200).json({
+      message: "Equipamento atualizado com sucesso!",
+      body: updatedEquipment,
+    });
+  } catch (err: any) {
+    console.error(err);
+    return response.status(500).json({
+      message: "Ocorreu um erro ao atualizar o equipamento.",
+      error: err.message,
+    });
+  }
+});
+
 router.get("/", async (request: Request, response: Response) => {
   const { companyId } = request.query as any;
 
@@ -54,6 +110,9 @@ router.get("/", async (request: Request, response: Response) => {
 
   try {
     const getAllEquipaments = await prisma.equipments.findMany({
+      include: {
+        EquipmentCompanies: true,
+      },
       where: {
         EquipmentCompanies: {
           some: {
