@@ -85,7 +85,6 @@ model Ticket {
   ticketPriorityId        String
   ticketLocationId        String
   assignedTo              String[]
-  equipaments             String[]
   assignedToAt            DateTime?
   closedBy                String?
   closedAt                DateTime?
@@ -114,25 +113,33 @@ model Ticket {
   images           Image[]
   usedItems        TicketItem[]
   Todos            Todo[]
-  group            Group?             @relation(fields: [groupId], references: [id])
+  Groups           Group?             @relation(fields: [groupId], references: [id])
+  Equipments       TicketEquipments[]
 }
 
-model Image {
-  id       Int    @id @default(autoincrement())
-  path     String
-  ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id])
+model TicketEquipments {
+  ticketId    String
+  ticket      Ticket     @relation(fields: [ticketId], references: [id])
+  equipmentId String
+  equipment   Equipments @relation(fields: [equipmentId], references: [id])
+
+  @@id([ticketId, equipmentId])
 }
+
+
 
 model Equipments {
   id           String @id @default(uuid())
   name         String
   model        String
-  serialNumber String
-  patrimonyTag String
+  patrimonyTag String @unique
+  serialNumber String @unique
   type         String
+  locationId   String
 
   EquipmentCompanies EquipmentCompany[]
+  Tickets            TicketEquipments[]
+  Location           Locations          @relation(fields: [locationId], references: [id])
 }
 
 model EquipmentCompany {
@@ -148,21 +155,20 @@ model EquipmentCompany {
   @@id([equipmentId, companyId])
 }
 
+model Image {
+  id       Int    @id @default(autoincrement())
+  path     String
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
+}
+
 model Locations {
   id   String @id @default(uuid())
   name String
 
   LocationCompanies LocationCompany[]
   Ticket            Ticket[]
-}
-
-model TicketCompany {
-  ticketId  String
-  ticket    Ticket  @relation(fields: [ticketId], references: [id])
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-
-  @@id([ticketId, companyId])
+  Equipments        Equipments[]
 }
 
 model LocationCompany {
@@ -172,6 +178,15 @@ model LocationCompany {
   company    Company   @relation(fields: [companyId], references: [id])
 
   @@id([locationId, companyId])
+}
+
+model TicketCompany {
+  ticketId  String
+  ticket    Ticket  @relation(fields: [ticketId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@id([ticketId, companyId])
 }
 
 model TicketType {

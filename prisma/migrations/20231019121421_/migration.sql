@@ -77,6 +77,14 @@ CREATE TABLE "Ticket" (
 );
 
 -- CreateTable
+CREATE TABLE "TicketEquipments" (
+    "ticketId" TEXT NOT NULL,
+    "equipmentId" TEXT NOT NULL,
+
+    CONSTRAINT "TicketEquipments_pkey" PRIMARY KEY ("ticketId","equipmentId")
+);
+
+-- CreateTable
 CREATE TABLE "Image" (
     "id" SERIAL NOT NULL,
     "path" TEXT NOT NULL,
@@ -441,6 +449,24 @@ CREATE TABLE "GroupCompany" (
 );
 
 -- CreateTable
+CREATE TABLE "EquipmentType" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "EquipmentType_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EquipmentTypeCompany" (
+    "id" TEXT NOT NULL,
+    "equipmentTypeId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "EquipmentTypeCompany_pkey" PRIMARY KEY ("equipmentTypeId","companyId")
+);
+
+-- CreateTable
 CREATE TABLE "Log" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -462,6 +488,9 @@ CREATE UNIQUE INDEX "RefreshToken_id_key" ON "RefreshToken"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Provider_email_key" ON "Provider"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EquipmentTypeCompany_id_key" ON "EquipmentTypeCompany"("id");
 
 -- AddForeignKey
 ALTER TABLE "UserCompany" ADD CONSTRAINT "UserCompany_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -498,6 +527,12 @@ ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_slaDefinitionId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketEquipments" ADD CONSTRAINT "TicketEquipments_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketEquipments" ADD CONSTRAINT "TicketEquipments_equipmentId_fkey" FOREIGN KEY ("equipmentId") REFERENCES "Equipments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Image" ADD CONSTRAINT "Image_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -609,6 +644,12 @@ ALTER TABLE "GroupCompany" ADD CONSTRAINT "GroupCompany_groupId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "GroupCompany" ADD CONSTRAINT "GroupCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EquipmentTypeCompany" ADD CONSTRAINT "EquipmentTypeCompany_equipmentTypeId_fkey" FOREIGN KEY ("equipmentTypeId") REFERENCES "EquipmentType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EquipmentTypeCompany" ADD CONSTRAINT "EquipmentTypeCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

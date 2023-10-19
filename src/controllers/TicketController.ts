@@ -32,6 +32,9 @@ router.post(
     try {
       const { userId } = request.query as unknown as IRequestQuery;
       const companyIds = JSON.parse(request.body.companyIds as string);
+      const equipmentTicketLocationId = JSON.parse(
+        request.body.equipmentTicketLocationId as string
+      );
       const values = JSON.parse(request.body.values as string);
       const ticket_images = request.files as Express.Multer.File[];
 
@@ -51,7 +54,6 @@ router.post(
         });
       }
 
-      // Check if user is associated with the provided companies
       const userCompanies = await prisma.userCompany.findMany({
         where: {
           userId: userId,
@@ -90,7 +92,6 @@ router.post(
         });
       }
 
-      // Consultar a definição de SLA para o tipo e prioridade do ticket
       const slaDef = await prisma.sLADefinition.findFirst({
         where: {
           ticketPriority: ticketPriorityObj.name,
@@ -121,6 +122,8 @@ router.post(
         companyId: companyId,
       }));
 
+      console.log(ticketImages);
+
       const createTicket = await prisma.ticket.create({
         data: {
           description: ticket_description,
@@ -130,11 +133,17 @@ router.post(
           ticketPriorityId: ticket_priority,
           status: "new",
           assignedTo: [],
-          equipaments: [],
           images: {
             create: ticketImages,
           },
           groupId: currentUserGroup?.groupId,
+          Equipments: {
+            create: [
+              {
+                equipmentId: equipmentTicketLocationId,
+              },
+            ],
+          },
           timeEstimate: resolutionDueDate,
           manualResolutionDueDate: manualResolutionDueDate
             ? new Date(manualResolutionDueDate)
@@ -149,6 +158,7 @@ router.post(
           ticketLocation: true,
           ticketPriority: true,
           ticketType: true,
+          images: true,
           User: {
             include: {
               UserCompanies: true,
@@ -202,7 +212,7 @@ router.post(
         ticketLocation: createTicket.ticketLocation,
         assignedTo: createTicket.assignedTo,
         equipaments: createTicket.equipaments,
-        // images: createTicket.images,
+        images: createTicket.images,
         assignedToAt: createTicket.assignedToAt,
         closedBy: createTicket.closedBy,
         closedAt: createTicket.closedAt,
@@ -294,22 +304,44 @@ router.get("/", async (request: Request, response: Response) => {
             DepotItem: true,
           },
         },
+        Equipments: true,
       },
     });
 
-    const serializedTickets = getAllTickets.map((ticket) => {
-      const serializedUsedItems = ticket.usedItems.map((usedItem) => {
-        const { DepotItem, ...rest } = usedItem;
-        return {
-          ...rest,
-          name: DepotItem.name,
-        };
-      });
+    const globalEquipmentUsageCount = {} as any;
 
-      return {
+    getAllTickets.forEach((ticket) => {
+      ticket.Equipments.forEach((equipment) => {
+        const eqId = equipment.equipmentId;
+
+        if (globalEquipmentUsageCount[eqId]) {
+          globalEquipmentUsageCount[eqId]++;
+        } else {
+          globalEquipmentUsageCount[eqId] = 1;
+        }
+      });
+    });
+
+    const serializedTickets = getAllTickets.map((ticket) => {
+      const ticketWithEquipmentUsage = {
         ...ticket,
-        usedItems: serializedUsedItems,
+        usedItems: ticket.usedItems.map((usedItem) => {
+          const { DepotItem, ...rest } = usedItem;
+          return {
+            ...rest,
+            name: DepotItem.name,
+          };
+        }),
+        equipmentUsage: ticket.Equipments.map((equipment) => {
+          const eqId = equipment.equipmentId;
+          return {
+            equipmentId: eqId,
+            usageCount: globalEquipmentUsageCount[eqId] || 0,
+          };
+        }),
       };
+
+      return ticketWithEquipmentUsage;
     });
 
     return response.status(200).json({
@@ -640,6 +672,47 @@ router.get("/:id/evaluations", async (request: Request, response: Response) => {
     });
   } catch (err) {
     return response.status(500).json(err);
+  }
+});
+
+router.get("/patrimony", async (request, response) => {
+  // Extrai o 'locationId' da string de consulta
+  const { locationId } = request.query;
+
+  // Verifica se 'locationId' está presente
+  if (!locationId || typeof locationId !== "string") {
+    return response
+      .status(400)
+      .json({ error: "locationId is required and must be a string" });
+  }
+
+  try {
+    const equipments = await prisma.equipments.findMany({
+      where: {
+        locationId: locationId,
+      },
+
+      select: {
+        id: true,
+        name: true,
+        model: true,
+        serialNumber: true,
+        patrimonyTag: true,
+        type: true,
+      },
+    });
+
+    if (equipments.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "No equipment found for this location." });
+    }
+
+    return response.status(200).json(equipments);
+  } catch (error) {
+    console.error("An error occurred while retrieving equipment:", error);
+
+    return response.status(500).json({ error: "Internal server error" });
   }
 });
 

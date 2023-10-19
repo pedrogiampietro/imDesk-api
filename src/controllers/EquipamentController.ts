@@ -5,8 +5,16 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 router.post("/", async (request, response) => {
-  const { name, model, serialNumber, patrimonyTag, type, companyId, groupId } =
-    request.body;
+  const {
+    name,
+    model,
+    serialNumber,
+    patrimonyTag,
+    type,
+    companyId,
+    groupId,
+    locationId,
+  } = request.body;
 
   try {
     const newEquipment = await prisma.equipments.create({
@@ -16,6 +24,7 @@ router.post("/", async (request, response) => {
         serialNumber,
         patrimonyTag,
         type,
+        locationId,
       },
     });
 
