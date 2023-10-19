@@ -211,7 +211,6 @@ router.post(
         ticketPriority: createTicket.ticketPriority,
         ticketLocation: createTicket.ticketLocation,
         assignedTo: createTicket.assignedTo,
-        equipaments: createTicket.equipaments,
         images: createTicket.images,
         assignedToAt: createTicket.assignedToAt,
         closedBy: createTicket.closedBy,

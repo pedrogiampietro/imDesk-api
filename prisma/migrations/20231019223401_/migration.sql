@@ -58,7 +58,6 @@ CREATE TABLE "Ticket" (
     "ticketPriorityId" TEXT NOT NULL,
     "ticketLocationId" TEXT NOT NULL,
     "assignedTo" TEXT[],
-    "equipaments" TEXT[],
     "assignedToAt" TIMESTAMP(3),
     "closedBy" TEXT,
     "closedAt" TIMESTAMP(3),
@@ -85,22 +84,14 @@ CREATE TABLE "TicketEquipments" (
 );
 
 -- CreateTable
-CREATE TABLE "Image" (
-    "id" SERIAL NOT NULL,
-    "path" TEXT NOT NULL,
-    "ticketId" TEXT NOT NULL,
-
-    CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Equipments" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "model" TEXT NOT NULL,
-    "serialNumber" TEXT NOT NULL,
     "patrimonyTag" TEXT NOT NULL,
+    "serialNumber" TEXT NOT NULL,
     "type" TEXT NOT NULL,
+    "locationId" TEXT NOT NULL,
 
     CONSTRAINT "Equipments_pkey" PRIMARY KEY ("id")
 );
@@ -116,6 +107,15 @@ CREATE TABLE "EquipmentCompany" (
 );
 
 -- CreateTable
+CREATE TABLE "Image" (
+    "id" SERIAL NOT NULL,
+    "path" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+
+    CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Locations" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -124,19 +124,19 @@ CREATE TABLE "Locations" (
 );
 
 -- CreateTable
-CREATE TABLE "TicketCompany" (
-    "ticketId" TEXT NOT NULL,
-    "companyId" TEXT NOT NULL,
-
-    CONSTRAINT "TicketCompany_pkey" PRIMARY KEY ("ticketId","companyId")
-);
-
--- CreateTable
 CREATE TABLE "LocationCompany" (
     "locationId" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
 
     CONSTRAINT "LocationCompany_pkey" PRIMARY KEY ("locationId","companyId")
+);
+
+-- CreateTable
+CREATE TABLE "TicketCompany" (
+    "ticketId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+
+    CONSTRAINT "TicketCompany_pkey" PRIMARY KEY ("ticketId","companyId")
 );
 
 -- CreateTable
@@ -484,6 +484,12 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Equipments_patrimonyTag_key" ON "Equipments"("patrimonyTag");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Equipments_serialNumber_key" ON "Equipments"("serialNumber");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "RefreshToken_id_key" ON "RefreshToken"("id");
 
 -- CreateIndex
@@ -535,7 +541,7 @@ ALTER TABLE "TicketEquipments" ADD CONSTRAINT "TicketEquipments_ticketId_fkey" F
 ALTER TABLE "TicketEquipments" ADD CONSTRAINT "TicketEquipments_equipmentId_fkey" FOREIGN KEY ("equipmentId") REFERENCES "Equipments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Image" ADD CONSTRAINT "Image_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Equipments" ADD CONSTRAINT "Equipments_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Locations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_equipmentId_fkey" FOREIGN KEY ("equipmentId") REFERENCES "Equipments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -550,16 +556,19 @@ ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_groupId_fkey" FO
 ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Image" ADD CONSTRAINT "Image_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LocationCompany" ADD CONSTRAINT "LocationCompany_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Locations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LocationCompany" ADD CONSTRAINT "LocationCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketTypeCompany" ADD CONSTRAINT "TicketTypeCompany_ticketTypeId_fkey" FOREIGN KEY ("ticketTypeId") REFERENCES "TicketType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
