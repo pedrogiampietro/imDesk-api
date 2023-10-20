@@ -122,8 +122,6 @@ router.post(
         companyId: companyId,
       }));
 
-      console.log(ticketImages);
-
       const createTicket = await prisma.ticket.create({
         data: {
           description: ticket_description,
@@ -241,7 +239,7 @@ router.post(
 
 router.get("/", async (request: Request, response: Response) => {
   try {
-    const { companyId, currentUserId } = request.query;
+    const { companyId, currentUserId, ticketPriorityId } = request.query;
 
     if (!companyId || typeof companyId !== "string") {
       return response.status(400).json({
@@ -261,7 +259,7 @@ router.get("/", async (request: Request, response: Response) => {
       },
     });
 
-    const userAndGroupCondition = {
+    const baseCondition = {
       OR: [
         {
           userId: userIdStr,
@@ -272,9 +270,17 @@ router.get("/", async (request: Request, response: Response) => {
       ],
     };
 
+    let priorityCondition = {};
+    if (ticketPriorityId && typeof ticketPriorityId === "string") {
+      priorityCondition = {
+        ticketPriorityId: ticketPriorityId,
+      };
+    }
+
     const getAllTickets = await prisma.ticket.findMany({
       where: {
-        ...userAndGroupCondition,
+        ...baseCondition,
+        ...priorityCondition,
         TicketCompanies: {
           some: {
             companyId: companyId,
@@ -303,7 +309,11 @@ router.get("/", async (request: Request, response: Response) => {
             DepotItem: true,
           },
         },
-        Equipments: true,
+        Equipments: {
+          include: {
+            equipment: true,
+          },
+        },
       },
     });
 
@@ -322,8 +332,10 @@ router.get("/", async (request: Request, response: Response) => {
     });
 
     const serializedTickets = getAllTickets.map((ticket) => {
+      const { Equipments, ...ticketWithoutEquipments } = ticket;
+
       const ticketWithEquipmentUsage = {
-        ...ticket,
+        ...ticketWithoutEquipments,
         usedItems: ticket.usedItems.map((usedItem) => {
           const { DepotItem, ...rest } = usedItem;
           return {
@@ -331,11 +343,18 @@ router.get("/", async (request: Request, response: Response) => {
             name: DepotItem.name,
           };
         }),
-        equipmentUsage: ticket.Equipments.map((equipment) => {
+        equipmentUsage: Equipments.map((equipment) => {
           const eqId = equipment.equipmentId;
+          const eqSerial = equipment.equipment.serialNumber;
+          const eqPatrimonyTag = equipment.equipment.patrimonyTag;
+          const eqName = equipment.equipment.name;
+
           return {
             equipmentId: eqId,
             usageCount: globalEquipmentUsageCount[eqId] || 0,
+            equipmentSerial: eqSerial,
+            equipmentPatrimony: eqPatrimonyTag,
+            equipmentName: eqName,
           };
         }),
       };

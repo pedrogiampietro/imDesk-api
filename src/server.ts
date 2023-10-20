@@ -19,6 +19,8 @@ import depositController from "./controllers/DepositController";
 import depositItemController from "./controllers/DepositItemController";
 import todooController from "./controllers/TodoController";
 import groupController from "./controllers/GroupController";
+import typeOfEquipmentsController from "./controllers/EquipmentTypeController";
+import generatePDF from "./controllers/GeneratePDFController";
 
 const app = express();
 
@@ -59,6 +61,8 @@ app.use("/deposit", depositController);
 app.use("/deposit-item", depositItemController);
 app.use("/todoo", todooController);
 app.use("/group", groupController);
+app.use("/equipmentType", typeOfEquipmentsController);
+app.use("/pdf-gen", generatePDF);
 
 app.get("/", (req, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });

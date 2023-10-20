@@ -78,26 +78,27 @@ model DepotUser {
 }
 
 model Ticket {
-  id                      String    @id @default(uuid())
-  description             String
-  ticketTypeId            String
-  ticketCategoryId        String
-  ticketPriorityId        String
-  ticketLocationId        String
-  assignedTo              String[]
-  assignedToAt            DateTime?
-  closedBy                String?
-  closedAt                DateTime?
-  status                  String?
-  timeEstimate            DateTime?
-  isDelay                 Boolean?  @default(false)
-  userId                  String?
-  manualResolutionDueDate DateTime?
-  slaViolated             Boolean   @default(false)
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @default(now())
-  slaDefinitionId         Int?
-  groupId                 Int?
+  id                         String    @id @default(uuid())
+  description                String
+  observationServiceExecuted String?
+  ticketTypeId               String
+  ticketCategoryId           String
+  ticketPriorityId           String
+  ticketLocationId           String
+  assignedTo                 String[]
+  assignedToAt               DateTime?
+  closedBy                   String?
+  closedAt                   DateTime?
+  status                     String?
+  timeEstimate               DateTime?
+  isDelay                    Boolean?  @default(false)
+  userId                     String?
+  manualResolutionDueDate    DateTime?
+  slaViolated                Boolean   @default(false)
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @default(now())
+  slaDefinitionId            Int?
+  groupId                    Int?
 
   ticketType       TicketType         @relation(fields: [ticketTypeId], references: [id])
   ticketCategory   TicketCategory     @relation(fields: [ticketCategoryId], references: [id])
@@ -125,8 +126,6 @@ model TicketEquipments {
 
   @@id([ticketId, equipmentId])
 }
-
-
 
 model Equipments {
   id           String @id @default(uuid())

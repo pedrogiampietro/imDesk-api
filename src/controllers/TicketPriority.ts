@@ -20,12 +20,10 @@ router.post("/", async (request: Request, response: Response) => {
     });
 
     if (existingTicketPriority) {
-      return response
-        .status(400)
-        .json({
-          message: "A ticket priority with this name already exists.",
-          error: true,
-        });
+      return response.status(400).json({
+        message: "A ticket priority with this name already exists.",
+        error: true,
+      });
     }
 
     const createTicketPriority = await prisma.ticketPriority.create({
@@ -67,9 +65,6 @@ router.get("/", async (request: Request, response: Response) => {
             companyId: companyId,
           },
         },
-      },
-      include: {
-        TicketPriorityCompanies: true,
       },
     });
 
