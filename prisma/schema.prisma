@@ -55,6 +55,7 @@ model User {
   avatarUrl                String?
   hourlyRate               Float?
   groupId                  Int?
+  signatureUrl             String?
 
   Ticket           Ticket[]
   RefreshTokens    RefreshToken[]
@@ -87,6 +88,7 @@ model Ticket {
   ticketLocationId           String
   assignedTo                 String[]
   assignedToAt               DateTime?
+  assignedSignature          String?
   closedBy                   String?
   closedAt                   DateTime?
   status                     String?
