@@ -82,6 +82,8 @@ model Ticket {
   id                         String    @id @default(uuid())
   description                String
   observationServiceExecuted String?
+  ticketWasSignedTech        Boolean?  @default(false)
+  ticketWasSignedUser        Boolean?  @default(false)
   ticketTypeId               String
   ticketCategoryId           String
   ticketPriorityId           String
