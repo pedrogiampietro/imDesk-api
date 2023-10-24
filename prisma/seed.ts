@@ -184,15 +184,39 @@ async function main() {
   // Criptografando a senha
   const hashedPassword = bcrypt.hashSync(userData.password, saltRounds);
 
-  // Criando o usuário
-  const newUser = await prisma.user.create({
-    data: {
-      ...userData,
-      password: hashedPassword,
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      username: userData.username,
     },
   });
 
-  console.log("Usuário criado:", newUser);
+  if (existingUser) {
+    console.log(`Username '${userData.username}' is already taken.`);
+  } else {
+    const newUser = await prisma.user.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+      },
+    });
+    console.log("New user created:", newUser);
+  }
+
+  try {
+    const newUser = await prisma.user.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+      },
+    });
+    console.log("New user created:", newUser);
+  } catch (error: any) {
+    if (error.code === "P2002" && error.meta.target.includes("username")) {
+      console.error(`Username '${userData.username}' is already taken.`);
+    } else {
+      console.error("An error occurred while creating a user:", error);
+    }
+  }
 }
 
 main()
