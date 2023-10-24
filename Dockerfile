@@ -9,6 +9,8 @@ COPY prisma ./prisma/
 
 RUN npm install
 
+ENV DATABASE_URL=yourActualDatabaseUrlHere
+
 RUN npx prisma generate
 RUN npx prisma migrate dev
 
