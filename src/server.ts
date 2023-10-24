@@ -68,8 +68,9 @@ app.get("/", (req, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });
 });
 
-const PORT = parseInt(process.env.PORT as string, 10) || 3333;
+const port = Number(process.env.PORT) || 3333;
 
-app.listen(PORT, "0.0.0.0", () =>
-  console.log(`Server is listening on port ${PORT}...`)
-);
+// Listen on `port` and 0.0.0.0
+app.listen(port, "0.0.0.0", function () {
+  console.log(`Server is listening on port ${port}...`);
+});
