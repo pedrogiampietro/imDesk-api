@@ -311,8 +311,8 @@ router.get("/:id", async (request: Request, response: Response) => {
 
     const globalEquipmentUsageCount = {} as any;
 
-    getAllTickets.forEach((ticket) => {
-      ticket.Equipments.forEach((equipment) => {
+    getAllTickets.forEach((ticket: any) => {
+      ticket.Equipments.forEach((equipment: any) => {
         const eqId = equipment.equipmentId;
 
         if (globalEquipmentUsageCount[eqId]) {

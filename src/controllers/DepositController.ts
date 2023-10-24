@@ -87,9 +87,9 @@ router.get("/", async (request: Request, response: Response) => {
     });
 
     // Mapear os depósitos para incluir os usuários no formato desejado
-    const depotsWithUsers = depots.map((depot) => ({
+    const depotsWithUsers = depots.map((depot: any) => ({
       ...depot,
-      users: depot.DepotUsers.map((depotUser) => depotUser.User),
+      users: depot.DepotUsers.map((depotUser: any) => depotUser.User),
     }));
 
     return response.status(200).json({
@@ -132,7 +132,7 @@ router.put("/:id", async (request: Request, response: Response) => {
     });
 
     const usersToRemove = existingDepotUsers.filter(
-      (depotUser) => !userId.includes(depotUser.userId)
+      (depotUser: any) => !userId.includes(depotUser.userId)
     );
     for (let user of usersToRemove) {
       await prisma.depotUser.delete({
@@ -147,7 +147,7 @@ router.put("/:id", async (request: Request, response: Response) => {
 
     for (let usersId of userId) {
       const existingDepotUser = existingDepotUsers.find(
-        (depotUser) => depotUser.userId === usersId
+        (depotUser: any) => depotUser.userId === usersId
       );
 
       if (!existingDepotUser) {

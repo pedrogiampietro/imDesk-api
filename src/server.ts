@@ -17,8 +17,8 @@ import companiesController from "./controllers/CompanyController";
 import slaController from "./controllers/SLAController";
 import depositController from "./controllers/DepositController";
 import depositItemController from "./controllers/DepositItemController";
-import todooController from "./controllers/TodoController";
 import groupController from "./controllers/GroupController";
+import todooController from "./controllers/TodoController";
 import typeOfEquipmentsController from "./controllers/EquipmentTypeController";
 import generatePDF from "./controllers/GeneratePDFController";
 

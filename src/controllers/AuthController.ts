@@ -116,7 +116,7 @@ router.post("/sign-in", async (request: Request, response: Response) => {
       email: findUser.email,
       avatarUrl: findUser.avatarUrl,
       isTechnician: findUser.isTechnician,
-      companies: findUser.UserCompanies.map((uc) => ({
+      companies: findUser.UserCompanies.map((uc: any) => ({
         companyId: uc.company.id,
         companyName: uc.company.name,
       })),
