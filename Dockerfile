@@ -12,6 +12,7 @@ COPY . .
 
 RUN npm run build
 
+# Estágio de execução
 FROM node:latest
 
 WORKDIR /usr/app

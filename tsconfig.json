@@ -1,16 +1,20 @@
 {
-	"compilerOptions": {
-		"target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-		"module": "CommonJS",
-		"rootDir": "./src",
-		"outDir": "./build" /* Specify what module code is generated. */,
-		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
-		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-		"moduleResolution": "node",
-		"typeRoots": ["./src/types", "./node_modules/@types"],
+  "compilerOptions": {
+    "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "module": "CommonJS",
+    "rootDir": ".", // especifica o diretório raiz (isto é significativo se você tem arquivos fora de 'src')
+    "outDir": "./build", // diretório de saída para o código compilado
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    "moduleResolution": "node",
+    "typeRoots": ["./src/types", "./node_modules/@types"],
 
-		/* Type Checking */
-		"strict": true /* Enable all strict type-checking options. */,
-		"skipLibCheck": true /* Skip type checking all .d.ts files. */
-	}
+    /* Type Checking */
+    "strict": true /* Enable all strict type-checking options. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+  },
+  "include": [
+    "src/**/*",
+    "prisma/**/*" // adicione outras pastas que você quer incluir na compilação
+  ]
 }
