@@ -11,7 +11,7 @@ RUN npm install
 
 ENV DATABASE_URL="postgresql://postgres:eGf-24E2bgEbFA45BgDB3-fb-C2-3E6e@viaduct.proxy.rlwy.net:55081/railway?schema=sample"
 
-RUN npx prisma migrate dev
+RUN npx prisma migrate deploy
 RUN npm run create:seeds
 
 COPY . .
