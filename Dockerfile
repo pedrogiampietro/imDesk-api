@@ -9,7 +9,7 @@ COPY prisma ./prisma/
 
 RUN npm install
 
-ENV DATABASE_URL=yourActualDatabaseUrlHere
+ENV DATABASE_URL="postgresql://imdesk:secret@localhost:5432/imdeskdb?schema=sample"
 
 RUN npx prisma generate
 RUN npx prisma migrate dev
@@ -18,6 +18,7 @@ COPY . .
 
 RUN npm run build
 
+# Estágio de produção
 FROM node:latest
 
 WORKDIR /usr/app
