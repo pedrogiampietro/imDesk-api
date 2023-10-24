@@ -9,7 +9,7 @@ COPY prisma ./prisma/
 
 RUN npm install
 
-ENV DATABASE_URL="postgresql://postgres:eGf-24E2bgEbFA45BgDB3-fb-C2-3E6e@viaduct.proxy.rlwy.net:55081/railway?schema=sample"
+ENV DATABASE_URL="postgres://imdesk:ZVSpaWEyh2YMtwAFs9Bedb3NWfLRtR0y@dpg-cks43qfd47qs73a9iqbg-a/imdesk"
 
 RUN npx prisma migrate deploy
 RUN npm run create:seeds
