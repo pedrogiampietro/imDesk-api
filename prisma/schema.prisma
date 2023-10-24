@@ -489,7 +489,7 @@ model GroupCompany {
 
 model EquipmentType {
   id        String                 @id @default(uuid())
-  name      String
+  name      String                 @unique
   companies EquipmentTypeCompany[]
 }
 

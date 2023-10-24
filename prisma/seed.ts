@@ -154,11 +154,24 @@ async function main() {
 
   // Criar entradas para tipos de equipamentos
   for (const type of equipmentTypes) {
-    await prisma.equipmentType.create({
-      data: {
+    // Primeiro, verifique se o tipo de equipamento já existe
+    const existingType = await prisma.equipmentType.findUnique({
+      where: {
         name: type,
       },
     });
+
+    // Se não existir, crie um novo
+    if (!existingType) {
+      await prisma.equipmentType.create({
+        data: {
+          name: type,
+        },
+      });
+      console.log(`Tipo de equipamento criado: ${type}`);
+    } else {
+      console.log(`Tipo de equipamento '${type}' já existe, pulando...`);
+    }
   }
 
   console.log(`${equipmentTypes.length} tipos de equipamentos criados.`);
@@ -192,14 +205,6 @@ async function main() {
 
   if (existingUser) {
     console.log(`Username '${userData.username}' is already taken.`);
-  } else {
-    const newUser = await prisma.user.create({
-      data: {
-        ...userData,
-        password: hashedPassword,
-      },
-    });
-    console.log("New user created:", newUser);
   }
 
   try {
