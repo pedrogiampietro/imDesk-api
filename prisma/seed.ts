@@ -152,10 +152,9 @@ async function main() {
     "WORKSTATION - TC",
   ];
 
-  // Criar entradas para tipos de equipamentos
   for (const type of equipmentTypes) {
     // Primeiro, verifique se o tipo de equipamento já existe
-    const existingType = await prisma.equipmentType.findUnique({
+    const existingType = await prisma.equipmentType.findFirst({
       where: {
         name: type,
       },
