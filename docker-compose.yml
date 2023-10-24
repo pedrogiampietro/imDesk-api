@@ -1,6 +1,16 @@
 version: "3.9"
 
 services:
+  app:
+    container_name: imdesk-api
+    build: .
+    ports:
+      - "3333:3333"
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+
   postgres:
     container_name: ihmef_database
     image: postgres
@@ -13,11 +23,11 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - postgres
+      - app-network
     restart: unless-stopped
 
 networks:
-  postgres:
+  app-network:
     driver: bridge
 
 volumes:
