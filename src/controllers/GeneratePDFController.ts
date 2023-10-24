@@ -323,20 +323,20 @@ router.get("/:id", async (request: Request, response: Response) => {
       });
     });
 
-    const serializedTickets = getAllTickets.map((ticket) => {
+    const serializedTickets = getAllTickets.map((ticket: any) => {
       const { Equipments, ...ticketWithoutEquipments } = ticket;
 
       const ticketWithEquipmentUsage = {
         ...ticketWithoutEquipments,
         techUserSignature: techUserSignature?.signatureUrl,
-        usedItems: ticket.usedItems.map((usedItem) => {
+        usedItems: ticket.usedItems.map((usedItem: any) => {
           const { DepotItem, ...rest } = usedItem;
           return {
             ...rest,
             name: DepotItem.name,
           };
         }),
-        equipmentUsage: Equipments.map((equipment) => {
+        equipmentUsage: Equipments.map((equipment: any) => {
           const eqId = equipment.equipmentId;
           const eqSerial = equipment.equipment.serialNumber;
           const eqPatrimonyTag = equipment.equipment.patrimonyTag;

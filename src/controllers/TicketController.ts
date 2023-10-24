@@ -114,7 +114,7 @@ router.post(
         ); // Caso contrário, use o SLA padrão
       }
 
-      const ticketImages = ticket_images.map((image) => ({
+      const ticketImages = ticket_images.map((image: any) => ({
         path: `http://${request.headers.host}/uploads/tickets_img/${image.filename}`,
       }));
 
@@ -332,8 +332,8 @@ router.get("/", async (request: Request, response: Response) => {
 
     const globalEquipmentUsageCount = {} as any;
 
-    getAllTickets.forEach((ticket) => {
-      ticket.Equipments.forEach((equipment) => {
+    getAllTickets.forEach((ticket: any) => {
+      ticket.Equipments.forEach((equipment: any) => {
         const eqId = equipment.equipmentId;
 
         if (globalEquipmentUsageCount[eqId]) {
@@ -344,19 +344,19 @@ router.get("/", async (request: Request, response: Response) => {
       });
     });
 
-    const serializedTickets = getAllTickets.map((ticket) => {
+    const serializedTickets = getAllTickets.map((ticket: any) => {
       const { Equipments, ...ticketWithoutEquipments } = ticket;
 
       const ticketWithEquipmentUsage = {
         ...ticketWithoutEquipments,
-        usedItems: ticket.usedItems.map((usedItem) => {
+        usedItems: ticket.usedItems.map((usedItem: any) => {
           const { DepotItem, ...rest } = usedItem;
           return {
             ...rest,
             name: DepotItem.name,
           };
         }),
-        equipmentUsage: Equipments.map((equipment) => {
+        equipmentUsage: Equipments.map((equipment: any) => {
           const eqId = equipment.equipmentId;
           const eqSerial = equipment.equipment.serialNumber;
           const eqPatrimonyTag = equipment.equipment.patrimonyTag;

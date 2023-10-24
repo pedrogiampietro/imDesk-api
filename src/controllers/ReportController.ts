@@ -25,12 +25,10 @@ router.get("/report", async (request: Request, response: Response) => {
       },
       include: {
         User: true,
-        assignedToAt: true,
-        closedAt: true,
       },
     });
 
-    const report = getAllTickets.map((ticket) => {
+    const report = getAllTickets.map((ticket: any) => {
       const timeToClose = ticket.closedAt
         ? new Date(ticket.closedAt).getTime() -
           new Date(ticket.assignedToAt).getTime()
