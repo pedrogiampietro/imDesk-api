@@ -43,7 +43,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
-app.use("/", express.static(path.join(__dirname, "..", "build")));
 
 app.use("/authenticate", authController);
 app.use("/account", userController);
@@ -56,7 +55,7 @@ app.use("/equipament", equipamentController);
 app.use("/maintenance", maintenanceController);
 app.use("/collect", colletInformationController);
 app.use("/providers", providerController);
-app.use("/api/companies", companiesController);
+app.use("/companies", companiesController);
 app.use("/sla", slaController);
 app.use("/deposit", depositController);
 app.use("/deposit-item", depositItemController);
