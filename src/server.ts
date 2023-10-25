@@ -56,7 +56,7 @@ app.use("/equipament", equipamentController);
 app.use("/maintenance", maintenanceController);
 app.use("/collect", colletInformationController);
 app.use("/providers", providerController);
-app.use("/companies", companiesController);
+app.use("/api/companies", companiesController);
 app.use("/sla", slaController);
 app.use("/deposit", depositController);
 app.use("/deposit-item", depositItemController);
