@@ -239,6 +239,27 @@ router.post(
         User,
       };
 
+      const groupName = process.env.GROUP_NAME || "NOT FOUND";
+
+      const group = await prisma.group.findFirst({
+        where: {
+          name: groupName,
+        },
+      });
+
+      if (group) {
+        const newId = createTicket.id.split("-");
+        await prisma.emailQueue.create({
+          data: {
+            to: group.email,
+            subject: "Novo Chamado Aberto",
+            text: `Um novo chamado foi criado: #${newId[0]}, ${createTicket.description}`,
+          },
+        });
+      } else {
+        console.error(`Grupo ${groupName} não encontrado`);
+      }
+
       return response.status(200).json({
         message: "Ticket created successfully",
         body: responseObj,

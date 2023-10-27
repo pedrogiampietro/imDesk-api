@@ -32,7 +32,7 @@ router.get("/", async (request: Request, response: Response) => {
 });
 
 router.post("/", async (request: Request, response: Response) => {
-  const { name, companyIds } = request.body;
+  const { name, email, companyIds } = request.body;
 
   if (
     !name ||
@@ -50,6 +50,7 @@ router.post("/", async (request: Request, response: Response) => {
     const createGroup = await prisma.group.create({
       data: {
         name: name,
+        email: email,
         GroupCompanies: {
           create: companyIds.map((companyId: string) => ({
             companyId,

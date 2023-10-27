@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import cron from "node-cron";
 
 import authController from "./controllers/AuthController";
 import userController from "./controllers/UserController";
@@ -21,6 +22,8 @@ import groupController from "./controllers/GroupController";
 import todooController from "./controllers/TodooController";
 import typeOfEquipmentsController from "./controllers/EquipmentTypeController";
 import generatePDF from "./controllers/GeneratePDFController";
+
+import { processEmailQueue } from "./services/processQueue";
 
 const app = express();
 
@@ -69,6 +72,8 @@ app.get("/", (req, res) => {
 });
 
 const port = process.env.PORT || 3333;
+
+cron.schedule("*/2 * * * *", processEmailQueue);
 
 app.listen(port, () => {
   console.log(`Server running at https://localhost:${port}/`);

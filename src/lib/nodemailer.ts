@@ -33,6 +33,6 @@ export async function sendEmail(
 
     await transporter.sendMail(mailOptions);
   } catch (error: any) {
-    console.error(`Error to send e-mail: ${error}`);
+    console.log(`Error to send e-mail: ${error}`);
   }
 }
