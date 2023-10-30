@@ -278,8 +278,17 @@ model TicketResponse {
   updatedAt DateTime @updatedAt
   userId    String
   ticketId  String
-  User      User     @relation(fields: [userId], references: [id])
-  Ticket    Ticket   @relation(fields: [ticketId], references: [id])
+
+  ticketImages TicketResponseImage[]
+  User         User                  @relation(fields: [userId], references: [id])
+  Ticket       Ticket                @relation(fields: [ticketId], references: [id])
+}
+
+model TicketResponseImage {
+  id               String         @id @default(uuid())
+  path             String // Stores the path to the image on the server or cloud
+  ticketResponseId String // Foreign key to TicketResponse
+  TicketResponse   TicketResponse @relation(fields: [ticketResponseId], references: [id])
 }
 
 model DiskInfo {

@@ -596,38 +596,53 @@ router.put("/:id", async (request: Request, response: Response) => {
   }
 });
 
-router.post("/response", async (request: Request, response: Response) => {
-  try {
-    const { ticketId, userId, content, type } =
-      request.body as ITicketResponseRequestBody;
+router.post(
+  "/response",
+  uploadTickets.array("images"),
+  async (request: Request, response: Response) => {
+    try {
+      const { ticketId, userId, content, type } =
+        request.body as ITicketResponseRequestBody;
 
-    if (!ticketId || !userId || !content || !type) {
-      return response.status(400).json({ message: "Missing required fields" });
+      const files = request.files as Express.Multer.File[];
+
+      if (!ticketId || !userId || !content || !type) {
+        return response
+          .status(400)
+          .json({ message: "Missing required fields" });
+      }
+
+      if (typeof content !== "string") {
+        return response
+          .status(400)
+          .json({ message: "Content must be a string" });
+      }
+
+      const ticketResponse = await prisma.ticketResponse.create({
+        data: {
+          content: content,
+          type: type,
+          userId: userId,
+          ticketId: ticketId,
+          ticketImages: {
+            create: files.map((file: Express.Multer.File) => ({
+              path: file.path,
+            })),
+          },
+        },
+      });
+
+      return response.status(200).json({
+        message: "Response added successfully",
+        body: ticketResponse,
+        error: false,
+      });
+    } catch (err: any) {
+      console.error("Error while creating ticket response:", err.message);
+      return response.status(500).json({ message: "Internal Server Error" });
     }
-
-    if (typeof content !== "string") {
-      return response.status(400).json({ message: "Content must be a string" });
-    }
-
-    const ticketResponse = await prisma.ticketResponse.create({
-      data: {
-        content: content,
-        type: type,
-        userId: userId,
-        ticketId: ticketId,
-      },
-    });
-
-    return response.status(200).json({
-      message: "Response added successfully",
-      body: ticketResponse,
-      error: false,
-    });
-  } catch (err: any) {
-    console.error("Error while creating ticket response:", err.message);
-    return response.status(500).json({ message: "Internal Server Error" });
   }
-});
+);
 
 router.get("/:id/responses", async (request: Request, response: Response) => {
   try {
@@ -645,6 +660,7 @@ router.get("/:id/responses", async (request: Request, response: Response) => {
         ticketId: ticketId,
       },
       include: {
+        ticketImages: true,
         User: true,
       },
     });
