@@ -438,6 +438,23 @@ router.put("/:id", async (request: Request, response: Response) => {
       updateData.assignedTo = undefined;
     }
 
+    let equipment;
+    if (requestBody.patrimonyTag) {
+      equipment = await prisma.equipments.findUnique({
+        where: { patrimonyTag: requestBody.patrimonyTag },
+      });
+
+      if (!equipment) {
+        return response.status(400).json({
+          message: "No equipment found for the provided patrimony tag.",
+          error: true,
+        });
+      }
+    }
+
+    console.log("equipment", equipment);
+    console.log("requestBody.patrimonyTag", requestBody.patrimonyTag);
+
     const fields = [
       "description",
       "observationServiceExecuted",
@@ -483,6 +500,23 @@ router.put("/:id", async (request: Request, response: Response) => {
       updateData.ticketPriority = {
         connect: {
           id: requestBody.ticketPriorityId,
+        },
+      };
+    }
+
+    if (equipment) {
+      updateData.Equipments = {
+        upsert: {
+          where: {
+            ticketId_equipmentId: {
+              ticketId: ticketId,
+              equipmentId: equipment.id,
+            },
+          },
+          create: {
+            equipmentId: equipment.id,
+          },
+          update: {},
         },
       };
     }
@@ -618,6 +652,8 @@ router.post(
           .json({ message: "Content must be a string" });
       }
 
+      const serverUrl = `http://${request.headers.host}/uploads/tickets_img`;
+
       const ticketResponse = await prisma.ticketResponse.create({
         data: {
           content: content,
@@ -626,7 +662,7 @@ router.post(
           ticketId: ticketId,
           ticketImages: {
             create: files.map((file: Express.Multer.File) => ({
-              path: file.path,
+              path: `${serverUrl}/${file.filename}`,
             })),
           },
         },

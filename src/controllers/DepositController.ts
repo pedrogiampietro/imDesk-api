@@ -86,10 +86,21 @@ router.get("/", async (request: Request, response: Response) => {
       },
     });
 
-    // Mapear os depósitos para incluir os usuários no formato desejado
-    const depotsWithUsers = depots.map((depot: any) => ({
+    const locationNames = await Promise.all(
+      depots.map(async (depot: any) => {
+        const location = await prisma.locations.findUnique({
+          where: {
+            id: depot.location,
+          },
+        });
+        return location ? location.name : null;
+      })
+    );
+
+    const depotsWithUsers = depots.map((depot: any, index: number) => ({
       ...depot,
       users: depot.DepotUsers.map((depotUser: any) => depotUser.User),
+      locationName: locationNames[index],
     }));
 
     return response.status(200).json({

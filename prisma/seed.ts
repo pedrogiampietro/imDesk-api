@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ["query", "info", "warn", "error"],
+});
 const saltRounds = 10;
 
 async function main() {

@@ -52,8 +52,16 @@ function buildHTML(ticketData: any) {
     ticketData.closedAt
   );
 
-  const serealizedAssignedTo = ticketData.assignedTo[0].split("-");
-  const assignedTo = serealizedAssignedTo[serealizedAssignedTo.length - 1];
+  let assignedTo = null;
+
+  if (
+    ticketData &&
+    Array.isArray(ticketData.assignedTo) &&
+    typeof ticketData.assignedTo[0] === "string"
+  ) {
+    const serealizedAssignedTo = ticketData.assignedTo[0].split("-");
+    assignedTo = serealizedAssignedTo[serealizedAssignedTo.length - 1];
+  }
 
   const html = `
   <html lang="pt-BR">
@@ -185,7 +193,7 @@ function buildHTML(ticketData: any) {
           <label>Assinatura do solicitante:</label>
           ${
             ticketData.User.signatureUrl && ticketData.ticketWasSignedUser
-              ? `<img src="${ticketData.User.signatureUrl}" alt="Assinatura do Solicitante" />`
+              ? `<div><img src="${ticketData.User.signatureUrl}" alt="Assinatura do Solicitante" /></div>`
               : `<p>Assinatura não disponível</p>`
           }
       </div>
@@ -193,7 +201,7 @@ function buildHTML(ticketData: any) {
           <label>Assinatura do executante</label>
           ${
             ticketData.techUserSignature && ticketData.ticketWasSignedTech
-              ? `<img src="${ticketData.techUserSignature}" alt="Assinatura do Solicitante" />`
+              ? `<div><img src="${ticketData.techUserSignature}" alt="Assinatura do Solicitante" /></div>`
               : `<p>Assinatura não disponível</p>`
           }
       </div>
@@ -301,8 +309,8 @@ router.get("/:id", async (request: Request, response: Response) => {
     });
 
     let serealizedAssignedTo = getAllTickets[0]?.assignedTo[0]?.split("-");
-    serealizedAssignedTo.pop();
-    let assignedTechId = serealizedAssignedTo.join("-");
+    serealizedAssignedTo?.pop();
+    let assignedTechId = serealizedAssignedTo?.join("-");
 
     const techUserSignature = await prisma.user.findUnique({
       where: { id: String(assignedTechId) },
