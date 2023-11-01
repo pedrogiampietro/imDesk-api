@@ -22,6 +22,7 @@ import groupController from "./controllers/GroupController";
 import todooController from "./controllers/TodooController";
 import typeOfEquipmentsController from "./controllers/EquipmentTypeController";
 import generatePDF from "./controllers/GeneratePDFController";
+import reportController from "./controllers/ReportController";
 
 import { processEmailQueue } from "./services/processQueue";
 
@@ -66,6 +67,7 @@ app.use("/todoo", todooController);
 app.use("/group", groupController);
 app.use("/equipmentType", typeOfEquipmentsController);
 app.use("/pdf-gen", generatePDF);
+app.use("/report", reportController);
 
 app.get("/", (req, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });
