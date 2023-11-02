@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   postgres:
-    container_name: ihmef_database
+    container_name: imdesk_database
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}

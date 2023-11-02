@@ -805,7 +805,7 @@ router.get("/patrimony", async (request, response) => {
 
     if (equipments.length === 0) {
       return response
-        .status(404)
+        .status(204)
         .json({ message: "No equipment found for this location." });
     }
 

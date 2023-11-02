@@ -37,6 +37,7 @@ CREATE TABLE "User" (
     "avatarUrl" TEXT,
     "hourlyRate" DOUBLE PRECISION,
     "groupId" INTEGER,
+    "signatureUrl" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -53,12 +54,16 @@ CREATE TABLE "DepotUser" (
 CREATE TABLE "Ticket" (
     "id" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "observationServiceExecuted" TEXT,
+    "ticketWasSignedTech" BOOLEAN DEFAULT false,
+    "ticketWasSignedUser" BOOLEAN DEFAULT false,
     "ticketTypeId" TEXT NOT NULL,
     "ticketCategoryId" TEXT NOT NULL,
     "ticketPriorityId" TEXT NOT NULL,
     "ticketLocationId" TEXT NOT NULL,
     "assignedTo" TEXT[],
     "assignedToAt" TIMESTAMP(3),
+    "assignedSignature" TEXT,
     "closedBy" TEXT,
     "closedAt" TIMESTAMP(3),
     "status" TEXT,
@@ -229,6 +234,15 @@ CREATE TABLE "TicketResponse" (
     "ticketId" TEXT NOT NULL,
 
     CONSTRAINT "TicketResponse_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TicketResponseImage" (
+    "id" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+    "ticketResponseId" TEXT NOT NULL,
+
+    CONSTRAINT "TicketResponseImage_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -436,6 +450,7 @@ CREATE TABLE "Todo" (
 CREATE TABLE "Group" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
 
     CONSTRAINT "Group_pkey" PRIMARY KEY ("id")
 );
@@ -477,6 +492,19 @@ CREATE TABLE "Log" (
     CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "EmailQueue" (
+    "id" SERIAL NOT NULL,
+    "to" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "sent" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "EmailQueue_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
@@ -494,6 +522,9 @@ CREATE UNIQUE INDEX "RefreshToken_id_key" ON "RefreshToken"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Provider_email_key" ON "Provider"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EquipmentType_name_key" ON "EquipmentType"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "EquipmentTypeCompany_id_key" ON "EquipmentTypeCompany"("id");
@@ -596,6 +627,9 @@ ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_userId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketResponseImage" ADD CONSTRAINT "TicketResponseImage_ticketResponseId_fkey" FOREIGN KEY ("ticketResponseId") REFERENCES "TicketResponse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DiskInfo" ADD CONSTRAINT "DiskInfo_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
