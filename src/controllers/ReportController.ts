@@ -4,12 +4,23 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = express.Router();
 
+interface SLAViolationsByTechnician {
+	[technicianId: string]: {
+		slaViolationsCount: number;
+	};
+}
+
 router.get('/dashboard', async (request: Request, response: Response) => {
 	try {
 		const { userId } = request.body;
 
+		const openStatuses = ['new', 'assigned'];
+
 		const statusCounts = await prisma.ticket.groupBy({
-			where: { userId },
+			where: {
+				userId,
+				status: { in: openStatuses },
+			},
 			by: ['status'],
 			_count: true,
 		});
@@ -20,6 +31,7 @@ router.get('/dashboard', async (request: Request, response: Response) => {
 				timeEstimate: {
 					lt: new Date(),
 				},
+				status: { in: openStatuses },
 			},
 		});
 
@@ -29,25 +41,37 @@ router.get('/dashboard', async (request: Request, response: Response) => {
 			statusCounts.find((item) => item.status === 'assigned')?._count || 0;
 
 		const categoryCounts = await prisma.ticket.groupBy({
-			where: { userId },
+			where: {
+				userId,
+				status: { in: openStatuses },
+			},
 			by: ['ticketCategoryId'],
 			_count: true,
 		});
 
 		const priorityCounts = await prisma.ticket.groupBy({
-			where: { userId },
+			where: {
+				userId,
+				status: { in: openStatuses },
+			},
 			by: ['ticketPriorityId'],
 			_count: true,
 		});
 
 		const recentTickets = await prisma.ticket.findMany({
-			where: { userId },
+			where: {
+				userId,
+				status: { in: openStatuses },
+			},
 			orderBy: { createdAt: 'desc' },
 			take: 5,
 		});
 
 		const allTickets = await prisma.ticket.count({
-			where: { userId },
+			where: {
+				userId,
+				status: { in: openStatuses },
+			},
 		});
 
 		const ticketsToday = await prisma.ticket.count({
@@ -56,6 +80,7 @@ router.get('/dashboard', async (request: Request, response: Response) => {
 				timeEstimate: {
 					equals: new Date(),
 				},
+				status: { in: openStatuses },
 			},
 		});
 
@@ -65,6 +90,7 @@ router.get('/dashboard', async (request: Request, response: Response) => {
 				timeEstimate: {
 					equals: new Date(new Date().setDate(new Date().getDate() + 1)),
 				},
+				status: { in: openStatuses },
 			},
 		});
 
@@ -74,6 +100,7 @@ router.get('/dashboard', async (request: Request, response: Response) => {
 				timeEstimate: {
 					gte: new Date(new Date().setDate(new Date().getDate() + 2)),
 				},
+				status: { in: openStatuses },
 			},
 		});
 
@@ -99,7 +126,7 @@ router.get('/dashboard', async (request: Request, response: Response) => {
 	}
 });
 
-router.post('/os', async (request: Request, response: Response) => {
+router.get('/os', async (request: Request, response: Response) => {
 	try {
 		const { userId, startDate, endDate } = request.body;
 		const getUser = await prisma.user.findUnique({
@@ -177,5 +204,102 @@ router.post('/os', async (request: Request, response: Response) => {
 		return response.status(500).json({ error: true, message: err.message });
 	}
 });
+
+router.get(
+	'/open-tickets-by-location',
+	async (request: Request, response: Response) => {
+		try {
+			// Obtém todos os tickets que estão abertos, agrupados por localização
+			const openTicketsCountByLocation = await prisma.ticket.groupBy({
+				by: ['ticketLocationId'],
+				_count: {
+					id: true,
+				},
+				where: {
+					status: {
+						in: ['new', 'assigned', 'closed'],
+					},
+				},
+			});
+
+			const openTicketsWithLocationNames = await Promise.all(
+				openTicketsCountByLocation.map(async (location) => {
+					const locationInfo = await prisma.locations.findUnique({
+						where: { id: location.ticketLocationId },
+						select: { name: true },
+					});
+					return {
+						locationName: locationInfo?.name,
+						openTicketsCount: location._count.id,
+					};
+				})
+			);
+
+			return response.status(200).json({
+				body: openTicketsWithLocationNames,
+				message: '',
+				error: false,
+			});
+		} catch (err: any) {
+			return response.status(500).json({ error: true, message: err.message });
+		}
+	}
+);
+
+router.get(
+	'/sla-violations-by-technician',
+	async (request: Request, response: Response) => {
+		try {
+			// Buscar todos os tickets que estão fechados
+			const closedTickets = await prisma.ticket.findMany({
+				where: {
+					closedAt: {
+						not: null,
+					},
+					OR: [
+						{ slaViolated: true },
+						{ timeEstimate: { not: null } }, // Tickets com estimativa de tempo definida
+					],
+				},
+				select: {
+					id: true,
+					closedBy: true,
+					closedAt: true,
+					timeEstimate: true,
+					slaViolated: true,
+				},
+			});
+
+			// Filtrar os tickets que violaram o SLA com base nas condições especificadas
+			const slaViolationsByTechnician =
+				closedTickets.reduce<SLAViolationsByTechnician>((acc, ticket) => {
+					const technicianId = ticket.closedBy;
+					if (technicianId) {
+						if (!acc[technicianId]) {
+							acc[technicianId] = { slaViolationsCount: 0 };
+						}
+						// Checar se o SLA foi violado ou se o ticket foi fechado após o tempo estimado
+						if (
+							ticket.slaViolated ||
+							(ticket.timeEstimate &&
+								ticket.closedAt &&
+								new Date(ticket.closedAt) > new Date(ticket.timeEstimate))
+						) {
+							acc[technicianId].slaViolationsCount++;
+						}
+					}
+					return acc;
+				}, {});
+
+			return response.status(200).json({
+				body: slaViolationsByTechnician,
+				message: 'SLA violations by technician retrieved successfully.',
+				error: false,
+			});
+		} catch (err: any) {
+			return response.status(500).json({ error: true, message: err.message });
+		}
+	}
+);
 
 export default router;
