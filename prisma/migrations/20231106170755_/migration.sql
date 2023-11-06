@@ -71,7 +71,6 @@ CREATE TABLE "Ticket" (
     "isDelay" BOOLEAN DEFAULT false,
     "userId" TEXT,
     "manualResolutionDueDate" TIMESTAMP(3),
-    "slaViolated" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "slaDefinitionId" INTEGER,
