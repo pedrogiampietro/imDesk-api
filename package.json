@@ -2,12 +2,12 @@
   "name": "ihmef-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node build/index.js",
     "watch": "tsc -w",
     "build": "tsc",
-    "dev": "tsnd --exit-child index.ts",
+    "dev": "tsnd --exit-childs src/server.ts",
     "create:seeds": "ts-node prisma/seed.ts",
     "migrations:run": "npx prisma migrate dev"
   },
