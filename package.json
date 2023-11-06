@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node dist/server.js",
     "watch": "tsc -w",
     "build": "tsc",
     "dev": "tsnd --exit-childs src/server.ts",
@@ -27,6 +27,7 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.1",
     "puppeteer": "^21.4.0",
     "uuid": "^9.0.0"
   },
