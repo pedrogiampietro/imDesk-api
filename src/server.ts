@@ -43,7 +43,12 @@ app.use((_, response, next) => {
   return next();
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://imdesk-production.up.railway.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
