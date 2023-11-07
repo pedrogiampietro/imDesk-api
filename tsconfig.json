@@ -3,7 +3,7 @@
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "module": "CommonJS",
     "rootDir": ".", // especifica o diretório raiz (isto é significativo se você tem arquivos fora de 'src')
-    "outDir": "./dist", // diretório de saída para o código compilado
+    "outDir": "./build", // diretório de saída para o código compilado
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     "moduleResolution": "node",
@@ -15,7 +15,6 @@
   },
   "include": [
     "src/**/*",
-    "prisma/**/*", // adicione outras pastas que você quer incluir na compilação
-    "src/server.ts"
+    "prisma/**/*" // adicione outras pastas que você quer incluir na compilação
   ]
 }

@@ -45,7 +45,7 @@ app.use((_, response, next) => {
 
 app.use(
   cors({
-    origin: "https://imdesk-production.up.railway.app",
+    origin: "*",
     credentials: true,
   })
 );

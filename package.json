@@ -2,12 +2,13 @@
   "name": "ihmef-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node dist/src/server.js",
+    "start": "node build/server.js",
     "watch": "tsc -w",
     "build": "tsc",
-    "dev": "tsnd --exit-childs src/server.ts",
+    "railway": "nodemon dist/index.js",
+    "dev": "tsnd --exit-child src/server.ts",
     "create:seeds": "ts-node prisma/seed.ts",
     "migrations:run": "npx prisma migrate dev"
   },
@@ -27,7 +28,6 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.7",
-    "nodemon": "^3.0.1",
     "puppeteer": "^21.4.0",
     "uuid": "^9.0.0"
   },

@@ -126,9 +126,10 @@ router.get("/dashboard", async (request: Request, response: Response) => {
   }
 });
 
-router.get("/os", async (request: Request, response: Response) => {
+router.post("/os", async (request: Request, response: Response) => {
   try {
     const { userId, startDate, endDate } = request.body;
+
     const getUser = await prisma.user.findUnique({
       where: { id: userId },
     });
