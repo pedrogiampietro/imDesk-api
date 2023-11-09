@@ -131,13 +131,15 @@ model TicketEquipments {
 }
 
 model Equipments {
-  id           String @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   model        String
-  patrimonyTag String @unique
-  serialNumber String @unique
+  patrimonyTag String   @unique
+  serialNumber String   @unique
   type         String
   locationId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
 
   EquipmentCompanies EquipmentCompany[]
   Tickets            TicketEquipments[]
@@ -165,8 +167,10 @@ model Image {
 }
 
 model Locations {
-  id   String @id @default(uuid())
-  name String
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   LocationCompanies LocationCompany[]
   Ticket            Ticket[]
@@ -192,8 +196,11 @@ model TicketCompany {
 }
 
 model TicketType {
-  id                  String              @id @default(uuid())
-  name                String
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
   Ticket              Ticket[]
   TicketTypeCompanies TicketTypeCompany[]
 }
@@ -208,8 +215,11 @@ model TicketTypeCompany {
 }
 
 model TicketPriority {
-  id     String   @id @default(uuid())
-  name   String
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
   Ticket Ticket[]
 
   TicketPriorityCompanies TicketPriorityCompany[]
@@ -225,10 +235,13 @@ model TicketPriorityCompany {
 }
 
 model TicketCategory {
-  id                      String                  @id @default(uuid())
-  name                    String
-  childrenName            String
-  defaultText             String?
+  id           String   @id @default(uuid())
+  name         String
+  childrenName String
+  defaultText  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+
   Ticket                  Ticket[]
   TicketCategoryCompanies TicketCategoryCompany[]
 }
@@ -477,9 +490,12 @@ model Todo {
 }
 
 model Group {
-  id      Int      @id @default(autoincrement())
-  name    String
-  email   String
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
   users   User[]
   tickets Ticket[]
 
