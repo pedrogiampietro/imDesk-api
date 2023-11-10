@@ -69,4 +69,67 @@ router.get("/", async (request: Request, response: Response) => {
   }
 });
 
+router.get("/find-by-id/", async (request: Request, response: Response) => {
+  const { id } = request.query;
+
+  try {
+    const getType = await prisma.ticketType.findUnique({
+      where: {
+        id: String(id),
+      },
+    });
+
+    return response.status(200).json({
+      message: "Type found",
+      body: getType,
+      error: false,
+    });
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+});
+
+router.patch("/update-type/:id", async (request, response) => {
+  const typeId = request.params.id;
+
+  const { name, companyIds } = request.body;
+
+  if (!typeId || !companyIds) {
+    return response
+      .status(400)
+      .json("ID e Empresas são obrigatórios para atualização");
+  }
+
+  try {
+    const type = await prisma.ticketType.findUnique({
+      where: { id: String(typeId) },
+    });
+
+    if (!type) {
+      return response.status(404).json("Usuário não encontrado");
+    }
+
+    const updateType = await prisma.ticketType.update({
+      where: { id: String(typeId) },
+      data: {
+        name,
+        TicketTypeCompanies: {
+          deleteMany: {},
+          create: companyIds.map((companyId: any) => ({
+            companyId,
+          })),
+        },
+      },
+    });
+
+    return response.status(200).json({
+      message: "Type updated successfully",
+      body: updateType,
+      error: false,
+    });
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+});
+
 export default router;

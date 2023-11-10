@@ -113,4 +113,69 @@ router.get("/", async (request: Request, response: Response) => {
   }
 });
 
+router.get("/find-by-id", async (request: Request, response: Response) => {
+  const { id } = request.query;
+
+  try {
+    const getCategory = await prisma.ticketCategory.findUnique({
+      where: {
+        id: String(id),
+      },
+    });
+
+    return response.status(200).json({
+      message: "Category found",
+      body: getCategory,
+      error: false,
+    });
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+});
+
+router.patch("/update-category/:id", async (request, response) => {
+  const categoryId = request.params.id;
+
+  const { name, childrenName, defaultText, companyIds } = request.body;
+
+  if (!categoryId || !companyIds) {
+    return response
+      .status(400)
+      .json("ID e Empresas são obrigatórios para atualização");
+  }
+
+  try {
+    const priority = await prisma.ticketCategory.findUnique({
+      where: { id: String(categoryId) },
+    });
+
+    if (!priority) {
+      return response.status(404).json("Usuário não encontrado");
+    }
+
+    const updateCategory = await prisma.ticketCategory.update({
+      where: { id: String(categoryId) },
+      data: {
+        name,
+        childrenName,
+        defaultText,
+        TicketCategoryCompanies: {
+          deleteMany: {},
+          create: companyIds.map((companyId: any) => ({
+            companyId,
+          })),
+        },
+      },
+    });
+
+    return response.status(200).json({
+      message: "Category updated successfully",
+      body: updateCategory,
+      error: false,
+    });
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+});
+
 export default router;
