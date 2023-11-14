@@ -1,7 +1,10 @@
+require("dotenv").config();
+
 import express from "express";
 import cors from "cors";
 import path from "path";
 import cron from "node-cron";
+import oracledb from "oracledb";
 
 import authController from "./controllers/AuthController";
 import userController from "./controllers/UserController";
@@ -23,10 +26,14 @@ import todooController from "./controllers/TodooController";
 import typeOfEquipmentsController from "./controllers/EquipmentTypeController";
 import generatePDF from "./controllers/GeneratePDFController";
 import reportController from "./controllers/ReportController";
+import mvController from "./controllers/MVController";
 
 import { processEmailQueue } from "./services/processQueue";
+import { dbConfig } from "./config/oracle_config";
 
 const app = express();
+
+const oracleEnabled = process.env.ORACLE_ENABLED === "true";
 
 app.use((_, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
@@ -73,15 +80,33 @@ app.use("/group", groupController);
 app.use("/equipmentType", typeOfEquipmentsController);
 app.use("/pdf-gen", generatePDF);
 app.use("/report", reportController);
+app.use("/integration/mv", mvController);
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });
 });
+
+async function initializeOracle() {
+  if (oracleEnabled) {
+    try {
+      await oracledb.createPool(dbConfig);
+      console.log("Oracle database connected");
+    } catch (error) {
+      console.error("Failed to connect to the Oracle database:", error);
+    }
+  }
+}
 
 const port = process.env.PORT || 3333;
 
 cron.schedule("*/2 * * * *", processEmailQueue);
 
-app.listen(port, () => {
-  console.log(`Server running at https://localhost:${port}/`);
-});
+async function initialize() {
+  await initializeOracle();
+
+  app.listen(port, () => {
+    console.log(`Server started at http://localhost:${port}`);
+  });
+}
+
+initialize();
