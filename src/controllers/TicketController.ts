@@ -1,6 +1,11 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { uploadTickets } from "../middlewares/multer";
+import {
+  closeTicketNotification,
+  createTicketNotification,
+  updateTicketNotification,
+} from "../services/webhookService";
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -278,6 +283,8 @@ router.post(
         User,
         equipmentUsage: equipmentUsageData,
       };
+
+      await createTicketNotification(responseObj);
 
       const groupName = process.env.GROUP_NAME || "NOT FOUND";
 
@@ -644,6 +651,12 @@ router.put("/:id", async (request: Request, response: Response) => {
       }
     }
 
+    const currentTicket = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+    });
+    const isClosingTicket =
+      requestBody.status === "closed" && currentTicket?.status !== "closed";
+
     const updatedTicket = await prisma.ticket.update({
       where: { id: ticketId },
       data: updateData,
@@ -655,6 +668,12 @@ router.put("/:id", async (request: Request, response: Response) => {
         User: true,
       },
     });
+
+    if (isClosingTicket) {
+      await closeTicketNotification(updatedTicket);
+    } else {
+      await updateTicketNotification(updatedTicket);
+    }
 
     return response.status(200).json({
       message: "Ticket updated successfully",

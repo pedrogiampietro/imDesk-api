@@ -13,8 +13,6 @@ router.get(
     const page = parseInt(request.query.page as string) || 1;
     const pageSize = parseInt(request.query.perPage as string) || 20;
 
-    console.log("Page:", page, "PageSize:", pageSize);
-
     const offset = (page - 1) * pageSize;
     const limit = pageSize;
 
@@ -90,8 +88,6 @@ router.get(
     const page = parseInt(request.query.page as string) || 1;
     const pageSize = parseInt(request.query.perPage as string) || 20;
     const offset = (page - 1) * pageSize;
-
-    console.log(`Offset: ${offset}, PageSize: ${pageSize}`);
 
     try {
       connection = await oracledb.getConnection();
