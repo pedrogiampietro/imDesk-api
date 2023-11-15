@@ -27,6 +27,7 @@ model Company {
   Depots                Depot[]
   GroupCompanies        GroupCompany[]
   EquipmentTypes        EquipmentTypeCompany[]
+  ShiftChangeCompany    ShiftChangeCompany[]
 }
 
 model UserCompany {
@@ -67,6 +68,7 @@ model User {
   DepotUsers       DepotUser[]
   Log              Log[]
   Groups           Group?             @relation(fields: [groupId], references: [id])
+  ShiftChange      ShiftChange[]
 }
 
 model DepotUser {
@@ -119,6 +121,11 @@ model Ticket {
   Todos            Todo[]
   Groups           Group?             @relation(fields: [groupId], references: [id])
   Equipments       TicketEquipments[]
+
+  AssignedShiftChanges ShiftChangeAssignedTicket[]
+  PlannedShiftChanges  ShiftChangePlannedTicket[]
+  PendingShiftChanges  ShiftChangePendingTicket[]
+  ShiftChangeTicket    ShiftChangeTicket[]
 }
 
 model TicketEquipments {
@@ -547,4 +554,71 @@ model EmailQueue {
   sent      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ShiftChangeTicket {
+  shiftChangeId String
+  ticketId      String
+  type          String
+
+  ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
+  Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+
+  @@id([shiftChangeId, ticketId])
+}
+
+model ShiftChange {
+  id                 String   @id @default(uuid())
+  date               DateTime @default(now())
+  responsibleUserId  String
+  temperatureControl Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+
+  ShiftChangeTickets        ShiftChangeTicket[]
+  ResponsibleUser           User                        @relation(fields: [responsibleUserId], references: [id])
+  ShiftChangeCompanies      ShiftChangeCompany[]
+  ShiftChangeAssignedTicket ShiftChangeAssignedTicket[]
+  ShiftChangePlannedTicket  ShiftChangePlannedTicket[]
+  ShiftChangePendingTicket  ShiftChangePendingTicket[]
+}
+
+model ShiftChangeCompany {
+  shiftChangeId String
+  companyId     String
+
+  ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
+  Company     Company     @relation(fields: [companyId], references: [id])
+
+  @@id([shiftChangeId, companyId])
+}
+
+model ShiftChangeAssignedTicket {
+  shiftChangeId String
+  ticketId      String
+
+  ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
+  Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+
+  @@id([shiftChangeId, ticketId])
+}
+
+model ShiftChangePlannedTicket {
+  shiftChangeId String
+  ticketId      String
+
+  ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
+  Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+
+  @@id([shiftChangeId, ticketId])
+}
+
+model ShiftChangePendingTicket {
+  shiftChangeId String
+  ticketId      String
+
+  ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
+  Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+
+  @@id([shiftChangeId, ticketId])
 }

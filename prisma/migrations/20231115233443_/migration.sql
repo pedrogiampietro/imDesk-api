@@ -96,6 +96,8 @@ CREATE TABLE "Equipments" (
     "serialNumber" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "locationId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Equipments_pkey" PRIMARY KEY ("id")
 );
@@ -123,6 +125,8 @@ CREATE TABLE "Image" (
 CREATE TABLE "Locations" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Locations_pkey" PRIMARY KEY ("id")
 );
@@ -147,6 +151,8 @@ CREATE TABLE "TicketCompany" (
 CREATE TABLE "TicketType" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "TicketType_pkey" PRIMARY KEY ("id")
 );
@@ -163,6 +169,8 @@ CREATE TABLE "TicketTypeCompany" (
 CREATE TABLE "TicketPriority" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "TicketPriority_pkey" PRIMARY KEY ("id")
 );
@@ -181,6 +189,8 @@ CREATE TABLE "TicketCategory" (
     "name" TEXT NOT NULL,
     "childrenName" TEXT NOT NULL,
     "defaultText" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "TicketCategory_pkey" PRIMARY KEY ("id")
 );
@@ -450,6 +460,8 @@ CREATE TABLE "Group" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Group_pkey" PRIMARY KEY ("id")
 );
@@ -502,6 +514,59 @@ CREATE TABLE "EmailQueue" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "EmailQueue_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangeTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+
+    CONSTRAINT "ShiftChangeTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChange" (
+    "id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "responsibleUserId" TEXT NOT NULL,
+    "temperatureControl" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ShiftChange_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangeCompany" (
+    "shiftChangeId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+
+    CONSTRAINT "ShiftChangeCompany_pkey" PRIMARY KEY ("shiftChangeId","companyId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangeAssignedTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+
+    CONSTRAINT "ShiftChangeAssignedTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangePlannedTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+
+    CONSTRAINT "ShiftChangePlannedTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangePendingTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+
+    CONSTRAINT "ShiftChangePendingTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
 );
 
 -- CreateIndex
@@ -695,3 +760,36 @@ ALTER TABLE "EquipmentTypeCompany" ADD CONSTRAINT "EquipmentTypeCompany_companyI
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeTicket" ADD CONSTRAINT "ShiftChangeTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeTicket" ADD CONSTRAINT "ShiftChangeTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChange" ADD CONSTRAINT "ShiftChange_responsibleUserId_fkey" FOREIGN KEY ("responsibleUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeCompany" ADD CONSTRAINT "ShiftChangeCompany_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeCompany" ADD CONSTRAINT "ShiftChangeCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeAssignedTicket" ADD CONSTRAINT "ShiftChangeAssignedTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeAssignedTicket" ADD CONSTRAINT "ShiftChangeAssignedTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePlannedTicket" ADD CONSTRAINT "ShiftChangePlannedTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePlannedTicket" ADD CONSTRAINT "ShiftChangePlannedTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
