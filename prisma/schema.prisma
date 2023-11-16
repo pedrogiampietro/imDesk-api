@@ -559,13 +559,13 @@ model EmailQueue {
 model ShiftChangeTicket {
   shiftChangeId String
   ticketId      String
-  type          String
 
   ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
   Ticket      Ticket      @relation(fields: [ticketId], references: [id])
 
   @@id([shiftChangeId, ticketId])
 }
+
 
 model ShiftChange {
   id                 String   @id @default(uuid())

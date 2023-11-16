@@ -36,7 +36,7 @@ resources:
     parentId: fld_089d44b733e5401e9c155130df644e1b
     modified: 1669332396608
     created: 1669332370886
-    url: http://localhost/equipament/
+    url: http://10.0.101.70/equipament/
     name: List All Equipaments
     description: ""
     method: GET
@@ -67,7 +67,7 @@ resources:
     parentId: fld_089d44b733e5401e9c155130df644e1b
     modified: 1669333306450
     created: 1669332402516
-    url: http://localhost/equipament/
+    url: http://10.0.101.70/equipament/
     name: Create Equipament
     description: ""
     method: POST
@@ -107,7 +107,7 @@ resources:
     parentId: fld_0ff534c4b7a04546979eb745d86083c2
     modified: 1669567838998
     created: 1669335293718
-    url: http://localhost/ticket-category
+    url: http://10.0.101.70/ticket-category
     name: List All Category
     description: ""
     method: GET
@@ -138,7 +138,7 @@ resources:
     parentId: fld_0ff534c4b7a04546979eb745d86083c2
     modified: 1669567878675
     created: 1669335293724
-    url: http://localhost/ticket-category
+    url: http://10.0.101.70/ticket-category
     name: Create Category
     description: ""
     method: POST
@@ -176,7 +176,7 @@ resources:
     parentId: fld_9940a8e4cd644d4fb8aae9bac68e7eac
     modified: 1671571156782
     created: 1671571130033
-    url: http://localhost/maintenance
+    url: http://10.0.101.70/maintenance
     name: List All Maintenance
     description: ""
     method: GET
@@ -207,7 +207,7 @@ resources:
     parentId: fld_9940a8e4cd644d4fb8aae9bac68e7eac
     modified: 1671659819989
     created: 1671571130037
-    url: http://localhost/maintenance
+    url: http://10.0.101.70/maintenance
     name: Create Maintenance
     description: ""
     method: POST
@@ -249,7 +249,7 @@ resources:
     parentId: fld_9940a8e4cd644d4fb8aae9bac68e7eac
     modified: 1671578304949
     created: 1671577922960
-    url: http://localhost/maintenance
+    url: http://10.0.101.70/maintenance
     name: Complete Preventive Maintenance
     description: ""
     method: PATCH
@@ -287,7 +287,7 @@ resources:
     parentId: fld_d19291d74d5449a5a2665c925a99adf2
     modified: 1669470235400
     created: 1669470173394
-    url: http://localhost/ticket-type
+    url: http://10.0.101.70/ticket-type
     name: List All Type
     description: ""
     method: GET
@@ -318,7 +318,7 @@ resources:
     parentId: fld_d19291d74d5449a5a2665c925a99adf2
     modified: 1669567889263
     created: 1669470173397
-    url: http://localhost/ticket-type
+    url: http://10.0.101.70/ticket-type
     name: Create Type
     description: ""
     method: POST
@@ -355,7 +355,7 @@ resources:
     parentId: fld_8fef9e7229884030bf55d736056c8e0b
     modified: 1669470296493
     created: 1669470276459
-    url: http://localhost/ticket-priority
+    url: http://10.0.101.70/ticket-priority
     name: List All Priority
     description: ""
     method: GET
@@ -386,7 +386,7 @@ resources:
     parentId: fld_8fef9e7229884030bf55d736056c8e0b
     modified: 1669567893384
     created: 1669470276462
-    url: http://localhost/ticket-priority
+    url: http://10.0.101.70/ticket-priority
     name: Create Priority
     description: ""
     method: POST
@@ -423,7 +423,7 @@ resources:
     parentId: fld_e1800c495390463dbfb6680839ee62a8
     modified: 1669491928829
     created: 1669491903110
-    url: http://localhost/ticket-location
+    url: http://10.0.101.70/ticket-location
     name: List All Location
     description: ""
     method: GET
@@ -454,7 +454,7 @@ resources:
     parentId: fld_e1800c495390463dbfb6680839ee62a8
     modified: 1669569730622
     created: 1669491903115
-    url: http://localhost/location
+    url: http://10.0.101.70/location
     name: Create Location
     description: ""
     method: POST
@@ -491,7 +491,7 @@ resources:
     parentId: fld_2bf6ae64da3a4c62b3165c2140f4a715
     modified: 1693227482159
     created: 1692981138993
-    url: http://localhost/companies
+    url: http://10.0.101.70/companies
     name: Create Companie
     description: ""
     method: POST
@@ -532,7 +532,7 @@ resources:
     parentId: fld_2bf6ae64da3a4c62b3165c2140f4a715
     modified: 1693310063979
     created: 1693310061849
-    url: http://localhost/companies
+    url: http://10.0.101.70/companies
     name: List Companies
     description: ""
     method: GET
@@ -563,7 +563,7 @@ resources:
     parentId: fld_4ccfd26c2ff94c65804995642768e595
     modified: 1693312860636
     created: 1693310076306
-    url: http://localhost/deposit
+    url: http://10.0.101.70/deposit
     name: Create Deposit
     description: ""
     method: POST
@@ -605,7 +605,7 @@ resources:
     parentId: fld_4ccfd26c2ff94c65804995642768e595
     modified: 1693313435901
     created: 1693313164845
-    url: http://localhost/deposit/67322405-c7c1-4e71-9d96-2ef237050a24
+    url: http://10.0.101.70/deposit/67322405-c7c1-4e71-9d96-2ef237050a24
     name: UpdateDeposit
     description: ""
     method: PUT
@@ -642,7 +642,7 @@ resources:
     parentId: fld_4ccfd26c2ff94c65804995642768e595
     modified: 1693312928467
     created: 1693310076348
-    url: http://localhost/deposit
+    url: http://10.0.101.70/deposit
     name: List Deposits
     description: ""
     method: GET
@@ -669,7 +669,7 @@ resources:
     parentId: fld_6e91ae354f624eacbe135e87a985610f
     modified: 1693313698864
     created: 1693313164759
-    url: http://localhost/deposit-item/items/8771877c-6f36-4167-9cfe-b21823208179
+    url: http://10.0.101.70/deposit-item/items/8771877c-6f36-4167-9cfe-b21823208179
     name: Update Item
     description: ""
     method: PUT
@@ -710,7 +710,7 @@ resources:
     parentId: fld_6e91ae354f624eacbe135e87a985610f
     modified: 1693313468976
     created: 1693311358756
-    url: http://localhost/deposit-item/items
+    url: http://10.0.101.70/deposit-item/items
     name: Create Item
     description: ""
     method: POST
@@ -746,7 +746,7 @@ resources:
     parentId: fld_6e91ae354f624eacbe135e87a985610f
     modified: 1693313545713
     created: 1693313164802
-    url: http://localhost/deposit-item/items
+    url: http://10.0.101.70/deposit-item/items
     name: List Items
     description: ""
     method: GET
@@ -812,7 +812,7 @@ resources:
     parentId: fld_d3d8d50376374e1cab701adb758ada98
     modified: 1693313005633
     created: 1669332358435
-    url: http://localhost/authenticate/sign-up
+    url: http://10.0.101.70/authenticate/sign-up
     name: Register
     description: ""
     method: POST
@@ -850,7 +850,7 @@ resources:
     created: 1669313194567
     name: Base Environment
     data:
-      devUrl: http://localhost
+      devUrl: http://10.0.101.70
       productionUrl: http://www.imdesk.tk
       token: "{% response 'body', 'req_5d195bc631e64aad92eee44cecd0ece3',
         'b64::JC50b2tlbnMudG9rZW4=::46b', 'never', 60 %}"
