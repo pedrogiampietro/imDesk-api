@@ -284,7 +284,7 @@ router.post(
         equipmentUsage: equipmentUsageData,
       };
 
-      await createTicketNotification(responseObj);
+      // await createTicketNotification(responseObj);
 
       const groupName = process.env.GROUP_NAME || "NOT FOUND";
 
@@ -669,11 +669,11 @@ router.put("/:id", async (request: Request, response: Response) => {
       },
     });
 
-    if (isClosingTicket) {
-      await closeTicketNotification(updatedTicket);
-    } else {
-      await updateTicketNotification(updatedTicket);
-    }
+    // if (isClosingTicket) {
+    //   await closeTicketNotification(updatedTicket);
+    // } else {
+    //   await updateTicketNotification(updatedTicket);
+    // }
 
     return response.status(200).json({
       message: "Ticket updated successfully",

@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { Parser } from "json2csv";
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -203,6 +204,136 @@ router.post("/os", async (request: Request, response: Response) => {
   } catch (err: any) {
     console.error(`Error: ${err.message}`);
     return response.status(500).json({ error: true, message: err.message });
+  }
+});
+
+router.get("/os/export", async (request, response) => {
+  try {
+    const { userId, format } = request.query;
+
+    const startDateParam = request.query.startDate;
+    const endDateParam = request.query.endDate;
+
+    const isStartDateString = typeof startDateParam === "string";
+    const isEndDateString = typeof endDateParam === "string";
+
+    const getUser = await prisma.user.findUnique({
+      where: { id: String(userId) },
+    });
+
+    const adjustedStartDate = isStartDateString
+      ? new Date(new Date(startDateParam).setUTCHours(0, 0, 0, 0))
+      : new Date();
+    const adjustedEndDate = isEndDateString
+      ? new Date(new Date(endDateParam).setUTCHours(23, 59, 59, 999))
+      : new Date();
+
+    const fields = [
+      {
+        label: "ID",
+        value: "id",
+      },
+      {
+        label: "Categoria",
+        value: (row: any) =>
+          `${row.ticketCategory?.name} - ${row.ticketCategory?.childrenName}`,
+      },
+      {
+        label: "Descrição",
+        value: "description",
+      },
+      {
+        label: "Status",
+        value: "status",
+      },
+      {
+        label: "Data de Criação",
+        value: (row: any) => formatDate(row.createdAt),
+      },
+      {
+        label: "Data de Fechamento",
+        value: (row: any) => (row.closedAt ? formatDate(row.closedAt) : "N/A"),
+      },
+    ];
+
+    function formatDate(dateStr: any) {
+      const date = new Date(dateStr);
+      return (
+        date.toLocaleDateString("pt-BR") +
+        " " +
+        date.toLocaleTimeString("pt-BR")
+      );
+    }
+
+    const openedOSCount = await prisma.ticket.count({
+      where: {
+        assignedTo: {
+          equals: `${userId}-${getUser?.name}`,
+        },
+        createdAt: {
+          gte: adjustedStartDate,
+          lte: adjustedEndDate,
+        },
+      },
+    });
+
+    const closedOSCount = await prisma.ticket.count({
+      where: {
+        assignedTo: {
+          equals: `${userId}-${getUser?.name}`,
+        },
+        closedAt: {
+          gte: adjustedStartDate,
+          lte: adjustedEndDate,
+        },
+      },
+    });
+
+    const tickets = await prisma.ticket.findMany({
+      where: {
+        assignedTo: {
+          equals: `${userId}-${getUser?.name}`,
+        },
+        AND: [
+          {
+            createdAt: {
+              gte: adjustedStartDate,
+            },
+          },
+          {
+            createdAt: {
+              lte: adjustedEndDate,
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        ticketCategory: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        closedAt: true,
+        observationServiceExecuted: true,
+      },
+    });
+
+    if (format === "csv") {
+      const json2csvParser = new Parser({ fields });
+      const csv = json2csvParser.parse(tickets);
+
+      response.setHeader(
+        "Content-disposition",
+        "attachment; filename=report.csv"
+      );
+      response.set("Content-Type", "text/csv");
+      response.status(200).send(csv);
+    } else {
+      response.status(400).send("Formato de exportação não suportado");
+    }
+  } catch (err: any) {
+    console.error(`Error: ${err.message}`);
+    response.status(500).json({ error: true, message: err.message });
   }
 });
 
