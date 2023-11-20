@@ -28,6 +28,7 @@ model Company {
   GroupCompanies        GroupCompany[]
   EquipmentTypes        EquipmentTypeCompany[]
   ShiftChangeCompany    ShiftChangeCompany[]
+  SuggestionComplaint   SuggestionComplaint[]
 }
 
 model UserCompany {
@@ -58,17 +59,18 @@ model User {
   groupId                  Int?
   signatureUrl             String?
 
-  Ticket           Ticket[]
-  RefreshTokens    RefreshToken[]
-  Equipments       EquipmentCompany[]
-  TicketResponse   TicketResponse[]
-  TicketEvaluation TicketEvaluation[]
-  UserCompanies    UserCompany[]
-  Notification     Notification[]
-  DepotUsers       DepotUser[]
-  Log              Log[]
-  Groups           Group?             @relation(fields: [groupId], references: [id])
-  ShiftChange      ShiftChange[]
+  Ticket              Ticket[]
+  RefreshTokens       RefreshToken[]
+  Equipments          EquipmentCompany[]
+  TicketResponse      TicketResponse[]
+  TicketEvaluation    TicketEvaluation[]
+  UserCompanies       UserCompany[]
+  Notification        Notification[]
+  DepotUsers          DepotUser[]
+  Log                 Log[]
+  Groups              Group?                @relation(fields: [groupId], references: [id])
+  ShiftChange         ShiftChange[]
+  SuggestionComplaint SuggestionComplaint[]
 }
 
 model DepotUser {
@@ -566,7 +568,6 @@ model ShiftChangeTicket {
   @@id([shiftChangeId, ticketId])
 }
 
-
 model ShiftChange {
   id                 String   @id @default(uuid())
   date               DateTime @default(now())
@@ -621,4 +622,20 @@ model ShiftChangePendingTicket {
   Ticket      Ticket      @relation(fields: [ticketId], references: [id])
 
   @@id([shiftChangeId, ticketId])
+}
+
+model SuggestionComplaint {
+  id          String    @id @default(uuid())
+  userId      String
+  companyId   String?
+  description String
+  category    String // 'Serviço', 'Produto', 'Atendimento', etc.
+  status      String // 'new', 'pending', 'planned', 'closed'
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  feedback    String?
+
+  User    User     @relation(fields: [userId], references: [id])
+  Company Company? @relation(fields: [companyId], references: [id])
 }

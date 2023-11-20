@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { uploadTickets } from '../middlewares/multer';
+import { uploadTickets, uploadTicketResponse } from '../middlewares/multer';
 import {
 	closeTicketNotificationDiscord,
 	createTicketNotificationDiscord,
@@ -709,7 +709,7 @@ router.put('/:id', async (request: Request, response: Response) => {
 
 router.post(
 	'/response',
-	uploadTickets.array('images'),
+	uploadTicketResponse.array('images'),
 	async (request: Request, response: Response) => {
 		try {
 			const { ticketId, userId, content, type } =

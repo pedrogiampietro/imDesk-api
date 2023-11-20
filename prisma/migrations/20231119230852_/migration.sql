@@ -520,7 +520,6 @@ CREATE TABLE "EmailQueue" (
 CREATE TABLE "ShiftChangeTicket" (
     "shiftChangeId" TEXT NOT NULL,
     "ticketId" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
 
     CONSTRAINT "ShiftChangeTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
 );
@@ -567,6 +566,22 @@ CREATE TABLE "ShiftChangePendingTicket" (
     "ticketId" TEXT NOT NULL,
 
     CONSTRAINT "ShiftChangePendingTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "SuggestionComplaint" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "companyId" TEXT,
+    "description" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "resolvedAt" TIMESTAMP(3),
+    "feedback" TEXT,
+
+    CONSTRAINT "SuggestionComplaint_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -793,3 +808,9 @@ ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_
 
 -- AddForeignKey
 ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SuggestionComplaint" ADD CONSTRAINT "SuggestionComplaint_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SuggestionComplaint" ADD CONSTRAINT "SuggestionComplaint_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE SET NULL ON UPDATE CASCADE;

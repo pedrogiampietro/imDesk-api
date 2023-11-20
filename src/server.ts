@@ -29,6 +29,7 @@ import reportController from './controllers/ReportController';
 import mvController from './controllers/MVController';
 import shiftChangeController from './controllers/ShiftChangeController';
 import notificationController from './controllers/NotificationController';
+import suggestionComplaintController from './controllers/SuggestionComplaintController';
 
 import { processEmailQueue } from './services/processQueue';
 import { dbConfig } from './config/oracle_config';
@@ -85,6 +86,7 @@ app.use('/report', reportController);
 app.use('/integration/mv', mvController);
 app.use('/shift-changes', shiftChangeController);
 app.use('/notification', notificationController);
+app.use('/suggestion-complaint', suggestionComplaintController);
 
 app.get('/', (_, res) => {
 	return res.json({ status: 'OK', data: new Date().toLocaleString() });

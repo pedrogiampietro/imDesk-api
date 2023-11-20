@@ -89,13 +89,22 @@ router.post('/sign-in', async (request: Request, response: Response) => {
 				.json('Usuário não associado a nenhuma empresa.');
 		}
 
+		const isAssociatedWithCompany = findUser.UserCompanies.some(
+			(uc) => uc.company.id === companyId
+		);
+
+		if (!isAssociatedWithCompany) {
+			return response
+				.status(400)
+				.json('Usuário não está associado à empresa informada.');
+		}
+
 		const validPassword = await bcrypt.compare(password, findUser.password);
 
 		if (!validPassword) {
 			return response.status(400).json('Password incorreto, tente novamente.');
 		}
 
-		// Update user's currentLoggedCompany
 		await prisma.user.update({
 			where: {
 				id: findUser.id,
