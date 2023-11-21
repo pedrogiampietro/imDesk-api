@@ -14,17 +14,7 @@ router.post("/", async (request: Request, response: Response) => {
     pendentes,
   } = request.body;
 
-  console.log("Dados recebidos:", {
-    controleTemperatura,
-    companyId,
-    responsibleUserId,
-    atribuidos,
-    planejados,
-    pendentes,
-  });
-
   try {
-    // Cria uma nova ShiftChange
     const shiftChange = await prisma.shiftChange.create({
       data: {
         date: new Date(),
@@ -36,25 +26,18 @@ router.post("/", async (request: Request, response: Response) => {
       },
     });
 
-    console.log("ShiftChange criada:", shiftChange);
-
-    // Função para extrair IDs válidos dos tickets
     const extractValidTicketIds = (tickets: any[]) => {
       return tickets
         .filter((ticket) => ticket.id && ticket.id.trim() !== "")
         .map((ticket) => ticket.id);
     };
 
-    // Extrai e associa os tickets à ShiftChange
     const allTicketIds = [
       ...extractValidTicketIds(atribuidos),
       ...extractValidTicketIds(planejados),
       ...extractValidTicketIds(pendentes),
     ];
 
-    console.log("IDs dos tickets a serem associados:", allTicketIds);
-
-    // Associa os tickets atribuídos à ShiftChange
     for (const ticket of atribuidos) {
       if (ticket.id && ticket.id.trim() !== "") {
         await prisma.shiftChangeAssignedTicket.create({
@@ -66,7 +49,6 @@ router.post("/", async (request: Request, response: Response) => {
       }
     }
 
-    // Associa os tickets planejados à ShiftChange
     for (const ticket of planejados) {
       if (ticket.id && ticket.id.trim() !== "") {
         await prisma.shiftChangePlannedTicket.create({
@@ -78,7 +60,6 @@ router.post("/", async (request: Request, response: Response) => {
       }
     }
 
-    // Associa os tickets pendentes à ShiftChange
     for (const ticket of pendentes) {
       if (ticket.id && ticket.id.trim() !== "") {
         await prisma.shiftChangePendingTicket.create({
