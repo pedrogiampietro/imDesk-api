@@ -15,6 +15,7 @@
 	},
 	"include": [
 		"src/**/*",
-		"prisma/**/*" // adicione outras pastas que você quer incluir na compilação
+		"prisma/**/*", // adicione outras pastas que você quer incluir na compilação
+		"src/server.ts"
 	]
 }
