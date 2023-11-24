@@ -31,9 +31,11 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.7",
+    "openai": "^4.19.1",
     "oracledb": "^5.5.0",
     "puppeteer": "^21.4.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "vhost": "^3.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

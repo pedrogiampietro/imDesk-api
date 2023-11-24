@@ -8,6 +8,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Tenant {
+  id        String @id @default(uuid())
+  name      String
+  subdomain String @unique
+
+  users                      User[]
+  tickets                    Ticket[]
+  equipments                 Equipments[]
+  companies                  Company[]
+  locations                  Locations[]
+  service                    Service[]
+  contracts                  Contract[]
+  images                     Image[]
+  ticketTypes                TicketType[]
+  ticketPrioritys            TicketPriority[]
+  ticketCategorys            TicketCategory[]
+  maintenances               Maintenance[]
+  historyMaintenances        HistoryMaintenance[]
+  ticketResponses            TicketResponse[]
+  ticketResponseImages       TicketResponseImage[]
+  diskInfos                  DiskInfo[]
+  installedApps              InstalledApp[]
+  machineInfos               MachineInfo[]
+  refreshTokens              RefreshToken[]
+  providers                  Provider[]
+  ticketEvaluations          TicketEvaluation[]
+  SLAViolations              SLAViolation[]
+  SLADefinitions             SLADefinition[]
+  notifications              Notification[]
+  depots                     Depot[]
+  depotItems                 DepotItem[]
+  ticketItems                TicketItem[]
+  todos                      Todo[]
+  groups                     Group[]
+  groupCompanys              GroupCompany[]
+  equipmentTypes             EquipmentType[]
+  equipmentTypeCompanys      EquipmentTypeCompany[]
+  logs                       Log[]
+  emailQueues                EmailQueue[]
+  shiftChangeTickets         ShiftChangeTicket[]
+  shiftChanges               ShiftChange[]
+  shiftChangeCompanys        ShiftChangeCompany[]
+  shiftChangeAssignedTickets ShiftChangeAssignedTicket[]
+  shiftChangePlannedTickets  ShiftChangePlannedTicket[]
+  shiftChangePendingTickets  ShiftChangePendingTicket[]
+  suggestionComplaints       SuggestionComplaint[]
+}
+
 model Company {
   id        String   @id @default(uuid())
   name      String
@@ -29,6 +77,8 @@ model Company {
   EquipmentTypes        EquipmentTypeCompany[]
   ShiftChangeCompany    ShiftChangeCompany[]
   SuggestionComplaint   SuggestionComplaint[]
+  Tenant                Tenant?                 @relation(fields: [tenantId], references: [id])
+  tenantId              String?
 }
 
 model UserCompany {
@@ -71,6 +121,8 @@ model User {
   Groups              Group?                @relation(fields: [groupId], references: [id])
   ShiftChange         ShiftChange[]
   SuggestionComplaint SuggestionComplaint[]
+  Tenant              Tenant?               @relation(fields: [tenantId], references: [id])
+  tenantId            String?
 }
 
 model DepotUser {
@@ -128,6 +180,8 @@ model Ticket {
   PlannedShiftChanges  ShiftChangePlannedTicket[]
   PendingShiftChanges  ShiftChangePendingTicket[]
   ShiftChangeTicket    ShiftChangeTicket[]
+  Tenant               Tenant?                     @relation(fields: [tenantId], references: [id])
+  tenantId             String?
 }
 
 model TicketEquipments {
@@ -153,6 +207,8 @@ model Equipments {
   EquipmentCompanies EquipmentCompany[]
   Tickets            TicketEquipments[]
   Location           Locations          @relation(fields: [locationId], references: [id])
+  Tenant             Tenant?            @relation(fields: [tenantId], references: [id])
+  tenantId           String?
 }
 
 model EquipmentCompany {
@@ -169,10 +225,12 @@ model EquipmentCompany {
 }
 
 model Image {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   path     String
   ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id])
+  ticket   Ticket  @relation(fields: [ticketId], references: [id])
+  Tenant   Tenant? @relation(fields: [tenantId], references: [id])
+  tenantId String?
 }
 
 model Locations {
@@ -184,6 +242,8 @@ model Locations {
   LocationCompanies LocationCompany[]
   Ticket            Ticket[]
   Equipments        Equipments[]
+  Tenant            Tenant?           @relation(fields: [tenantId], references: [id])
+  tenantId          String?
 }
 
 model LocationCompany {
@@ -212,6 +272,8 @@ model TicketType {
 
   Ticket              Ticket[]
   TicketTypeCompanies TicketTypeCompany[]
+  Tenant              Tenant?             @relation(fields: [tenantId], references: [id])
+  tenantId            String?
 }
 
 model TicketTypeCompany {
@@ -232,6 +294,8 @@ model TicketPriority {
   Ticket Ticket[]
 
   TicketPriorityCompanies TicketPriorityCompany[]
+  Tenant                  Tenant?                 @relation(fields: [tenantId], references: [id])
+  tenantId                String?
 }
 
 model TicketPriorityCompany {
@@ -253,6 +317,8 @@ model TicketCategory {
 
   Ticket                  Ticket[]
   TicketCategoryCompanies TicketCategoryCompany[]
+  Tenant                  Tenant?                 @relation(fields: [tenantId], references: [id])
+  tenantId                String?
 }
 
 model TicketCategoryCompany {
@@ -280,6 +346,8 @@ model Maintenance {
   maintenanceListTodoo   Json?
 
   HistoryMaintenance HistoryMaintenance[]
+  Tenant             Tenant?              @relation(fields: [tenantId], references: [id])
+  tenantId           String?
 }
 
 model HistoryMaintenance {
@@ -289,6 +357,8 @@ model HistoryMaintenance {
 
   maintenanceId String
   historyId     Maintenance @relation(fields: [maintenanceId], references: [id])
+  Tenant        Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId      String?
 }
 
 model TicketResponse {
@@ -303,6 +373,8 @@ model TicketResponse {
   ticketImages TicketResponseImage[]
   User         User                  @relation(fields: [userId], references: [id])
   Ticket       Ticket                @relation(fields: [ticketId], references: [id])
+  Tenant       Tenant?               @relation(fields: [tenantId], references: [id])
+  tenantId     String?
 }
 
 model TicketResponseImage {
@@ -310,6 +382,8 @@ model TicketResponseImage {
   path             String // Stores the path to the image on the server or cloud
   ticketResponseId String // Foreign key to TicketResponse
   TicketResponse   TicketResponse @relation(fields: [ticketResponseId], references: [id])
+  Tenant           Tenant?        @relation(fields: [tenantId], references: [id])
+  tenantId         String?
 }
 
 model DiskInfo {
@@ -324,6 +398,8 @@ model DiskInfo {
 
   machineInfoId String
   machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
+  Tenant        Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId      String?
 }
 
 model InstalledApp {
@@ -340,6 +416,8 @@ model InstalledApp {
 
   machineInfoId String
   machineInfo   MachineInfo @relation(fields: [machineInfoId], references: [id])
+  Tenant        Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId      String?
 }
 
 model MachineInfo {
@@ -358,6 +436,8 @@ model MachineInfo {
 
   Disks         DiskInfo[]
   InstalledApps InstalledApp[]
+  Tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  tenantId      String?
 }
 
 model RefreshToken {
@@ -368,6 +448,8 @@ model RefreshToken {
   revoked     Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  Tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 }
 
 model Provider {
@@ -385,6 +467,8 @@ model Provider {
   updatedAt   DateTime?  @default(now())
   Contract    Contract[]
   Service     Service[]
+  Tenant      Tenant?    @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 }
 
 model Contract {
@@ -398,6 +482,8 @@ model Contract {
   updatedAt  DateTime? @default(now())
   Company    Company   @relation(fields: [companyId], references: [id])
   companyId  String
+  Tenant     Tenant?   @relation(fields: [tenantId], references: [id])
+  tenantId   String?
 }
 
 model Service {
@@ -410,6 +496,8 @@ model Service {
   updatedAt  DateTime? @default(now())
   Company    Company   @relation(fields: [companyId], references: [id])
   companyId  String
+  Tenant     Tenant?   @relation(fields: [tenantId], references: [id])
+  tenantId   String?
 }
 
 model TicketEvaluation {
@@ -421,8 +509,10 @@ model TicketEvaluation {
 
   userId   String
   ticketId String
-  User     User   @relation(fields: [userId], references: [id])
-  Ticket   Ticket @relation(fields: [ticketId], references: [id])
+  User     User    @relation(fields: [userId], references: [id])
+  Ticket   Ticket  @relation(fields: [ticketId], references: [id])
+  Tenant   Tenant? @relation(fields: [tenantId], references: [id])
+  tenantId String?
 }
 
 model SLAViolation {
@@ -431,6 +521,8 @@ model SLAViolation {
   ticketId  String
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   createdAt DateTime @default(now())
+  Tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId  String?
 }
 
 model SLADefinition {
@@ -440,6 +532,8 @@ model SLADefinition {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   Tickets        Ticket[]
+  Tenant         Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId       String?
 }
 
 model Notification {
@@ -452,6 +546,8 @@ model Notification {
   isRead    Boolean  @default(false)
   User      User     @relation(fields: [userId], references: [id])
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  Tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId  String?
 }
 
 model Depot {
@@ -464,6 +560,8 @@ model Depot {
   Company    Company     @relation(fields: [companyId], references: [id])
   DepotItems DepotItem[]
   DepotUsers DepotUser[]
+  Tenant     Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId   String?
 }
 
 model DepotItem {
@@ -477,6 +575,8 @@ model DepotItem {
   depotId       String
   Depot         Depot        @relation(fields: [depotId], references: [id])
   usedInTickets TicketItem[]
+  Tenant        Tenant?      @relation(fields: [tenantId], references: [id])
+  tenantId      String?
 }
 
 model TicketItem {
@@ -487,6 +587,8 @@ model TicketItem {
   DepotItem   DepotItem @relation(fields: [depotItemId], references: [id])
   quantity    Int
   cost        Int?
+  Tenant      Tenant?   @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 }
 
 model Todo {
@@ -495,7 +597,9 @@ model Todo {
   completed   Boolean @default(false)
   ticketId    String
 
-  Ticket Ticket @relation(fields: [ticketId], references: [id])
+  Ticket   Ticket  @relation(fields: [ticketId], references: [id])
+  Tenant   Tenant? @relation(fields: [tenantId], references: [id])
+  tenantId String?
 }
 
 model Group {
@@ -510,6 +614,8 @@ model Group {
 
   GroupCompanies   GroupCompany[]
   EquipmentCompany EquipmentCompany[]
+  Tenant           Tenant?            @relation(fields: [tenantId], references: [id])
+  tenantId         String?
 }
 
 model GroupCompany {
@@ -517,6 +623,8 @@ model GroupCompany {
   group     Group   @relation(fields: [groupId], references: [id])
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  Tenant    Tenant? @relation(fields: [tenantId], references: [id])
+  tenantId  String?
 
   @@id([groupId, companyId])
 }
@@ -525,6 +633,8 @@ model EquipmentType {
   id        String                 @id @default(uuid())
   name      String                 @unique
   companies EquipmentTypeCompany[]
+  Tenant    Tenant?                @relation(fields: [tenantId], references: [id])
+  tenantId  String?
 }
 
 model EquipmentTypeCompany {
@@ -535,6 +645,8 @@ model EquipmentTypeCompany {
 
   equipmentType EquipmentType @relation(fields: [equipmentTypeId], references: [id])
   company       Company       @relation(fields: [companyId], references: [id])
+  Tenant        Tenant?       @relation(fields: [tenantId], references: [id])
+  tenantId      String?
 
   @@id([equipmentTypeId, companyId])
 }
@@ -546,6 +658,8 @@ model Log {
   action    String
   details   String
   createdAt DateTime @default(now())
+  Tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId  String?
 }
 
 model EmailQueue {
@@ -556,6 +670,8 @@ model EmailQueue {
   sent      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId  String?
 }
 
 model ShiftChangeTicket {
@@ -564,6 +680,8 @@ model ShiftChangeTicket {
 
   ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
   Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+  Tenant      Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 
   @@id([shiftChangeId, ticketId])
 }
@@ -582,6 +700,8 @@ model ShiftChange {
   ShiftChangeAssignedTicket ShiftChangeAssignedTicket[]
   ShiftChangePlannedTicket  ShiftChangePlannedTicket[]
   ShiftChangePendingTicket  ShiftChangePendingTicket[]
+  Tenant                    Tenant?                     @relation(fields: [tenantId], references: [id])
+  tenantId                  String?
 }
 
 model ShiftChangeCompany {
@@ -590,6 +710,8 @@ model ShiftChangeCompany {
 
   ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
   Company     Company     @relation(fields: [companyId], references: [id])
+  Tenant      Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 
   @@id([shiftChangeId, companyId])
 }
@@ -600,6 +722,8 @@ model ShiftChangeAssignedTicket {
 
   ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
   Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+  Tenant      Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 
   @@id([shiftChangeId, ticketId])
 }
@@ -610,6 +734,8 @@ model ShiftChangePlannedTicket {
 
   ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
   Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+  Tenant      Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 
   @@id([shiftChangeId, ticketId])
 }
@@ -620,6 +746,8 @@ model ShiftChangePendingTicket {
 
   ShiftChange ShiftChange @relation(fields: [shiftChangeId], references: [id])
   Ticket      Ticket      @relation(fields: [ticketId], references: [id])
+  Tenant      Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId    String?
 
   @@id([shiftChangeId, ticketId])
 }
@@ -636,6 +764,8 @@ model SuggestionComplaint {
   resolvedAt  DateTime?
   feedback    String?
 
-  User    User     @relation(fields: [userId], references: [id])
-  Company Company? @relation(fields: [companyId], references: [id])
+  User     User     @relation(fields: [userId], references: [id])
+  Company  Company? @relation(fields: [companyId], references: [id])
+  Tenant   Tenant?  @relation(fields: [tenantId], references: [id])
+  tenantId String?
 }

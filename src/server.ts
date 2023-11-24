@@ -4,7 +4,6 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import cron from "node-cron";
-import oracledb from "oracledb";
 
 import authController from "./controllers/AuthController";
 import userController from "./controllers/UserController";
@@ -29,8 +28,10 @@ import reportController from "./controllers/ReportController";
 import shiftChangeController from "./controllers/ShiftChangeController";
 import notificationController from "./controllers/NotificationController";
 import suggestionComplaintController from "./controllers/SuggestionComplaintController";
+import chatGPTController from "./controllers/ChatGPTController";
 
 import { processEmailQueue } from "./services/processQueue";
+import { tenantMiddleware } from "./middlewares/tenant";
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(tenantMiddleware);
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.use("/authenticate", authController);
@@ -82,6 +84,7 @@ app.use("/report", reportController);
 app.use("/shift-changes", shiftChangeController);
 app.use("/notification", notificationController);
 app.use("/suggestion-complaint", suggestionComplaintController);
+app.use("/bot-ia", chatGPTController);
 
 app.get("/", (_, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });
