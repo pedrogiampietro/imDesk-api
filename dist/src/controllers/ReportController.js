@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
+const json2csv_1 = require("json2csv");
 const prisma = new client_1.PrismaClient();
 const router = express_1.default.Router();
 router.get("/dashboard", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
@@ -119,7 +120,7 @@ router.get("/dashboard", (request, response) => __awaiter(void 0, void 0, void 0
         return response.status(500).json(err);
     }
 }));
-router.get("/os", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/os", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId, startDate, endDate } = request.body;
         const getUser = yield prisma.user.findUnique({
@@ -187,6 +188,120 @@ router.get("/os", (request, response) => __awaiter(void 0, void 0, void 0, funct
     catch (err) {
         console.error(`Error: ${err.message}`);
         return response.status(500).json({ error: true, message: err.message });
+    }
+}));
+router.get("/os/export", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId, format } = request.query;
+        const startDateParam = request.query.startDate;
+        const endDateParam = request.query.endDate;
+        const isStartDateString = typeof startDateParam === "string";
+        const isEndDateString = typeof endDateParam === "string";
+        const getUser = yield prisma.user.findUnique({
+            where: { id: String(userId) },
+        });
+        const adjustedStartDate = isStartDateString
+            ? new Date(new Date(startDateParam).setUTCHours(0, 0, 0, 0))
+            : new Date();
+        const adjustedEndDate = isEndDateString
+            ? new Date(new Date(endDateParam).setUTCHours(23, 59, 59, 999))
+            : new Date();
+        const fields = [
+            {
+                label: "ID",
+                value: "id",
+            },
+            {
+                label: "Categoria",
+                value: (row) => { var _a, _b; return `${(_a = row.ticketCategory) === null || _a === void 0 ? void 0 : _a.name} - ${(_b = row.ticketCategory) === null || _b === void 0 ? void 0 : _b.childrenName}`; },
+            },
+            {
+                label: "Descrição",
+                value: "description",
+            },
+            {
+                label: "Status",
+                value: "status",
+            },
+            {
+                label: "Data de Criação",
+                value: (row) => formatDate(row.createdAt),
+            },
+            {
+                label: "Data de Fechamento",
+                value: (row) => (row.closedAt ? formatDate(row.closedAt) : "N/A"),
+            },
+        ];
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return (date.toLocaleDateString("pt-BR") +
+                " " +
+                date.toLocaleTimeString("pt-BR"));
+        }
+        const openedOSCount = yield prisma.ticket.count({
+            where: {
+                assignedTo: {
+                    equals: `${userId}-${getUser === null || getUser === void 0 ? void 0 : getUser.name}`,
+                },
+                createdAt: {
+                    gte: adjustedStartDate,
+                    lte: adjustedEndDate,
+                },
+            },
+        });
+        const closedOSCount = yield prisma.ticket.count({
+            where: {
+                assignedTo: {
+                    equals: `${userId}-${getUser === null || getUser === void 0 ? void 0 : getUser.name}`,
+                },
+                closedAt: {
+                    gte: adjustedStartDate,
+                    lte: adjustedEndDate,
+                },
+            },
+        });
+        const tickets = yield prisma.ticket.findMany({
+            where: {
+                assignedTo: {
+                    equals: `${userId}-${getUser === null || getUser === void 0 ? void 0 : getUser.name}`,
+                },
+                AND: [
+                    {
+                        createdAt: {
+                            gte: adjustedStartDate,
+                        },
+                    },
+                    {
+                        createdAt: {
+                            lte: adjustedEndDate,
+                        },
+                    },
+                ],
+            },
+            select: {
+                id: true,
+                ticketCategory: true,
+                description: true,
+                status: true,
+                createdAt: true,
+                closedAt: true,
+                observationServiceExecuted: true,
+            },
+        });
+        if (format === "csv") {
+            const json2csvParser = new json2csv_1.Parser({ fields });
+            const csv = json2csvParser.parse(tickets);
+            response.setHeader("Content-disposition", "attachment; filename=report.csv");
+            response.set("Content-Type", "text/csv");
+            response.status(200).send(csv);
+        }
+        else {
+            response.status(400).send("Formato de exportação não suportado");
+        }
+    }
+    catch (err) {
+        console.error(`Error: ${err.message}`);
+        response.status(500).json({ error: true, message: err.message });
     }
 }));
 router.get("/open-tickets-by-location", (request, response) => __awaiter(void 0, void 0, void 0, function* () {

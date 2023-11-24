@@ -13,9 +13,5 @@
 		"strict": true /* Enable all strict type-checking options. */,
 		"skipLibCheck": true /* Skip type checking all .d.ts files. */
 	},
-	"include": [
-		"src/**/*",
-		"prisma/**/*", // adicione outras pastas que você quer incluir na compilação
-		"src/server.ts"
-	]
+	"include": ["src/**/*", "prisma/**/*", "src/server.ts"]
 }

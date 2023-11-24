@@ -117,4 +117,61 @@ router.get("/", (request, response) => __awaiter(void 0, void 0, void 0, functio
         return response.status(500).json(err);
     }
 }));
+router.get("/find-by-id", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = request.query;
+    try {
+        const getCategory = yield prisma.ticketCategory.findUnique({
+            where: {
+                id: String(id),
+            },
+        });
+        return response.status(200).json({
+            message: "Category found",
+            body: getCategory,
+            error: false,
+        });
+    }
+    catch (err) {
+        return response.status(500).json(err);
+    }
+}));
+router.patch("/update-category/:id", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const categoryId = request.params.id;
+    const { name, childrenName, defaultText, companyIds } = request.body;
+    if (!categoryId || !companyIds) {
+        return response
+            .status(400)
+            .json("ID e Empresas são obrigatórios para atualização");
+    }
+    try {
+        const priority = yield prisma.ticketCategory.findUnique({
+            where: { id: String(categoryId) },
+        });
+        if (!priority) {
+            return response.status(404).json("Usuário não encontrado");
+        }
+        const updateCategory = yield prisma.ticketCategory.update({
+            where: { id: String(categoryId) },
+            data: {
+                name,
+                childrenName,
+                defaultText,
+                TicketCategoryCompanies: {
+                    deleteMany: {},
+                    create: companyIds.map((companyId) => ({
+                        companyId,
+                    })),
+                },
+            },
+        });
+        return response.status(200).json({
+            message: "Category updated successfully",
+            body: updateCategory,
+            error: false,
+        });
+    }
+    catch (err) {
+        return response.status(500).json(err);
+    }
+}));
 exports.default = router;

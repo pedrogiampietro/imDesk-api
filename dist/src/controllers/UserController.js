@@ -20,11 +20,11 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const prisma = new client_1.PrismaClient();
 const router = express_1.default.Router();
-router.get('/users', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/users", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const companyId = request.query.companyId;
-    if (!companyId || typeof companyId !== 'string') {
+    if (!companyId || typeof companyId !== "string") {
         return response.status(400).json({
-            message: 'Company ID is required and must be a string.',
+            message: "Company ID is required and must be a string.",
             error: true,
         });
     }
@@ -51,11 +51,25 @@ router.get('/users', (request, response) => __awaiter(void 0, void 0, void 0, fu
         return response.status(500).json(err);
     }
 }));
-router.get('/technicians', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/user", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = request.query;
+    try {
+        const getAllUsers = yield prisma.user.findUnique({
+            where: {
+                id: String(id),
+            },
+        });
+        return response.status(200).json(getAllUsers);
+    }
+    catch (err) {
+        return response.status(500).json(err);
+    }
+}));
+router.get("/technicians", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const companyId = request.query.companyId;
-    if (!companyId || typeof companyId !== 'string') {
+    if (!companyId || typeof companyId !== "string") {
         return response.status(400).json({
-            message: 'Company ID is required and must be a string.',
+            message: "Company ID is required and must be a string.",
             error: true,
         });
     }
@@ -84,43 +98,39 @@ router.get('/technicians', (request, response) => __awaiter(void 0, void 0, void
         return response.status(500).json(err);
     }
 }));
-router.put('/user/update-avatar', multer_1.uploadAvatars.single('avatar'), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.put("/user/update-avatar", multer_1.uploadAvatars.single("avatar"), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = request.query.userId;
     if (!request.file) {
         return response.status(400).json({
-            message: 'File upload is required.',
+            message: "File upload is required.",
             error: true,
         });
     }
     const avatarUrl = `http://${request.headers.host}/uploads/avatars/${request.file.filename}`;
     if (!userId) {
         return response.status(400).json({
-            message: 'User ID is required.',
+            message: "User ID is required.",
             error: true,
         });
     }
     try {
-        // Pega o avatarUrl antigo
         const existingUser = yield prisma.user.findUnique({
             where: { id: userId },
             select: { avatarUrl: true },
         });
-        // Se houver um avatar anterior, deleta o arquivo
         if (existingUser === null || existingUser === void 0 ? void 0 : existingUser.avatarUrl) {
             const oldAvatarFilename = path_1.default.basename(existingUser.avatarUrl);
-            const oldAvatarPath = path_1.default.join(__dirname, '..', '..', 'uploads', 'avatars', oldAvatarFilename);
-            // Se o arquivo existir no sistema de arquivos, deleta
+            const oldAvatarPath = path_1.default.join(__dirname, "..", "..", "uploads", "avatars", oldAvatarFilename);
             if (fs_1.default.existsSync(oldAvatarPath)) {
                 fs_1.default.unlinkSync(oldAvatarPath);
             }
         }
-        // Atualiza o avatarUrl no banco de dados
         const updatedUser = yield prisma.user.update({
             where: { id: userId },
             data: { avatarUrl: avatarUrl },
         });
         return response.status(200).json({
-            message: 'Avatar updated successfully',
+            message: "Avatar updated successfully",
             updatedUser,
         });
     }
@@ -128,11 +138,54 @@ router.put('/user/update-avatar', multer_1.uploadAvatars.single('avatar'), (requ
         return response.status(500).json(err);
     }
 }));
-router.put('/user/update-password', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch("/update-user/:id", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = request.params.id;
+    const { username, name, email, phone, ramal, sector, isTechnician, companyIds, } = request.body;
+    if (!email || !companyIds) {
+        return response
+            .status(400)
+            .json("E-mail e Empresas são obrigatórios para atualização");
+    }
+    try {
+        const user = yield prisma.user.findUnique({
+            where: { id: String(userId) },
+        });
+        if (!user) {
+            return response.status(404).json("Usuário não encontrado");
+        }
+        const updateUser = yield prisma.user.update({
+            where: { id: String(userId) },
+            data: {
+                username,
+                name,
+                email,
+                phone,
+                ramal,
+                sector,
+                isTechnician,
+                UserCompanies: {
+                    deleteMany: {},
+                    create: companyIds.map((companyId) => ({
+                        companyId,
+                    })),
+                },
+            },
+        });
+        return response.status(200).json({
+            message: "User updated successfully",
+            body: updateUser,
+            error: false,
+        });
+    }
+    catch (err) {
+        return response.status(500).json(err);
+    }
+}));
+router.put("/user/update-password", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, newPassword } = request.body;
     if (!userId || !newPassword) {
         return response.status(400).json({
-            message: 'User ID and new password are required.',
+            message: "User ID and new password are required.",
             error: true,
         });
     }
@@ -144,7 +197,7 @@ router.put('/user/update-password', (request, response) => __awaiter(void 0, voi
             data: { password: hashedPassword },
         });
         return response.status(200).json({
-            message: 'Password updated successfully',
+            message: "Password updated successfully",
             updatedUser,
         });
     }
@@ -152,18 +205,18 @@ router.put('/user/update-password', (request, response) => __awaiter(void 0, voi
         return response.status(500).json(err);
     }
 }));
-router.put('/user/update-signature', multer_1.uploadSignatures.single('signature'), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.put("/user/update-signature", multer_1.uploadSignatures.single("signature"), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = request.query.userId;
     if (!request.file) {
         return response.status(400).json({
-            message: 'File upload is required.',
+            message: "File upload is required.",
             error: true,
         });
     }
     const signatureUrl = `http://${request.headers.host}/uploads/signatures/${request.file.filename}`;
     if (!userId) {
         return response.status(400).json({
-            message: 'User ID is required.',
+            message: "User ID is required.",
             error: true,
         });
     }
@@ -176,7 +229,7 @@ router.put('/user/update-signature', multer_1.uploadSignatures.single('signature
         // Se houver uma assinatura anterior, deleta o arquivo
         if (existingUser === null || existingUser === void 0 ? void 0 : existingUser.signatureUrl) {
             const oldSignatureFilename = path_1.default.basename(existingUser.signatureUrl);
-            const oldSignaturePath = path_1.default.join(__dirname, '..', '..', 'uploads', 'signatures', oldSignatureFilename);
+            const oldSignaturePath = path_1.default.join(__dirname, "..", "..", "uploads", "signatures", oldSignatureFilename);
             // Se o arquivo existir no sistema de arquivos, deleta
             if (fs_1.default.existsSync(oldSignaturePath)) {
                 fs_1.default.unlinkSync(oldSignaturePath);
@@ -188,7 +241,7 @@ router.put('/user/update-signature', multer_1.uploadSignatures.single('signature
             data: { signatureUrl: signatureUrl },
         });
         return response.status(200).json({
-            message: 'Signature updated successfully',
+            message: "Signature updated successfully",
             updatedUser,
         });
     }
@@ -196,11 +249,11 @@ router.put('/user/update-signature', multer_1.uploadSignatures.single('signature
         return response.status(500).json(err);
     }
 }));
-router.get('/user/get-signature', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/user/get-signature", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = request.query.userId;
     if (!userId) {
         return response.status(400).json({
-            message: 'User ID is required.',
+            message: "User ID is required.",
             error: true,
         });
     }
@@ -211,12 +264,12 @@ router.get('/user/get-signature', (request, response) => __awaiter(void 0, void 
         });
         if (!user) {
             return response.status(404).json({
-                message: 'User not found.',
+                message: "User not found.",
                 error: true,
             });
         }
         return response.status(200).json({
-            message: 'Signature retrieved successfully.',
+            message: "Signature retrieved successfully.",
             body: user.signatureUrl,
         });
     }
@@ -224,7 +277,7 @@ router.get('/user/get-signature', (request, response) => __awaiter(void 0, void 
         console.error(error);
         return response
             .status(500)
-            .json({ message: 'Internal server error', error: true });
+            .json({ message: "Internal server error", error: true });
     }
 }));
 exports.default = router;

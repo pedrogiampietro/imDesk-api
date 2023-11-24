@@ -17,11 +17,11 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const router = express_1.default.Router();
 // Criação de um novo depósito
-router.post("/", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, companyId, location } = request.body;
     if (!name || !companyId) {
         return response.status(400).json({
-            message: "Name, companyId e userId são obrigatórios para criar um depósito",
+            message: 'Name, companyId e userId são obrigatórios para criar um depósito',
             error: true,
         });
     }
@@ -37,10 +37,22 @@ router.post("/", (request, response) => __awaiter(void 0, void 0, void 0, functi
         });
         if (!company) {
             return response.status(404).json({
-                message: "Empresa não encontrada",
+                message: 'Empresa não encontrada',
                 error: true,
             });
         }
+        const findLocation = yield prisma.locations.findUnique({
+            where: {
+                id: location,
+            },
+        });
+        if (!findLocation) {
+            return response.status(404).json({
+                message: 'Localização não encontrada',
+                error: true,
+            });
+        }
+        console.log('findLocation', findLocation);
         const depot = yield prisma.depot.create({
             data: {
                 name,
@@ -50,9 +62,9 @@ router.post("/", (request, response) => __awaiter(void 0, void 0, void 0, functi
         });
         const responseBody = Object.assign(Object.assign({}, depot), { Company: {
                 name: company.name,
-            } });
+            }, locationName: findLocation.name });
         return response.status(200).json({
-            message: "Depósito criado com sucesso",
+            message: 'Depósito criado com sucesso',
             body: responseBody,
             error: false,
         });
@@ -63,11 +75,11 @@ router.post("/", (request, response) => __awaiter(void 0, void 0, void 0, functi
     }
 }));
 // Listagem de todos os depósitos de uma empresa
-router.get("/", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { companyId } = request.query;
-    if (!companyId || typeof companyId !== "string") {
+    if (!companyId || typeof companyId !== 'string') {
         return response.status(400).json({
-            message: "CompanyId é obrigatório para buscar depósitos",
+            message: 'CompanyId é obrigatório para buscar depósitos',
             error: true,
         });
     }
@@ -95,7 +107,7 @@ router.get("/", (request, response) => __awaiter(void 0, void 0, void 0, functio
         })));
         const depotsWithUsers = depots.map((depot, index) => (Object.assign(Object.assign({}, depot), { users: depot.DepotUsers.map((depotUser) => depotUser.User), locationName: locationNames[index] })));
         return response.status(200).json({
-            message: "Depósitos encontrados",
+            message: 'Depósitos encontrados',
             body: depotsWithUsers,
             error: false,
         });
@@ -105,7 +117,7 @@ router.get("/", (request, response) => __awaiter(void 0, void 0, void 0, functio
     }
 }));
 // Atualização de um depósito
-router.put("/:id", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/:id', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = request.params;
     const { name, userId } = request.body;
     try {
@@ -167,7 +179,7 @@ router.put("/:id", (request, response) => __awaiter(void 0, void 0, void 0, func
             },
         });
         return response.status(200).json({
-            message: "Depósito atualizado com sucesso",
+            message: 'Depósito atualizado com sucesso',
             body: updatedDepot,
             error: false,
         });
@@ -177,7 +189,7 @@ router.put("/:id", (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 }));
 // Deleção de um depósito
-router.delete("/:id", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:id', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = request.params;
     try {
         yield prisma.depot.delete({
@@ -186,7 +198,7 @@ router.delete("/:id", (request, response) => __awaiter(void 0, void 0, void 0, f
             },
         });
         return response.status(200).json({
-            message: "Depósito deletado com sucesso",
+            message: 'Depósito deletado com sucesso',
             error: false,
         });
     }

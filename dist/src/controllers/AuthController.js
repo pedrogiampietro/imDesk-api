@@ -16,15 +16,17 @@ const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jwt_1 = require("../utils/jwt");
+const helperTenant_1 = require("../utils/helperTenant");
 const prisma = new client_1.PrismaClient();
 const router = express_1.default.Router();
 const saltRounds = 10;
-router.post("/sign-up", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/sign-up', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, name, email, password, phone, ramal, sector, isTechnician, companyIds, } = request.body;
+    const tenantId = (0, helperTenant_1.getTenantId)(request);
     if (!email || !password || !companyIds)
         response
             .status(400)
-            .json("Nome, e-mail, senha e companyIds são obrigatórios para cadastro");
+            .json('Nome, e-mail, senha e companyIds são obrigatórios para cadastro');
     const hashedPassword = bcrypt_1.default.hashSync(password, saltRounds);
     try {
         const createUser = yield prisma.user.create({
@@ -43,10 +45,11 @@ router.post("/sign-up", (request, response) => __awaiter(void 0, void 0, void 0,
                         companyId,
                     })),
                 },
+                tenantId: String(tenantId),
             },
         });
         return response.status(201).json({
-            message: "User created successfully",
+            message: 'User created successfully',
             body: createUser,
             error: false,
         });
@@ -55,12 +58,18 @@ router.post("/sign-up", (request, response) => __awaiter(void 0, void 0, void 0,
         return response.status(500).json(err);
     }
 }));
-router.post("/sign-in", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/sign-in', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, companyId, companyName } = request.body;
+    const tenantId = (0, helperTenant_1.getTenantId)(request);
+    if (!email || !password || !companyId)
+        response
+            .status(400)
+            .json('Nome, e-mail, senha e companyIds são obrigatórios para cadastro');
     try {
-        const findUser = yield prisma.user.findUnique({
+        const findUser = yield prisma.user.findFirst({
             where: {
                 email: email,
+                tenantId: String(tenantId),
             },
             include: {
                 UserCompanies: {
@@ -76,18 +85,23 @@ router.post("/sign-in", (request, response) => __awaiter(void 0, void 0, void 0,
             },
         });
         if (!findUser) {
-            return response.status(404).json("Usuário não encontrado no sistema.");
+            return response.status(404).json('Usuário não encontrado no sistema.');
         }
         if (findUser.UserCompanies.length === 0) {
             return response
                 .status(400)
-                .json("Usuário não associado a nenhuma empresa.");
+                .json('Usuário não associado a nenhuma empresa.');
+        }
+        const isAssociatedWithCompany = findUser.UserCompanies.some((uc) => uc.company.id === companyId);
+        if (!isAssociatedWithCompany) {
+            return response
+                .status(400)
+                .json('Usuário não está associado à empresa informada.');
         }
         const validPassword = yield bcrypt_1.default.compare(password, findUser.password);
         if (!validPassword) {
-            return response.status(400).json("Password incorreto, tente novamente.");
+            return response.status(400).json('Password incorreto, tente novamente.');
         }
-        // Update user's currentLoggedCompany
         yield prisma.user.update({
             where: {
                 id: findUser.id,

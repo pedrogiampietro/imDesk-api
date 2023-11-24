@@ -26,6 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
 const multer_1 = require("../middlewares/multer");
+const webhookService_1 = require("../services/webhookService");
+const notificationService_1 = require("../services/notificationService");
 const prisma = new client_1.PrismaClient();
 const router = express_1.default.Router();
 router.post('/', multer_1.uploadTickets.array('ticket_images'), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
@@ -131,6 +133,11 @@ router.post('/', multer_1.uploadTickets.array('ticket_images'), (request, respon
                         UserCompanies: true,
                     },
                 },
+                Equipments: {
+                    include: {
+                        equipment: true,
+                    },
+                },
             },
         });
         const ticketCategoryId = {
@@ -164,6 +171,31 @@ router.post('/', multer_1.uploadTickets.array('ticket_images'), (request, respon
             updatedAt: (_k = createTicket.User) === null || _k === void 0 ? void 0 : _k.updatedAt,
             Company: (_l = createTicket.User) === null || _l === void 0 ? void 0 : _l.UserCompanies,
         };
+        const equipmentUsageCounts = yield prisma.ticketEquipments.groupBy({
+            by: ['equipmentId'],
+            _count: {
+                equipmentId: true,
+            },
+            where: {
+                equipmentId: {
+                    in: createTicket.Equipments.map((equipment) => equipment.equipmentId),
+                },
+            },
+        });
+        const usageCountMap = equipmentUsageCounts.reduce((map, item) => {
+            map[item.equipmentId] = item._count.equipmentId;
+            return map;
+        }, {});
+        const equipmentUsageData = createTicket.Equipments.map((equipment) => {
+            const equipmentDetails = equipment.equipment || {};
+            return {
+                equipmentId: equipment.equipmentId,
+                equipmentSerial: equipmentDetails.serialNumber,
+                equipmentPatrimony: equipmentDetails.patrimonyTag,
+                equipmentName: equipmentDetails.name,
+                usageCount: usageCountMap[equipment.equipmentId] || 0,
+            };
+        });
         const responseObj = {
             id: createTicket.id,
             description: createTicket.description,
@@ -187,7 +219,15 @@ router.post('/', multer_1.uploadTickets.array('ticket_images'), (request, respon
             ticketPriorityId,
             ticketTypeId,
             User,
+            equipmentUsage: equipmentUsageData,
         };
+        const data = {
+            userId: userId,
+            ticketId: createTicket.id,
+            type: 'new_ticket',
+        };
+        yield (0, webhookService_1.createTicketNotificationDiscord)(responseObj);
+        yield (0, notificationService_1.createNotification)(data);
         const groupName = process.env.GROUP_NAME || 'NOT FOUND';
         const group = yield prisma.group.findFirst({
             where: {
@@ -497,6 +537,10 @@ router.put('/:id', (request, response) => __awaiter(void 0, void 0, void 0, func
                 updateData.SLADefinition = { connect: { id: slaDef.id } };
             }
         }
+        const currentTicket = yield prisma.ticket.findUnique({
+            where: { id: ticketId },
+        });
+        const isClosingTicket = requestBody.status === 'closed' && (currentTicket === null || currentTicket === void 0 ? void 0 : currentTicket.status) !== 'closed';
         const updatedTicket = yield prisma.ticket.update({
             where: { id: ticketId },
             data: updateData,
@@ -508,6 +552,24 @@ router.put('/:id', (request, response) => __awaiter(void 0, void 0, void 0, func
                 User: true,
             },
         });
+        if (isClosingTicket) {
+            const notificationData = {
+                userId,
+                ticketId,
+                type: 'ticket_closed',
+            };
+            yield (0, notificationService_1.createNotification)(notificationData);
+            yield (0, webhookService_1.closeTicketNotificationDiscord)(updatedTicket);
+        }
+        else {
+            const notificationData = {
+                userId,
+                ticketId,
+                type: 'ticket_updated',
+            };
+            yield (0, notificationService_1.createNotification)(notificationData);
+            yield (0, webhookService_1.updateTicketNotificationDiscord)(updatedTicket);
+        }
         return response.status(200).json({
             message: 'Ticket updated successfully',
             body: updatedTicket,
@@ -519,24 +581,24 @@ router.put('/:id', (request, response) => __awaiter(void 0, void 0, void 0, func
         return response.status(500).json({ message: err.message, error: true });
     }
 }));
-router.post('/response', multer_1.uploadTickets.array('images'), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/response', multer_1.uploadTicketResponse.array('images'), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { ticketId, userId, content, type } = request.body;
         const files = request.files;
-        if (!ticketId || !userId || !content || !type) {
+        if (!ticketId || !userId || !type) {
             return response
                 .status(400)
-                .json({ message: 'Missing required fields' });
+                .json({ message: 'Campos obrigatórios em falta' });
         }
         if (typeof content !== 'string') {
             return response
                 .status(400)
-                .json({ message: 'Content must be a string' });
+                .json({ message: 'O conteúdo deve ser uma string' });
         }
         const serverUrl = `http://${request.headers.host}/uploads/tickets_img`;
         const ticketResponse = yield prisma.ticketResponse.create({
             data: {
-                content: content,
+                content: content ? content : '',
                 type: type,
                 userId: userId,
                 ticketId: ticketId,
@@ -546,16 +608,26 @@ router.post('/response', multer_1.uploadTickets.array('images'), (request, respo
                     })),
                 },
             },
+            include: {
+                ticketImages: true,
+            },
         });
+        // Após adicionar a resposta ao ticket
+        const notificationData = {
+            userId: userId,
+            ticketId: ticketId,
+            type: 'ticket_response_added',
+        };
+        yield (0, notificationService_1.createNotification)(notificationData);
         return response.status(200).json({
-            message: 'Response added successfully',
+            message: 'Resposta adicionada com sucesso',
             body: ticketResponse,
             error: false,
         });
     }
     catch (err) {
-        console.error('Error while creating ticket response:', err.message);
-        return response.status(500).json({ message: 'Internal Server Error' });
+        console.error('Erro ao criar resposta ao ticket:', err.message);
+        return response.status(500).json({ message: 'Erro interno do servidor' });
     }
 }));
 router.get('/:id/responses', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
