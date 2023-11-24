@@ -1,10 +1,20 @@
 -- CreateTable
+CREATE TABLE "Tenant" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "subdomain" TEXT NOT NULL,
+
+    CONSTRAINT "Tenant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Company" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
 );
@@ -38,6 +48,7 @@ CREATE TABLE "User" (
     "hourlyRate" DOUBLE PRECISION,
     "groupId" INTEGER,
     "signatureUrl" TEXT,
+    "tenantId" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -75,6 +86,7 @@ CREATE TABLE "Ticket" (
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "slaDefinitionId" INTEGER,
     "groupId" INTEGER,
+    "tenantId" TEXT,
 
     CONSTRAINT "Ticket_pkey" PRIMARY KEY ("id")
 );
@@ -96,6 +108,9 @@ CREATE TABLE "Equipments" (
     "serialNumber" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "locationId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "Equipments_pkey" PRIMARY KEY ("id")
 );
@@ -115,6 +130,7 @@ CREATE TABLE "Image" (
     "id" SERIAL NOT NULL,
     "path" TEXT NOT NULL,
     "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
 );
@@ -123,6 +139,9 @@ CREATE TABLE "Image" (
 CREATE TABLE "Locations" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "Locations_pkey" PRIMARY KEY ("id")
 );
@@ -147,6 +166,9 @@ CREATE TABLE "TicketCompany" (
 CREATE TABLE "TicketType" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketType_pkey" PRIMARY KEY ("id")
 );
@@ -163,6 +185,9 @@ CREATE TABLE "TicketTypeCompany" (
 CREATE TABLE "TicketPriority" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketPriority_pkey" PRIMARY KEY ("id")
 );
@@ -181,6 +206,9 @@ CREATE TABLE "TicketCategory" (
     "name" TEXT NOT NULL,
     "childrenName" TEXT NOT NULL,
     "defaultText" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketCategory_pkey" PRIMARY KEY ("id")
 );
@@ -208,6 +236,7 @@ CREATE TABLE "Maintenance" (
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "maintenanceListTodoo" JSONB,
+    "tenantId" TEXT,
 
     CONSTRAINT "Maintenance_pkey" PRIMARY KEY ("id")
 );
@@ -218,6 +247,7 @@ CREATE TABLE "HistoryMaintenance" (
     "maintenanceListTodoo" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "maintenanceId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "HistoryMaintenance_pkey" PRIMARY KEY ("id")
 );
@@ -231,6 +261,7 @@ CREATE TABLE "TicketResponse" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketResponse_pkey" PRIMARY KEY ("id")
 );
@@ -240,6 +271,7 @@ CREATE TABLE "TicketResponseImage" (
     "id" TEXT NOT NULL,
     "path" TEXT NOT NULL,
     "ticketResponseId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketResponseImage_pkey" PRIMARY KEY ("id")
 );
@@ -255,6 +287,7 @@ CREATE TABLE "DiskInfo" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "machineInfoId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "DiskInfo_pkey" PRIMARY KEY ("id")
 );
@@ -272,6 +305,7 @@ CREATE TABLE "InstalledApp" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "machineInfoId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "InstalledApp_pkey" PRIMARY KEY ("id")
 );
@@ -290,6 +324,7 @@ CREATE TABLE "MachineInfo" (
     "ipAddress" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "MachineInfo_pkey" PRIMARY KEY ("id")
 );
@@ -302,6 +337,7 @@ CREATE TABLE "RefreshToken" (
     "revoked" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("id")
 );
@@ -320,6 +356,7 @@ CREATE TABLE "Provider" (
     "price" DOUBLE PRECISION,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "Provider_pkey" PRIMARY KEY ("id")
 );
@@ -334,6 +371,7 @@ CREATE TABLE "Contract" (
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "companyId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "Contract_pkey" PRIMARY KEY ("id")
 );
@@ -347,6 +385,7 @@ CREATE TABLE "Service" (
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "companyId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
 );
@@ -360,6 +399,7 @@ CREATE TABLE "TicketEvaluation" (
     "updatedAt" TIMESTAMP(3),
     "userId" TEXT NOT NULL,
     "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketEvaluation_pkey" PRIMARY KEY ("id")
 );
@@ -370,6 +410,7 @@ CREATE TABLE "SLAViolation" (
     "reason" TEXT NOT NULL,
     "ticketId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "SLAViolation_pkey" PRIMARY KEY ("id")
 );
@@ -381,6 +422,7 @@ CREATE TABLE "SLADefinition" (
     "resolutionTime" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "SLADefinition_pkey" PRIMARY KEY ("id")
 );
@@ -394,6 +436,7 @@ CREATE TABLE "Notification" (
     "ticketId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "tenantId" TEXT,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
@@ -406,6 +449,7 @@ CREATE TABLE "Depot" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "companyId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "Depot_pkey" PRIMARY KEY ("id")
 );
@@ -420,6 +464,7 @@ CREATE TABLE "DepotItem" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "depotId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "DepotItem_pkey" PRIMARY KEY ("id")
 );
@@ -431,6 +476,7 @@ CREATE TABLE "TicketItem" (
     "depotItemId" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "cost" INTEGER,
+    "tenantId" TEXT,
 
     CONSTRAINT "TicketItem_pkey" PRIMARY KEY ("id")
 );
@@ -441,6 +487,7 @@ CREATE TABLE "Todo" (
     "description" TEXT NOT NULL,
     "completed" BOOLEAN NOT NULL DEFAULT false,
     "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "Todo_pkey" PRIMARY KEY ("id")
 );
@@ -450,6 +497,9 @@ CREATE TABLE "Group" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "Group_pkey" PRIMARY KEY ("id")
 );
@@ -458,6 +508,7 @@ CREATE TABLE "Group" (
 CREATE TABLE "GroupCompany" (
     "groupId" INTEGER NOT NULL,
     "companyId" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "GroupCompany_pkey" PRIMARY KEY ("groupId","companyId")
 );
@@ -466,6 +517,7 @@ CREATE TABLE "GroupCompany" (
 CREATE TABLE "EquipmentType" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "EquipmentType_pkey" PRIMARY KEY ("id")
 );
@@ -476,6 +528,7 @@ CREATE TABLE "EquipmentTypeCompany" (
     "equipmentTypeId" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "EquipmentTypeCompany_pkey" PRIMARY KEY ("equipmentTypeId","companyId")
 );
@@ -487,6 +540,7 @@ CREATE TABLE "Log" (
     "action" TEXT NOT NULL,
     "details" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
 
     CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
@@ -500,9 +554,88 @@ CREATE TABLE "EmailQueue" (
     "sent" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "tenantId" TEXT,
 
     CONSTRAINT "EmailQueue_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateTable
+CREATE TABLE "ShiftChangeTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
+
+    CONSTRAINT "ShiftChangeTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChange" (
+    "id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "responsibleUserId" TEXT NOT NULL,
+    "temperatureControl" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT,
+
+    CONSTRAINT "ShiftChange_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangeCompany" (
+    "shiftChangeId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "tenantId" TEXT,
+
+    CONSTRAINT "ShiftChangeCompany_pkey" PRIMARY KEY ("shiftChangeId","companyId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangeAssignedTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
+
+    CONSTRAINT "ShiftChangeAssignedTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangePlannedTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
+
+    CONSTRAINT "ShiftChangePlannedTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "ShiftChangePendingTicket" (
+    "shiftChangeId" TEXT NOT NULL,
+    "ticketId" TEXT NOT NULL,
+    "tenantId" TEXT,
+
+    CONSTRAINT "ShiftChangePendingTicket_pkey" PRIMARY KEY ("shiftChangeId","ticketId")
+);
+
+-- CreateTable
+CREATE TABLE "SuggestionComplaint" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "companyId" TEXT,
+    "description" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "resolvedAt" TIMESTAMP(3),
+    "feedback" TEXT,
+    "tenantId" TEXT,
+
+    CONSTRAINT "SuggestionComplaint_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Tenant_subdomain_key" ON "Tenant"("subdomain");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
@@ -529,6 +662,9 @@ CREATE UNIQUE INDEX "EquipmentType_name_key" ON "EquipmentType"("name");
 CREATE UNIQUE INDEX "EquipmentTypeCompany_id_key" ON "EquipmentTypeCompany"("id");
 
 -- AddForeignKey
+ALTER TABLE "Company" ADD CONSTRAINT "Company_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "UserCompany" ADD CONSTRAINT "UserCompany_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -536,6 +672,9 @@ ALTER TABLE "UserCompany" ADD CONSTRAINT "UserCompany_companyId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DepotUser" ADD CONSTRAINT "DepotUser_depotId_fkey" FOREIGN KEY ("depotId") REFERENCES "Depot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -565,6 +704,9 @@ ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_slaDefinitionId_fkey" FOREIGN KEY ("
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TicketEquipments" ADD CONSTRAINT "TicketEquipments_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -572,6 +714,9 @@ ALTER TABLE "TicketEquipments" ADD CONSTRAINT "TicketEquipments_equipmentId_fkey
 
 -- AddForeignKey
 ALTER TABLE "Equipments" ADD CONSTRAINT "Equipments_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Locations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Equipments" ADD CONSTRAINT "Equipments_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_equipmentId_fkey" FOREIGN KEY ("equipmentId") REFERENCES "Equipments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -589,6 +734,12 @@ ALTER TABLE "EquipmentCompany" ADD CONSTRAINT "EquipmentCompany_userId_fkey" FOR
 ALTER TABLE "Image" ADD CONSTRAINT "Image_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Image" ADD CONSTRAINT "Image_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Locations" ADD CONSTRAINT "Locations_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "LocationCompany" ADD CONSTRAINT "LocationCompany_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Locations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -601,10 +752,16 @@ ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_ticketId_fkey" FOREIGN
 ALTER TABLE "TicketCompany" ADD CONSTRAINT "TicketCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "TicketType" ADD CONSTRAINT "TicketType_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TicketTypeCompany" ADD CONSTRAINT "TicketTypeCompany_ticketTypeId_fkey" FOREIGN KEY ("ticketTypeId") REFERENCES "TicketType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketTypeCompany" ADD CONSTRAINT "TicketTypeCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketPriority" ADD CONSTRAINT "TicketPriority_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketPriorityCompany" ADD CONSTRAINT "TicketPriorityCompany_ticketPriorityId_fkey" FOREIGN KEY ("ticketPriorityId") REFERENCES "TicketPriority"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -613,13 +770,22 @@ ALTER TABLE "TicketPriorityCompany" ADD CONSTRAINT "TicketPriorityCompany_ticket
 ALTER TABLE "TicketPriorityCompany" ADD CONSTRAINT "TicketPriorityCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "TicketCategory" ADD CONSTRAINT "TicketCategory_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TicketCategoryCompany" ADD CONSTRAINT "TicketCategoryCompany_ticketCategoryId_fkey" FOREIGN KEY ("ticketCategoryId") REFERENCES "TicketCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketCategoryCompany" ADD CONSTRAINT "TicketCategoryCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Maintenance" ADD CONSTRAINT "Maintenance_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "HistoryMaintenance" ADD CONSTRAINT "HistoryMaintenance_maintenanceId_fkey" FOREIGN KEY ("maintenanceId") REFERENCES "Maintenance"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HistoryMaintenance" ADD CONSTRAINT "HistoryMaintenance_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -628,16 +794,37 @@ ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_userId_fkey" FOREIGN
 ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "TicketResponse" ADD CONSTRAINT "TicketResponse_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TicketResponseImage" ADD CONSTRAINT "TicketResponseImage_ticketResponseId_fkey" FOREIGN KEY ("ticketResponseId") REFERENCES "TicketResponse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TicketResponseImage" ADD CONSTRAINT "TicketResponseImage_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DiskInfo" ADD CONSTRAINT "DiskInfo_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "DiskInfo" ADD CONSTRAINT "DiskInfo_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "InstalledApp" ADD CONSTRAINT "InstalledApp_machineInfoId_fkey" FOREIGN KEY ("machineInfoId") REFERENCES "MachineInfo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "InstalledApp" ADD CONSTRAINT "InstalledApp_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MachineInfo" ADD CONSTRAINT "MachineInfo_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Provider" ADD CONSTRAINT "Provider_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Contract" ADD CONSTRAINT "Contract_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "Provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -646,10 +833,16 @@ ALTER TABLE "Contract" ADD CONSTRAINT "Contract_providerId_fkey" FOREIGN KEY ("p
 ALTER TABLE "Contract" ADD CONSTRAINT "Contract_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Contract" ADD CONSTRAINT "Contract_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "Provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Service" ADD CONSTRAINT "Service_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -658,7 +851,16 @@ ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_userId_fkey" FOR
 ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "TicketEvaluation" ADD CONSTRAINT "TicketEvaluation_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "SLAViolation" ADD CONSTRAINT "SLAViolation_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SLAViolation" ADD CONSTRAINT "SLAViolation_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SLADefinition" ADD CONSTRAINT "SLADefinition_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -667,10 +869,19 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Depot" ADD CONSTRAINT "Depot_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Depot" ADD CONSTRAINT "Depot_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "DepotItem" ADD CONSTRAINT "DepotItem_depotId_fkey" FOREIGN KEY ("depotId") REFERENCES "Depot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DepotItem" ADD CONSTRAINT "DepotItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -679,7 +890,16 @@ ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_ticketId_fkey" FOREIGN KEY (
 ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_depotItemId_fkey" FOREIGN KEY ("depotItemId") REFERENCES "DepotItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "TicketItem" ADD CONSTRAINT "TicketItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Todo" ADD CONSTRAINT "Todo_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Todo" ADD CONSTRAINT "Todo_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Group" ADD CONSTRAINT "Group_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "GroupCompany" ADD CONSTRAINT "GroupCompany_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -688,10 +908,85 @@ ALTER TABLE "GroupCompany" ADD CONSTRAINT "GroupCompany_groupId_fkey" FOREIGN KE
 ALTER TABLE "GroupCompany" ADD CONSTRAINT "GroupCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "GroupCompany" ADD CONSTRAINT "GroupCompany_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EquipmentType" ADD CONSTRAINT "EquipmentType_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "EquipmentTypeCompany" ADD CONSTRAINT "EquipmentTypeCompany_equipmentTypeId_fkey" FOREIGN KEY ("equipmentTypeId") REFERENCES "EquipmentType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EquipmentTypeCompany" ADD CONSTRAINT "EquipmentTypeCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "EquipmentTypeCompany" ADD CONSTRAINT "EquipmentTypeCompany_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Log" ADD CONSTRAINT "Log_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EmailQueue" ADD CONSTRAINT "EmailQueue_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeTicket" ADD CONSTRAINT "ShiftChangeTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeTicket" ADD CONSTRAINT "ShiftChangeTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeTicket" ADD CONSTRAINT "ShiftChangeTicket_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChange" ADD CONSTRAINT "ShiftChange_responsibleUserId_fkey" FOREIGN KEY ("responsibleUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChange" ADD CONSTRAINT "ShiftChange_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeCompany" ADD CONSTRAINT "ShiftChangeCompany_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeCompany" ADD CONSTRAINT "ShiftChangeCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeCompany" ADD CONSTRAINT "ShiftChangeCompany_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeAssignedTicket" ADD CONSTRAINT "ShiftChangeAssignedTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeAssignedTicket" ADD CONSTRAINT "ShiftChangeAssignedTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangeAssignedTicket" ADD CONSTRAINT "ShiftChangeAssignedTicket_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePlannedTicket" ADD CONSTRAINT "ShiftChangePlannedTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePlannedTicket" ADD CONSTRAINT "ShiftChangePlannedTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePlannedTicket" ADD CONSTRAINT "ShiftChangePlannedTicket_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_shiftChangeId_fkey" FOREIGN KEY ("shiftChangeId") REFERENCES "ShiftChange"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ShiftChangePendingTicket" ADD CONSTRAINT "ShiftChangePendingTicket_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SuggestionComplaint" ADD CONSTRAINT "SuggestionComplaint_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SuggestionComplaint" ADD CONSTRAINT "SuggestionComplaint_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SuggestionComplaint" ADD CONSTRAINT "SuggestionComplaint_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;

@@ -4,28 +4,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = express.Router();
 
-router.post('/create', async (request: Request, response: Response) => {
-	try {
-		const { userId, ticketId, type } = request.body;
-
-		const notification = await prisma.notification.create({
-			data: {
-				userId,
-				ticketId,
-				type,
-			},
-		});
-
-		return response.status(200).json({
-			message: 'Notification created successfully',
-			body: notification,
-			error: false,
-		});
-	} catch (err) {
-		return response.status(500).json(err);
-	}
-});
-
 router.get('/:userId', async (request: Request, response: Response) => {
 	try {
 		const { userId } = request.params;
@@ -33,6 +11,24 @@ router.get('/:userId', async (request: Request, response: Response) => {
 		const notifications = await prisma.notification.findMany({
 			where: {
 				userId,
+			},
+			select: {
+				id: true,
+				createdAt: true,
+				isRead: true,
+				Ticket: {
+					select: {
+						id: true,
+						description: true,
+						User: {
+							select: {
+								id: true,
+								name: true,
+								avatarUrl: true,
+							},
+						},
+					},
+				},
 			},
 		});
 
@@ -68,5 +64,36 @@ router.post('/mark-as-read', async (request: Request, response: Response) => {
 		return response.status(500).json(err);
 	}
 });
+
+router.post(
+	'/mark-all-read/:userId',
+	async (request: Request, response: Response) => {
+		try {
+			const { userId } = request.params;
+
+			const updatedNotifications = await prisma.notification.updateMany({
+				where: {
+					userId: userId,
+					isRead: false,
+				},
+				data: {
+					isRead: true,
+				},
+			});
+
+			return response.status(200).json({
+				message: 'All notifications marked as read',
+				body: updatedNotifications,
+				error: false,
+			});
+		} catch (err) {
+			return response.status(500).json({
+				message: 'Error updating notifications',
+				error: true,
+				details: err,
+			});
+		}
+	}
+);
 
 export default router;

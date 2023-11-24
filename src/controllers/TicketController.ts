@@ -1,6 +1,12 @@
 import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { uploadTickets } from '../middlewares/multer';
+import { uploadTickets, uploadTicketResponse } from '../middlewares/multer';
+import {
+	closeTicketNotificationDiscord,
+	createTicketNotificationDiscord,
+	updateTicketNotificationDiscord,
+} from '../services/webhookService';
+import { createNotification } from '../services/notificationService';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -175,6 +181,11 @@ router.post(
 							UserCompanies: true,
 						},
 					},
+					Equipments: {
+						include: {
+							equipment: true,
+						},
+					},
 				},
 			});
 
@@ -214,6 +225,40 @@ router.post(
 				Company: createTicket.User?.UserCompanies,
 			};
 
+			const equipmentUsageCounts = await prisma.ticketEquipments.groupBy({
+				by: ['equipmentId'],
+				_count: {
+					equipmentId: true,
+				},
+				where: {
+					equipmentId: {
+						in: createTicket.Equipments.map(
+							(equipment) => equipment.equipmentId
+						),
+					},
+				},
+			});
+
+			const usageCountMap = equipmentUsageCounts.reduce(
+				(map: any, item: any) => {
+					map[item.equipmentId] = item._count.equipmentId;
+					return map;
+				},
+				{}
+			);
+
+			const equipmentUsageData = createTicket.Equipments.map((equipment) => {
+				const equipmentDetails = equipment.equipment || {};
+
+				return {
+					equipmentId: equipment.equipmentId,
+					equipmentSerial: equipmentDetails.serialNumber,
+					equipmentPatrimony: equipmentDetails.patrimonyTag,
+					equipmentName: equipmentDetails.name,
+					usageCount: usageCountMap[equipment.equipmentId] || 0,
+				};
+			});
+
 			const responseObj = {
 				id: createTicket.id,
 				description: createTicket.description,
@@ -237,7 +282,17 @@ router.post(
 				ticketPriorityId,
 				ticketTypeId,
 				User,
+				equipmentUsage: equipmentUsageData,
 			};
+
+			const data = {
+				userId: userId,
+				ticketId: createTicket.id,
+				type: 'new_ticket',
+			};
+
+			await createTicketNotificationDiscord(responseObj);
+			await createNotification(data);
 
 			const groupName = process.env.GROUP_NAME || 'NOT FOUND';
 
@@ -604,6 +659,12 @@ router.put('/:id', async (request: Request, response: Response) => {
 			}
 		}
 
+		const currentTicket = await prisma.ticket.findUnique({
+			where: { id: ticketId },
+		});
+		const isClosingTicket =
+			requestBody.status === 'closed' && currentTicket?.status !== 'closed';
+
 		const updatedTicket = await prisma.ticket.update({
 			where: { id: ticketId },
 			data: updateData,
@@ -615,6 +676,25 @@ router.put('/:id', async (request: Request, response: Response) => {
 				User: true,
 			},
 		});
+
+		if (isClosingTicket) {
+			const notificationData = {
+				userId,
+				ticketId,
+				type: 'ticket_closed',
+			};
+
+			await createNotification(notificationData);
+			await closeTicketNotificationDiscord(updatedTicket);
+		} else {
+			const notificationData = {
+				userId,
+				ticketId,
+				type: 'ticket_updated',
+			};
+			await createNotification(notificationData);
+			await updateTicketNotificationDiscord(updatedTicket);
+		}
 
 		return response.status(200).json({
 			message: 'Ticket updated successfully',
@@ -629,7 +709,7 @@ router.put('/:id', async (request: Request, response: Response) => {
 
 router.post(
 	'/response',
-	uploadTickets.array('images'),
+	uploadTicketResponse.array('images'),
 	async (request: Request, response: Response) => {
 		try {
 			const { ticketId, userId, content, type } =
@@ -637,23 +717,23 @@ router.post(
 
 			const files = request.files as Express.Multer.File[];
 
-			if (!ticketId || !userId || !content || !type) {
+			if (!ticketId || !userId || !type) {
 				return response
 					.status(400)
-					.json({ message: 'Missing required fields' });
+					.json({ message: 'Campos obrigatórios em falta' });
 			}
 
 			if (typeof content !== 'string') {
 				return response
 					.status(400)
-					.json({ message: 'Content must be a string' });
+					.json({ message: 'O conteúdo deve ser uma string' });
 			}
 
 			const serverUrl = `http://${request.headers.host}/uploads/tickets_img`;
 
 			const ticketResponse = await prisma.ticketResponse.create({
 				data: {
-					content: content,
+					content: content ? content : '',
 					type: type,
 					userId: userId,
 					ticketId: ticketId,
@@ -663,16 +743,28 @@ router.post(
 						})),
 					},
 				},
+				include: {
+					ticketImages: true,
+				},
 			});
 
+			// Após adicionar a resposta ao ticket
+			const notificationData = {
+				userId: userId,
+				ticketId: ticketId,
+				type: 'ticket_response_added',
+			};
+
+			await createNotification(notificationData);
+
 			return response.status(200).json({
-				message: 'Response added successfully',
+				message: 'Resposta adicionada com sucesso',
 				body: ticketResponse,
 				error: false,
 			});
 		} catch (err: any) {
-			console.error('Error while creating ticket response:', err.message);
-			return response.status(500).json({ message: 'Internal Server Error' });
+			console.error('Erro ao criar resposta ao ticket:', err.message);
+			return response.status(500).json({ message: 'Erro interno do servidor' });
 		}
 	}
 );

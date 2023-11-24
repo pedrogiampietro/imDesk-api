@@ -78,4 +78,67 @@ router.get("/", async (request: Request, response: Response) => {
   }
 });
 
+router.get("/find-by-id/", async (request: Request, response: Response) => {
+  const { id } = request.query;
+
+  try {
+    const getPriority = await prisma.ticketPriority.findUnique({
+      where: {
+        id: String(id),
+      },
+    });
+
+    return response.status(200).json({
+      message: "Priority found",
+      body: getPriority,
+      error: false,
+    });
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+});
+
+router.patch("/update-priority/:id", async (request, response) => {
+  const priorityId = request.params.id;
+
+  const { name, companyIds } = request.body;
+
+  if (!priorityId || !companyIds) {
+    return response
+      .status(400)
+      .json("ID e Empresas são obrigatórios para atualização");
+  }
+
+  try {
+    const priority = await prisma.ticketPriority.findUnique({
+      where: { id: String(priorityId) },
+    });
+
+    if (!priority) {
+      return response.status(404).json("Usuário não encontrado");
+    }
+
+    const updatePriority = await prisma.ticketPriority.update({
+      where: { id: String(priorityId) },
+      data: {
+        name,
+        TicketPriorityCompanies: {
+          deleteMany: {},
+          create: companyIds.map((companyId: any) => ({
+            companyId,
+          })),
+        },
+      },
+    });
+
+    return response.status(200).json({
+      message: "Priority updated successfully",
+      body: updatePriority,
+      error: false,
+    });
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+});
+
 export default router;

@@ -5,6 +5,7 @@ declare global {
 		interface Request {
 			user?: Record<string, any>;
 			file: any;
+			tenantId: string;
 		}
 	}
 }
