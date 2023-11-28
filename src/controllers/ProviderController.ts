@@ -1,5 +1,9 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { uploadStorageProviders } from "../middlewares/multer";
+
+import fs from "fs";
+import path from "path";
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -48,47 +52,58 @@ router.get("/provider", async (request: Request, response: Response) => {
 });
 
 // Endpoint para atualizar um provider específico
-router.put("/provider/:id", async (request: Request, response: Response) => {
-  const providerId = request.params.id;
-  const {
-    name,
-    phone,
-    email,
-    address,
-    logoURL,
-    description,
-    category,
-    price,
-    status,
-  } = request.body;
+router.put(
+  "/provider/:id",
+  uploadStorageProviders.single("logo"),
+  async (request, response) => {
+    const providerId = request.params.id;
 
-  try {
-    const updatedProvider = await prisma.provider.update({
-      where: {
-        id: providerId,
-      },
-      data: {
-        name: name,
-        phone: phone,
-        email: email,
-        address: address,
-        logoURL: logoURL,
-        description: description,
-        category: category,
-        price: price,
-        status: status,
-      },
-    });
+    if (!request.file) {
+      return response.status(400).json({
+        message: "File upload is required.",
+        error: true,
+      });
+    }
 
-    return response.status(200).json({
-      message: "Provider updated successfully",
-      body: updatedProvider,
-      error: false,
-    });
-  } catch (err) {
-    return response.status(500).json(err);
+    const logoURL = `http://${request.headers.host}/uploads/providers_logo/${request.file.filename}`;
+
+    try {
+      const existingProvider = await prisma.provider.findUnique({
+        where: { id: providerId },
+        select: { logoURL: true },
+      });
+
+      if (existingProvider?.logoURL) {
+        const oldLogoFilename = path.basename(existingProvider.logoURL);
+        const oldLogoPath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "uploads",
+          "providers_logo",
+          oldLogoFilename
+        );
+
+        if (fs.existsSync(oldLogoPath)) {
+          fs.unlinkSync(oldLogoPath);
+        }
+      }
+
+      const updatedProvider = await prisma.provider.update({
+        where: { id: providerId },
+        data: { logoURL: logoURL },
+      });
+
+      return response.status(200).json({
+        message: "Provider logo updated successfully",
+        updatedProvider,
+      });
+    } catch (err) {
+      console.error(err);
+      return response.status(500).json(err);
+    }
   }
-});
+);
 
 // Deletar um provedor específico
 router.delete("/provider/:id", async (request: Request, response: Response) => {

@@ -14,7 +14,7 @@ router.post("/", async (request: Request, response: Response) => {
         companyId: company.id,
         description,
         category: category.value,
-        status: "new",
+        status: "Novo",
       },
     });
 
@@ -84,20 +84,22 @@ router.patch("/:id", async (request: Request, response: Response) => {
     request.body;
 
   try {
+    let dataToUpdate = {
+      description,
+      category: category.value,
+      status: status.value,
+      companyId: company.id,
+      feedback,
+      resolvedAt: status.value === "closed" ? new Date() : new Date(resolvedAt),
+    };
+
     const updatedSuggestionComplaint = await prisma.suggestionComplaint.update({
       where: { id },
-      data: {
-        description,
-        category: category.value,
-        status: status.value,
-        companyId: company.id,
-        resolvedAt: new Date(resolvedAt),
-        feedback,
-      },
+      data: dataToUpdate,
     });
 
     return response.status(200).json({
-      message: "Suggestion created successfully",
+      message: "Suggestion updated successfully",
       body: updatedSuggestionComplaint,
       error: false,
     });
