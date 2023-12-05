@@ -96,7 +96,8 @@ router.put(
 
       return response.status(200).json({
         message: "Provider logo updated successfully",
-        updatedProvider,
+        body: updatedProvider,
+        error: false,
       });
     } catch (err) {
       console.error(err);
