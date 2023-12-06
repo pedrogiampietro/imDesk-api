@@ -10,15 +10,15 @@ export const tenantMiddleware = async (
 ) => {
   let subdomain = req.hostname.split(".")[0];
 
-  if (req.hostname === "localhost") {
+  if (req.hostname === "localhost" || req.hostname === 'imdesk.cloud') {
     const getTenant = await prisma.tenant.findUnique({
       where: {
-        subdomain: "imdesktest",
+        subdomain: "imdesk.cloud",
       },
     });
 
     (req as any).tenantId = getTenant?.id;
-    subdomain = "imdesktest";
+    subdomain = "imdesk.cloud";
   }
 
   try {
