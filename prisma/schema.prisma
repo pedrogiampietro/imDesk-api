@@ -108,6 +108,7 @@ model User {
   hourlyRate               Float?
   groupId                  Int?
   signatureUrl             String?
+  isOnline                 Boolean   @default(false)
 
   Ticket              Ticket[]
   RefreshTokens       RefreshToken[]

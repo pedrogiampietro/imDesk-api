@@ -330,9 +330,34 @@ router.get("/user/get-signature", async (request, response) => {
     return response.status(200).json({
       message: "Signature retrieved successfully.",
       body: user.signatureUrl,
+      error: false,
     });
   } catch (error) {
     console.error(error);
+    return response
+      .status(500)
+      .json({ message: "Internal server error", error: true });
+  }
+});
+
+router.get("/users/online", async (request, response) => {
+  try {
+    const onlineUsers = await prisma.user.findMany({
+      where: {
+        isOnline: true,
+      },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+      },
+    });
+    return response.status(200).json({
+      message: "Signature retrieved successfully.",
+      body: onlineUsers,
+      error: false,
+    });
+  } catch (err: any) {
     return response
       .status(500)
       .json({ message: "Internal server error", error: true });
