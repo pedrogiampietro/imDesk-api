@@ -136,27 +136,27 @@ model DepotUser {
 }
 
 model Ticket {
-  id                         String    @id @default(uuid())
+  id                         String     @id @default(uuid())
   description                String
   observationServiceExecuted String?
-  ticketWasSignedTech        Boolean?  @default(false)
-  ticketWasSignedUser        Boolean?  @default(false)
+  ticketWasSignedTech        Boolean?   @default(false)
+  ticketWasSignedUser        Boolean?   @default(false)
   ticketTypeId               String
   ticketCategoryId           String
   ticketPriorityId           String
   ticketLocationId           String
   assignedTo                 String[]
-  assignedToAt               DateTime?
+  assignedToAt               DateTime[]
   assignedSignature          String?
   closedBy                   String?
   closedAt                   DateTime?
   status                     String?
   timeEstimate               DateTime?
-  isDelay                    Boolean?  @default(false)
+  isDelay                    Boolean?   @default(false)
   userId                     String?
   manualResolutionDueDate    DateTime?
-  createdAt                  DateTime  @default(now())
-  updatedAt                  DateTime  @default(now())
+  createdAt                  DateTime   @default(now())
+  updatedAt                  DateTime   @default(now())
   slaDefinitionId            Int?
   groupId                    Int?
 
@@ -454,22 +454,28 @@ model RefreshToken {
 }
 
 model Provider {
-  id          String     @id @default(uuid())
-  name        String
-  phone       String
-  email       String     @unique
-  address     String
-  status      Boolean    @default(true)
-  logoURL     String?
-  description String?
-  category    String?
-  price       Float?
-  createdAt   DateTime?  @default(now())
-  updatedAt   DateTime?  @default(now())
-  Contract    Contract[]
-  Service     Service[]
-  Tenant      Tenant?    @relation(fields: [tenantId], references: [id])
-  tenantId    String?
+  id              String     @id @default(uuid())
+  name            String
+  phone           String
+  email           String     @unique
+  address         String
+  status          Boolean    @default(true)
+  logoURL         String?
+  description     String?
+  category        String?
+  price           Float?
+  serviceProvided String?
+  monthlyValue    Float?
+  dueDate         DateTime?
+  operationDate   DateTime?
+  contractNumber  String?
+  adendum         String?
+  createdAt       DateTime?  @default(now())
+  updatedAt       DateTime?  @default(now())
+  Contract        Contract[]
+  Service         Service[]
+  Tenant          Tenant?    @relation(fields: [tenantId], references: [id])
+  tenantId        String?
 }
 
 model Contract {

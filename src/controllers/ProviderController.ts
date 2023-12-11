@@ -58,20 +58,46 @@ router.put(
   async (request, response) => {
     const providerId = request.params.id;
 
-    if (!request.file) {
-      return response.status(400).json({
-        message: "File upload is required.",
-        error: true,
-      });
-    }
+    const {
+      name,
+      phone,
+      email,
+      address,
+      description,
+      category,
+      price,
+      status,
+      contracts,
+      services,
+      serviceProvided,
+      monthlyValue,
+      dueDate,
+      operationDate,
+      contractNumber,
+      adendum,
+    } = request.body;
 
-    const logoURL = `http://${request.headers.host}/uploads/providers_logo/${request.file.filename}`;
+    let logoURL;
+
+    if (request.file) {
+      logoURL = `http://${request.headers.host}/uploads/providers_logo/${request.file.filename}`;
+    }
 
     try {
       const existingProvider = await prisma.provider.findUnique({
         where: { id: providerId },
-        select: { logoURL: true },
+        include: {
+          Contract: true,
+          Service: true,
+        },
       });
+
+      if (!existingProvider) {
+        return response.status(404).json({
+          message: "Provider not found",
+          error: true,
+        });
+      }
 
       if (existingProvider?.logoURL) {
         const oldLogoFilename = path.basename(existingProvider.logoURL);
@@ -91,7 +117,37 @@ router.put(
 
       const updatedProvider = await prisma.provider.update({
         where: { id: providerId },
-        data: { logoURL: logoURL },
+        data: {
+          name: name,
+          phone: phone || undefined,
+          email: email,
+          address: address,
+          description: description !== "null" ? description : undefined,
+          category: category !== "null" ? category : undefined,
+          price: !isNaN(parseFloat(price)) ? parseFloat(price) : undefined,
+          status: status || undefined,
+          logoURL: logoURL || undefined,
+          serviceProvided: serviceProvided || undefined,
+          monthlyValue: !isNaN(parseFloat(monthlyValue))
+            ? parseFloat(monthlyValue)
+            : undefined,
+          dueDate: new Date(dueDate),
+          operationDate: new Date(operationDate),
+          contractNumber: contractNumber || undefined,
+          adendum: adendum || undefined,
+          Contract: {
+            connectOrCreate: contracts?.map((contract: any) => ({
+              where: { id: contract.id },
+              create: contract,
+            })),
+          },
+          Service: {
+            connectOrCreate: services?.map((service: any) => ({
+              where: { id: service.id },
+              create: service,
+            })),
+          },
+        },
       });
 
       return response.status(200).json({
