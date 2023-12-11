@@ -32,11 +32,11 @@ async function main() {
 	let newCompanies = [];
 	const companyData = [
 		{
-			name: 'Empresa ABC',
+			name: 'Hospital Evandro Freire',
 			address: 'Rua dos Alfeneiros, 123',
 		},
 		{
-			name: 'Empresa XYZ',
+			name: 'Hospital Mariska Ribeiro',
 			address: 'Avenida Exemplo, 456',
 		},
 	];
@@ -177,7 +177,7 @@ async function main() {
 
 	console.log(`${equipmentTypes.length} tipos de equipamentos criados.`);
 
-	const mockTenant = 'imdesktest';
+	const mockTenant = 'imdesk.cloud';
 	let resultTenant = {} as any;
 
 	const findTenant = await prisma.tenant.findFirst({

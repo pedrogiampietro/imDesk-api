@@ -7,15 +7,15 @@ const router = express.Router();
 router.get('/get-tenant', async (request: Request, response: Response) => {
 	let subdomain = request.hostname.split('.')[0];
 
-	if (request.hostname === 'localhost') {
+	if (request.hostname === 'localhost' || request.hostname === 'imdesk.cloud') {
 		const getTenant = await prisma.tenant.findUnique({
 			where: {
-				subdomain: 'imdesktest',
+				subdomain: 'imdesk.cloud',
 			},
 		});
 
 		(request as any).tenantId = getTenant?.id;
-		subdomain = 'imdesktest';
+		subdomain = 'imdesk.cloud';
 	}
 
 	try {
