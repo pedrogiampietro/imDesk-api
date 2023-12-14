@@ -7,6 +7,7 @@ import {
   updateTicketNotificationDiscord,
 } from "../services/webhookService";
 import { createNotification } from "../services/notificationService";
+import moment from "moment-timezone";
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -648,6 +649,8 @@ router.put("/:id", async (request: Request, response: Response) => {
       where: { id: ticketId },
     });
 
+    const currentMoment = moment().tz("America/Sao_Paulo");
+
     if (Array.isArray(requestBody.assignedTo)) {
       const existingAssignedTo = currentTicket?.assignedTo || [];
       const newAssignedToIds = requestBody.assignedTo.map(
@@ -661,9 +664,16 @@ router.put("/:id", async (request: Request, response: Response) => {
       ];
 
       updateData.assignedTo = updatedAssignedTo;
+
+      // Log current time in Sao Paulo timezone
+      const currentTimeSaoPaulo = currentMoment.format();
+      console.log("Current time in Sao Paulo:", currentTimeSaoPaulo);
+
       updateData.assignedToAt = [
-        ...existingAssignedTo.map(() => new Date()),
-        ...requestBody.assignedTo.map(() => new Date()),
+        ...existingAssignedTo
+          .filter((user: any) => newAssignedToIds.includes(user.id))
+          .map(() => currentTimeSaoPaulo),
+        ...requestBody.assignedTo.map(() => currentTimeSaoPaulo),
       ];
     } else if (
       requestBody.assignedTo &&
@@ -678,9 +688,16 @@ router.put("/:id", async (request: Request, response: Response) => {
       ];
 
       updateData.assignedTo = updatedAssignedTo;
+
+      // Log current time in Sao Paulo timezone
+      const currentTimeSaoPaulo = currentMoment.format();
+      console.log("Current time in Sao Paulo:", currentTimeSaoPaulo);
+
       updateData.assignedToAt = [
-        ...existingAssignedTo.map(() => new Date()),
-        new Date(),
+        ...existingAssignedTo
+          .filter((user: any) => user.id !== requestBody.assignedTo.id)
+          .map(() => currentTimeSaoPaulo),
+        currentTimeSaoPaulo,
       ];
     } else {
       updateData.assignedTo = undefined;
@@ -702,24 +719,24 @@ router.put("/:id", async (request: Request, response: Response) => {
       },
     });
 
-    if (isClosingTicket) {
-      const notificationData = {
-        userId,
-        ticketId,
-        type: "ticket_closed",
-      };
+    // if (isClosingTicket) {
+    //   const notificationData = {
+    //     userId,
+    //     ticketId,
+    //     type: "ticket_closed",
+    //   };
 
-      await createNotification(notificationData);
-      await closeTicketNotificationDiscord(updatedTicket);
-    } else {
-      const notificationData = {
-        userId,
-        ticketId,
-        type: "ticket_updated",
-      };
-      await createNotification(notificationData);
-      await updateTicketNotificationDiscord(updatedTicket);
-    }
+    //   await createNotification(notificationData);
+    //   await closeTicketNotificationDiscord(updatedTicket);
+    // } else {
+    //   const notificationData = {
+    //     userId,
+    //     ticketId,
+    //     type: "ticket_updated",
+    //   };
+    //   await createNotification(notificationData);
+    //   await updateTicketNotificationDiscord(updatedTicket);
+    // }
 
     return response.status(200).json({
       message: "Ticket updated successfully",

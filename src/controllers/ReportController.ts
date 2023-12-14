@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { Parser } from "json2csv";
+import moment from "moment";
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -66,6 +67,21 @@ router.get("/dashboard", async (request: Request, response: Response) => {
       },
       orderBy: { createdAt: "desc" },
       take: 5,
+      select: {
+        id: true,
+        description: true,
+        ticketCategory: {
+          select: {
+            name: true,
+            childrenName: true,
+          },
+        },
+        User: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     const allTickets = await prisma.ticket.count({
@@ -207,7 +223,7 @@ router.post("/os", async (request: Request, response: Response) => {
   }
 });
 
-router.get("/os/export", async (request, response) => {
+router.get("/os/export", async (request: Request, response: Response) => {
   try {
     const { userId, format } = request.query;
 
@@ -427,6 +443,172 @@ router.get(
       });
     } catch (err: any) {
       return response.status(500).json({ error: true, message: err.message });
+    }
+  }
+);
+
+router.get(
+  "/calculate-man-hour",
+  async (request: Request, response: Response) => {
+    const { userId } = request.query;
+
+    const getUser = (await prisma.user.findUnique({
+      where: { id: String(userId) },
+    })) as any;
+
+    try {
+      const tickets = await prisma.ticket.findMany({
+        where: {
+          assignedTo: {
+            equals: `${userId}-${getUser?.name}`,
+          },
+          closedAt: { not: null },
+        },
+      });
+
+      let totalManHours = 0;
+
+      for (let i = 0; i < tickets.length; i++) {
+        const ticket = tickets[i];
+
+        const assignedAtIndex = ticket.assignedTo.findIndex((item) =>
+          item.includes(String(userId))
+        );
+
+        if (assignedAtIndex !== -1) {
+          const assignedAt = moment(ticket.assignedToAt[assignedAtIndex]);
+          const closedTime = moment(ticket.closedAt);
+
+          if (closedTime.isAfter(assignedAt)) {
+            const timeDiff = closedTime.diff(assignedAt, "hours");
+
+            if (timeDiff > 0) {
+              totalManHours += timeDiff;
+            }
+          }
+        }
+      }
+
+      if (getUser) {
+        if (getUser.hourlyRate && totalManHours) {
+          const hourlyRate = getUser.hourlyRate / 160;
+          const totalCost = totalManHours * hourlyRate;
+
+          response.json({
+            totalManHours: Number(totalManHours.toFixed(2)),
+            hourlyRate: Number((hourlyRate * 5.26).toFixed(2)),
+            totalCost: Number((totalCost * 5.26).toFixed(2)),
+          });
+        } else {
+          response.status(500).json({ message: "Dados inválidos" });
+        }
+      } else {
+        response.status(404).json({ message: "Usuário não encontrado" });
+      }
+    } catch (error) {
+      response.status(500).json({ message: "Erro interno do servidor" });
+    }
+  }
+);
+
+router.get(
+  "/calculate-salary",
+  async (request: Request, response: Response) => {
+    const { userId } = request.query;
+
+    const getUser = (await prisma.user.findUnique({
+      where: { id: String(userId) },
+    })) as any;
+
+    try {
+      if (getUser) {
+        const salary = getUser.hourlyRate;
+        const daysWorkedPerMonth = 15;
+        const hoursWorkedPerDay = 12;
+        const totalHoursWorkedPerMonth = daysWorkedPerMonth * hoursWorkedPerDay;
+
+        const hourlyRate = salary / totalHoursWorkedPerMonth;
+        const dailyEarnings = hourlyRate * hoursWorkedPerDay;
+        const monthlyEarnings = dailyEarnings * daysWorkedPerMonth;
+
+        response.json({
+          hourlyRate,
+          dailyEarnings,
+          monthlyEarnings,
+        });
+      } else {
+        response.status(404).json({ message: "Usuário não encontrado" });
+      }
+    } catch (error) {
+      console.error("Erro ao calcular o salário:", error);
+      response.status(500).json({ message: "Erro interno do servidor" });
+    }
+  }
+);
+
+router.get(
+  "/calculate-real-earnings",
+  async (request: Request, response: Response) => {
+    const { userId } = request.query;
+
+    const getUser = (await prisma.user.findUnique({
+      where: { id: String(userId) },
+    })) as any;
+
+    try {
+      if (getUser) {
+        const salary = getUser.hourlyRate;
+        const daysWorkedPerMonth = 15;
+        const hoursWorkedPerDay = 12;
+        const totalHoursWorkedPerMonth = daysWorkedPerMonth * hoursWorkedPerDay;
+
+        const hourlyRate = salary / totalHoursWorkedPerMonth;
+
+        const tickets = await prisma.ticket.findMany({
+          where: {
+            assignedTo: {
+              equals: `${userId}-${getUser?.name}`,
+            },
+            closedAt: { not: null },
+          },
+        });
+
+        let totalManHours = 0;
+
+        for (let i = 0; i < tickets.length; i++) {
+          const ticket = tickets[i];
+
+          const assignedAtIndex = ticket.assignedTo.findIndex((item) =>
+            item.includes(String(userId))
+          );
+
+          if (assignedAtIndex !== -1) {
+            const assignedAt = moment(ticket.assignedToAt[assignedAtIndex]);
+            const closedTime = moment(ticket.closedAt);
+
+            if (closedTime.isAfter(assignedAt)) {
+              const timeDiff = closedTime.diff(assignedAt, "hours");
+
+              if (timeDiff > 0) {
+                totalManHours += timeDiff;
+              }
+            }
+          }
+        }
+
+        const realEarnings = totalManHours * hourlyRate;
+
+        response.json({
+          hourlyRate,
+          totalManHours,
+          realEarnings,
+        });
+      } else {
+        response.status(404).json({ message: "Usuário não encontrado" });
+      }
+    } catch (error) {
+      console.error("Erro ao calcular os ganhos reais:", error);
+      response.status(500).json({ message: "Erro interno do servidor" });
     }
   }
 );

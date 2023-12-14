@@ -166,6 +166,7 @@ router.patch("/update-user/:id", async (request, response) => {
     sector,
     isTechnician,
     companyIds,
+    hourlyRate,
   } = request.body;
 
   if (!email || !companyIds) {
@@ -193,7 +194,7 @@ router.patch("/update-user/:id", async (request, response) => {
         ramal,
         sector,
         isTechnician,
-
+        hourlyRate,
         UserCompanies: {
           deleteMany: {},
           create: companyIds.map((companyId: any) => ({
