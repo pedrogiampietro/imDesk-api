@@ -4,8 +4,9 @@ import express, { NextFunction, Response } from "express";
 import cors from "cors";
 import path from "path";
 import cron from "node-cron";
-
+import oracledb from "oracledb";
 import http from "http";
+
 import { Server as SocketIO } from "socket.io";
 
 import authController from "./controllers/AuthController";
@@ -36,9 +37,11 @@ import tenantController from "./controllers/TenantController";
 
 import { processEmailQueue } from "./services/processQueue";
 import { tenantMiddleware } from "./middlewares/tenant";
+import { dbConfig } from "./config/oracle_config";
 
 const app = express();
 const server = http.createServer(app);
+const oracleEnabled = process.env.ORACLE_ENABLED === "true";
 
 app.use((_, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
@@ -110,11 +113,24 @@ app.get("/", (_, res) => {
   return res.json({ status: "OK", data: new Date().toLocaleString() });
 });
 
+async function initializeOracle() {
+  if (oracleEnabled) {
+    try {
+      await oracledb.createPool(dbConfig);
+      console.log("Oracle database connected");
+    } catch (error) {
+      console.error("Failed to connect to the Oracle database:", error);
+    }
+  }
+}
+
 const port = process.env.PORT || 3333;
 
 cron.schedule("*/2 * * * *", processEmailQueue);
 
 async function initialize() {
+  await initializeOracle();
+
   server.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`);
   });
