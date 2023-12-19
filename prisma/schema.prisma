@@ -463,7 +463,6 @@ model Provider {
   logoURL         String?
   description     String?
   category        String?
-  price           Float?
   serviceProvided String?
   monthlyValue    Float?
   dueDate         DateTime?
@@ -483,7 +482,6 @@ model Contract {
   provider   Provider  @relation(fields: [providerId], references: [id])
   providerId String
   file       String
-  startDate  DateTime
   endDate    DateTime
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now())

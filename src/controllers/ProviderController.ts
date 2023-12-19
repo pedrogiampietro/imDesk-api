@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { uploadStorageProviders } from "../middlewares/multer";
+import { uploadProviders, uploadContracts } from "../middlewares/multer";
 
 import fs from "fs";
 import path from "path";
@@ -54,7 +54,7 @@ router.get("/provider", async (request: Request, response: Response) => {
 // Endpoint para atualizar um provider específico
 router.put(
   "/provider/:id",
-  uploadStorageProviders.single("logo"),
+  uploadProviders.any(),
   async (request, response) => {
     const providerId = request.params.id;
 
@@ -224,28 +224,59 @@ router.get("/service", async (request: Request, response: Response) => {
   }
 });
 
-// Adicionar um novo contrato a um provedor específico
-router.post("/contract", async (request: Request, response: Response) => {
-  const { providerId, file, startDate, endDate, companyId } = request.body;
+router.put("/contract/:providerId", uploadContracts.any(), async (req, res) => {
+  const { providerId } = req.params;
+  const { dueDate, companyId } = req.body;
 
-  try {
-    const contract = await prisma.contract.create({
-      data: {
-        providerId: providerId,
-        file: file,
-        startDate: startDate,
-        endDate: endDate,
-        companyId: companyId,
-      },
-    });
+  if (req.files && Array.isArray(req.files)) {
+    const pdfFiles = req.files.filter(
+      (file) => file.mimetype === "application/pdf"
+    );
+    const logoFile = req.files.find((file) =>
+      file.mimetype.startsWith("image/")
+    );
 
-    return response.status(200).json({
-      message: "Contract added successfully",
-      body: contract,
-      error: false,
-    });
-  } catch (err) {
-    return response.status(500).json(err);
+    const pdfURLs = pdfFiles.map(
+      (file) => `http://${req.headers.host}/uploads/pdf_files/${file.filename}`
+    );
+
+    try {
+      const newContracts = await Promise.all(
+        pdfURLs.map((pdfURL: any) =>
+          prisma.contract.create({
+            data: {
+              provider: {
+                connect: { id: providerId },
+              },
+              Company: {
+                connect: { id: companyId },
+              },
+              file: pdfURL,
+              startDate: new Date(),
+              endDate: new Date(dueDate),
+            },
+          })
+        )
+      );
+
+      if (logoFile) {
+        const logoURL = `http://${req.headers.host}/uploads/logo_files/${logoFile.filename}`;
+        // Update the provider with the new logo URL
+        const updatedProvider = await prisma.provider.update({
+          where: { id: providerId },
+          data: { logoURL },
+        });
+      }
+
+      return res.status(200).json({
+        message: "PDFs uploaded and contracts created successfully",
+        contracts: newContracts,
+        error: false,
+      });
+    } catch (err: any) {
+      console.error(err);
+      return res.status(500).json({ error: true, message: err.message });
+    }
   }
 });
 

@@ -51,16 +51,28 @@ const storageProviders = multer.diskStorage({
   },
 });
 
+const storageContracts = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/contracts_provider");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
 const uploadAvatars = multer({ storage: storageAvatars });
 const uploadTickets = multer({ storage: storageTickets });
 const uploadSignatures = multer({ storage: storageSignatures });
 const uploadTicketResponse = multer({ storage: storageTicketResponse });
-const uploadStorageProviders = multer({ storage: storageProviders });
+const uploadProviders = multer({ storage: storageProviders });
+const uploadContracts = multer({ storage: storageContracts });
 
 export {
   uploadAvatars,
   uploadTickets,
   uploadSignatures,
   uploadTicketResponse,
-  uploadStorageProviders,
+  uploadProviders,
+  uploadContracts,
 };
