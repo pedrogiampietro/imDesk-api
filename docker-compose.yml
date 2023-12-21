@@ -16,6 +16,11 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 2000M
 
 networks:
   postgres:

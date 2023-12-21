@@ -54,7 +54,7 @@ router.get("/provider", async (request: Request, response: Response) => {
 // Endpoint para atualizar um provider específico
 router.put(
   "/provider/:id",
-  uploadProviders.any(),
+  uploadProviders.single("logo"),
   async (request, response) => {
     const providerId = request.params.id;
 
@@ -124,7 +124,6 @@ router.put(
           address: address,
           description: description !== "null" ? description : undefined,
           category: category !== "null" ? category : undefined,
-          price: !isNaN(parseFloat(price)) ? parseFloat(price) : undefined,
           status: status || undefined,
           logoURL: logoURL || undefined,
           serviceProvided: serviceProvided || undefined,
@@ -252,7 +251,6 @@ router.put("/contract/:providerId", uploadContracts.any(), async (req, res) => {
                 connect: { id: companyId },
               },
               file: pdfURL,
-              startDate: new Date(),
               endDate: new Date(dueDate),
             },
           })

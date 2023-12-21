@@ -125,7 +125,6 @@ async function initializeOracle() {
 }
 
 const port = process.env.PORT || 3333;
-
 cron.schedule("*/2 * * * *", processEmailQueue);
 
 async function initialize() {
