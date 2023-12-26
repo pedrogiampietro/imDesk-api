@@ -159,6 +159,7 @@ model Ticket {
   updatedAt                  DateTime   @default(now())
   slaDefinitionId            Int?
   groupId                    Int?
+  dateToStart                DateTime?
 
   ticketType       TicketType         @relation(fields: [ticketTypeId], references: [id])
   ticketCategory   TicketCategory     @relation(fields: [ticketCategoryId], references: [id])
@@ -235,10 +236,11 @@ model Image {
 }
 
 model Locations {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  name         String
+  childrenName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
 
   LocationCompanies LocationCompany[]
   Ticket            Ticket[]
